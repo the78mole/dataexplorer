@@ -367,6 +367,8 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 			catch (RuntimeException e) {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
+			//GPSHelper.calculateSpeed2D(this, recordSet, 1, 0, 5);
+			//GPSHelper.calculateSpeed3D(this, recordSet, 1, 0, 2, 5);
 		}
 		this.application.updateStatisticsData();
 	}	

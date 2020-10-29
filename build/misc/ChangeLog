@@ -11,6 +11,7 @@ Device specific changes/fixes
 	* Core-Telemetry - initial release
 	* JetiAdapter - update dialog width Windows
 	* Pulsar3 - fix energy calculation
+	* IGCAdapter - consider TDS entries if exist 
 
 Version 3.4.3 - 09 Sep 2020
 Generic changes/fixes

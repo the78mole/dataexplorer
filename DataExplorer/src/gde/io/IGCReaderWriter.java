@@ -129,11 +129,13 @@ public class IGCReaderWriter {
 		StringBuilder header = new StringBuilder();
 		String date = "000000", time; //16 02 40
 		int hour, minute, second;
-		int latitude, longitude, altitude, height;
+		int latitude, longitude, altBaro, altGPS;
+		int lastLatitude = 0, lastLongitude = 0, lastAltBaro = 0, lastAltGPS = 0;
 		int values[] = new int[device.getNumberOfMeasurements(1)-1];
 		File inputFile = new File(filePath);
 		boolean isGsentence = false;
 		String dllID = "XXX";
+		IgcExtension timeStepExtension = null;
 		Vector<IgcExtension> extensions = new Vector<IgcExtension>();
 		GDE.getUiNotification().setProgress(0);
 
@@ -185,7 +187,11 @@ public class IGCReaderWriter {
 							try {
 								final int numExtensions = Integer.parseInt(line.substring(1, 3));
 								for (int i = 0; i < numExtensions; i++) {
-									extensions.add(new IgcExtension(Integer.parseInt(line.substring(7 * i + 3, 7 * i + 5))-1, Integer.parseInt(line.substring(7 * i + 5, 7 * i + 7)), line.substring(7 * i + 7, 7 * i + 10)));
+									IgcExtension extension = new IgcExtension(Integer.parseInt(line.substring(7 * i + 3, 7 * i + 5))-1, Integer.parseInt(line.substring(7 * i + 5, 7 * i + 7)), line.substring(7 * i + 7, 7 * i + 10));
+									if (extension.getThreeLetterCode().equals("TDS"))
+										timeStepExtension = extension;
+									else
+										extensions.add(extension);
 								}
 							}
 							catch (Exception e) {
@@ -204,6 +210,10 @@ public class IGCReaderWriter {
 				minute = Integer.parseInt(time.substring(2, 4));
 				second = Integer.parseInt(time.substring(4, 6));
 				startTimeStamp = new GregorianCalendar(year, month - 1, day, hour, minute, second).getTimeInMillis();
+				if (timeStepExtension != null) {
+					startTimeStamp += Long.parseLong(line.substring(timeStepExtension.start, timeStepExtension.end));
+				}
+					
 
 				//parse B records B160240 5407121N 00249342W A 00280 00421
 				do {
@@ -216,6 +226,9 @@ public class IGCReaderWriter {
 						minute = Integer.parseInt(time.substring(2, 4));
 						second = Integer.parseInt(time.substring(4, 6));
 						actualTimeStamp = new GregorianCalendar(year, month - 1, day, hour, minute, second).getTimeInMillis();
+						if (timeStepExtension != null) {
+							actualTimeStamp += Long.parseLong(line.substring(timeStepExtension.start, timeStepExtension.end));
+						}
 
 						int progress = (int) (lineNumber * 100 / approximateLines);
 						if (progress % 5 == 0) GDE.getUiNotification().setProgress(progress);
@@ -270,36 +283,50 @@ public class IGCReaderWriter {
 							//I04 36 38 FXA 39 40 SIU 4143TDS 4446ENL
 							//1234567 89012345 678901234 5 67890 12345 678 90 123 456
 							//B114643 4752040N 01109779E A 00522 00555 035 09 227 225
+							if (timeStamp > 0 && actualTimeStamp - timeStamp > 1000)
+								log.log(Level.WARNING, String.format(Locale.getDefault(), "High time\t deviation at line %d %s %2d", lineNumber, line.substring(1, 7), actualTimeStamp - timeStamp));
 							try {
-								latitude = Integer.valueOf(line.substring(7, 14)) * 10;
+								latitude = Integer.valueOf(line.substring(7, 14));
 								latitude = line.substring(14, 15).equalsIgnoreCase("N") ? latitude : -1 * latitude; //$NON-NLS-1$
+								if (lastLatitude != 0 && Math.abs(lastLatitude - latitude) > 6)
+									log.log(Level.WARNING, String.format(Locale.getDefault(), "High latitude\t deviation at line %d %s %2d", lineNumber, line.substring(1, 7), latitude - lastLatitude));
+								lastLatitude = latitude;
 							}
 							catch (Exception e) {
 								latitude = values[0];
 							}
 							try {
-								longitude = Integer.valueOf(line.substring(15, 23)) * 10;
+								longitude = Integer.valueOf(line.substring(15, 23));
 								longitude = line.substring(23, 24).equalsIgnoreCase("E") ? longitude : -1 * longitude; //$NON-NLS-1$
+								if (lastLongitude != 0 && Math.abs(lastLongitude - longitude) > 7)
+									log.log(Level.WARNING, String.format(Locale.getDefault(), "High longitude\t deviation at line %d %s %2d", lineNumber, line.substring(1, 7), longitude - lastLongitude));
+								lastLongitude = longitude;
 							}
 							catch (Exception e) {
 								longitude = values[1];
 							}
 							try {
-								altitude = Integer.valueOf(line.substring(25, 30)) * 1000;
+								altBaro = Integer.valueOf(line.substring(25, 30));
+								if (lastAltBaro != 0 && Math.abs(lastAltBaro - altBaro) > 5)
+									log.log(Level.WARNING, String.format(Locale.getDefault(), "High altBaro\t deviation at line %d %s %2d", lineNumber, line.substring(1, 7), altBaro - lastAltBaro));
+								lastAltBaro = altBaro;
 							}
 							catch (Exception e) {
-								altitude = values[2];
+								altBaro = values[2];
 							}
 							try {
-								height = Integer.valueOf(line.substring(31, 35)) * 1000;
+								altGPS = Integer.valueOf(line.substring(31, 35));
+								if (lastAltGPS != 0 && Math.abs(lastAltGPS - altGPS) > 5)
+									log.log(Level.WARNING, String.format(Locale.getDefault(), "High altGPS\t deviation at line %d %s %2d", lineNumber, line.substring(1, 7), altGPS - lastAltGPS));
+								lastAltGPS = altGPS;
 							}
 							catch (Exception e) {
-								height = values[3];
+								altGPS = values[3];
 							}
-							values[0] = latitude; // 5 digits after the decimal point only
-							values[1] = longitude;
-							values[2] = altitude;
-							values[3] = height;
+							values[0] = latitude * 10; // 5 digits after the decimal point only
+							values[1] = longitude * 10;
+							values[2] = altBaro * 1000;
+							values[3] = altGPS * 1000;
 
 							for (int i = 0; i < extensions.size() && i+4 < values.length; i++) {
 								values[i + 4] = extensions.get(i).getValue(line);

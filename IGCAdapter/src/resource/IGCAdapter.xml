@@ -59,11 +59,8 @@
 				<symbol>V</symbol>
 				<unit>m/s</unit>
 				<statistics sigma="false" avg="false" max="true" min="true" />
-				<property
-					description="Regression interval in seconds"
-					type="Integer" value="10" name="regression_interval_sec" />
-				<property description="Regression arithmetic" type="String"
-					value="regression_type_curve" name="regression_type" />
+				<property description="Regression interval in seconds" type="Integer" value="10" name="regression_interval_sec" />
+				<property description="Regression arithmetic" type="String" value="regression_type_curve" name="regression_type" />
 			</Measurement>
 			<Measurement>
 				<name>FXA</name>
