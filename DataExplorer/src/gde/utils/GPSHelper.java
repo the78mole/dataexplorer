@@ -39,6 +39,77 @@ public class GPSHelper {
 	final static double rad = Math.PI / 180;
 	
 	/**
+	 * calculate 2D distance in meter between two points
+	 * @param fistLatitude
+	 * @param firstLongitude
+	 * @param secondLatitude
+	 * @param secondLongitude
+	 * @return distance in meter
+	 */
+	public static synchronized double getDistance2D_m(double fistLatitude, double firstLongitude, double secondLatitude, double secondLongitude) {
+		return 6378388. * Math.acos(Math.sin(fistLatitude * rad) * Math.sin(secondLatitude * rad) + Math.cos(fistLatitude * rad) * Math.cos(secondLatitude * rad) * Math.cos((firstLongitude - secondLongitude) * rad));
+		//double dx = 111134 * (secondLatitude - fistLatitude);
+    //double dy = 71500 * (secondLongitude - secondLongitude);
+    //return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+	}
+	
+	/**
+	 * calculate 3D distance in meter between two points
+	 * @param fistLatitude
+	 * @param firstLongitude
+	 * @param firstAltitude
+	 * @param secondLatitude
+	 * @param secondLongitude
+	 * @param secondAltitude
+	 * @return distance in meter
+	 */
+	public static double getDistance3D_m(double fistLatitude, double firstLongitude, double firstAltitude, double secondLatitude, double secondLongitude, double secondAltitude) {
+		double dist_m = 6378388. * Math.acos(Math.sin(fistLatitude * rad) * Math.sin(secondLatitude * rad) + Math.cos(fistLatitude * rad) * Math.cos(secondLatitude * rad) * Math.cos((firstLongitude - secondLongitude) * rad));
+    //double dx = 111134 * (secondLatitude - fistLatitude);
+    //double dy = 71500 * (secondLongitude - secondLongitude);
+	  double dz = secondAltitude - firstAltitude;
+	  return Math.sqrt(Math.pow(dist_m, 2) + Math.pow(dz, 2));
+	}
+	
+	/**
+	 * calculate 2D speed in km/h between two points
+	 * @param fistLatitude
+	 * @param firstLongitude
+	 * @param firstAltitude
+	 * @param secondLatitude
+	 * @param secondLongitude
+	 * @param secondAltitude
+	 * @return speed in km/h
+	 */
+	public static double getSpeed2D_kmh(double fistLatitude, double firstLongitude, long firstTime_ms, double secondLatitude, double secondLongitude, long secondTime_ms) {
+		double dist_m = 6378388. * Math.acos(Math.sin(fistLatitude * rad) * Math.sin(secondLatitude * rad) + Math.cos(fistLatitude * rad) * Math.cos(secondLatitude * rad) * Math.cos((firstLongitude - secondLongitude) * rad));
+    //double dx = 111134 * (secondLatitude - fistLatitude);
+    //double dy = 71500 * (secondLongitude - secondLongitude);
+	  long deltaTime_ms = secondTime_ms - firstTime_ms;
+	  return dist_m / deltaTime_ms * 36000.;
+	}
+	
+	/**
+	 * calculate 3D speed in km/h between two points
+	 * @param fistLatitude
+	 * @param firstLongitude
+	 * @param firstAltitude
+	 * @param secondLatitude
+	 * @param secondLongitude
+	 * @param secondAltitude
+	 * @return speed in km/h
+	 */
+	public static double getSpeed3D_kmh(double fistLatitude, double firstLongitude, double firstAltitude, long firstTime_ms, double secondLatitude, double secondLongitude, double secondAltitude, long secondTime_ms) {
+    //double dx = 111134 * (secondLatitude - fistLatitude);
+    //double dy = 71500 * (secondLongitude - secondLongitude);
+	  double dz = secondAltitude - firstAltitude;
+	  long deltaTime_ms = secondTime_ms - firstTime_ms;
+	  //return Math.sqrt(Math.pow(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)), 2) + Math.pow(dz, 2)) / deltaTime_ms * 36000.;
+		double dist_m = 6378388. * Math.acos(Math.sin(fistLatitude * rad) * Math.sin(secondLatitude * rad) + Math.cos(fistLatitude * rad) * Math.cos(secondLatitude * rad) * Math.cos((firstLongitude - secondLongitude) * rad));
+	  return Math.sqrt(Math.pow(dist_m, 2) + Math.pow(dz, 2)) / deltaTime_ms * 36000.;
+	}
+	
+	/**
 	 * find the start index where GPS longitude and latitude has coordinate data
 	 * @param recordSet
 	 * @param recordOrdinalLatitude
@@ -405,6 +476,90 @@ public class GPSHelper {
 		
 		if(log.isLoggable(Level.TIME)) log.log(Level.TIME, "calcualation time = " + StringHelper.getFormatedTime("ss:SSS", (new Date().getTime() - startTime)));//$NON-NLS-1$ //$NON-NLS-2$	
 		return recordAzimuth;
+	}
+	
+	/**
+	 * add calculated 2D speed values to given related record
+	 * @param device
+	 * @param recordSet
+	 * @param recordOrdinalLatitude
+	 * @param recordOrdinalLongitude
+	 * @param recordOrdinalAltitude
+	 * @param recordOrdinalSpeed
+	 */
+	public static synchronized void calculateSpeed2D(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude,	int recordOrdinalSpeed) {
+		//input records
+		Record recordLatitude = recordSet.get(recordOrdinalLatitude);
+		Record recordLongitude = recordSet.get(recordOrdinalLongitude);
+		int recordSize = recordLatitude.realSize();
+		
+		//output record
+		Record recordSpeed = recordSet.get(recordOrdinalSpeed);
+		recordSpeed.clear();
+		
+		recordSpeed.add(0);
+		recordSpeed.add(0);
+		for (int i=5; i < recordSize - 1; ++i) {
+			double speed2D = getSpeed2D_kmh(
+					device.translateValue(recordLatitude, recordLatitude.realGet(i-5)/1000.), 
+					device.translateValue(recordLongitude, recordLongitude.realGet(i-5)/1000.), 
+					recordSet.getTime(i-5), 
+					device.translateValue(recordLatitude, recordLatitude.realGet(i)/1000.), 
+					device.translateValue(recordLongitude, recordLongitude.realGet(i)/1000.), 
+					recordSet.getTime(i));
+			recordSpeed.add((int)(speed2D  * 1000.));
+		}		
+		recordSpeed.add(0);
+		recordSpeed.add(0);
+		recordSpeed.add(0);
+		
+		for (int i=3; i < recordSize - 3; ++i) {
+			recordSpeed.set(i, (recordSpeed.get(i-3) + recordSpeed.get(i-2) + recordSpeed.get(i-1) + recordSpeed.get(i) + recordSpeed.get(i+1) + recordSpeed.get(i+2))/ 6);
+		}
+	}
+	
+	/**
+	 * add calculated 3D speed values to given related record
+	 * @param device
+	 * @param recordSet
+	 * @param recordOrdinalLatitude
+	 * @param recordOrdinalLongitude
+	 * @param recordOrdinalAltitude
+	 * @param recordOrdinalSpeed
+	 */
+	public static synchronized void calculateSpeed3D(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltitude,	int recordOrdinalSpeed) {
+		//input records
+		Record recordLatitude = recordSet.get(recordOrdinalLatitude);
+		Record recordLongitude = recordSet.get(recordOrdinalLongitude);
+		Record recordAltitude = recordSet.get(recordOrdinalAltitude);
+		int recordSize = recordLatitude.realSize();
+		
+		//output record
+		Record recordSpeed = recordSet.get(recordOrdinalSpeed);
+		recordSpeed.clear();
+		
+		recordSpeed.add(0);
+		recordSpeed.add(0);
+		for (int i=5; i < recordSize - 1; ++i) {
+			double speed3D_kmh = getSpeed3D_kmh(
+					device.translateValue(recordLatitude, recordLatitude.realGet(i-5)/1000.), 
+					device.translateValue(recordLongitude, recordLongitude.realGet(i-5)/1000.), 
+					device.translateValue(recordAltitude, recordAltitude.realGet(i-5)/1000.), 
+					recordSet.getTime(i-5), 
+					device.translateValue(recordLatitude, recordLatitude.realGet(i)/1000.), 
+					device.translateValue(recordLongitude, recordLongitude.realGet(i)/1000.), 
+					device.translateValue(recordAltitude, recordAltitude.realGet(i)/1000.), 
+					recordSet.getTime(i));
+			recordSpeed.add((int)(speed3D_kmh * 1000.));
+		}	
+		recordSpeed.add(0);
+		recordSpeed.add(0);
+		recordSpeed.add(0);
+		
+		for (int i=2; i < recordSize - 2; ++i) {
+			recordSpeed.set(i, (recordSpeed.get(i-2) + recordSpeed.get(i-1) + recordSpeed.get(i) + recordSpeed.get(i+1))/ 4);
+		}
+		
 	}
 
 	/**
