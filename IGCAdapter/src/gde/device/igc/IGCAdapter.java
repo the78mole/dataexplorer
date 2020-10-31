@@ -50,6 +50,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.CalculationThread;
 import gde.utils.FileUtils;
+import gde.utils.GPSHelper;
 import gde.utils.LinearRegression;
 import gde.utils.QuasiLinearRegression;
 
@@ -368,7 +369,10 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
 			//GPSHelper.calculateSpeed2D(this, recordSet, 1, 0, 5);
-			//GPSHelper.calculateSpeed3D(this, recordSet, 1, 0, 2, 5);
+			recordSet.get(5).setName("Speed");
+			recordSet.get(5).setUnit("km/h");
+			recordSet.setNoneCalculationRecordNames(this.getNoneCalculationMeasurementNames(1, recordSet.getActiveRecordNames()));
+			GPSHelper.calculateSpeed3D(this, recordSet, 1, 0, 2, 5);
 		}
 		this.application.updateStatisticsData();
 	}	

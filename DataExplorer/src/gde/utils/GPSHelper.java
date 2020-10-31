@@ -85,13 +85,13 @@ public class GPSHelper {
 		double dist_m = 6378388. * Math.acos(Math.sin(fistLatitude * rad) * Math.sin(secondLatitude * rad) + Math.cos(fistLatitude * rad) * Math.cos(secondLatitude * rad) * Math.cos((firstLongitude - secondLongitude) * rad));
     //double dx = 111134 * (secondLatitude - fistLatitude);
     //double dy = 71500 * (secondLongitude - secondLongitude);
-	  long deltaTime_ms = secondTime_ms - firstTime_ms;
-	  return dist_m / deltaTime_ms * 36000.;
+	  long deltaTime_ms = (secondTime_ms - firstTime_ms) / 10;;
+	  return dist_m / deltaTime_ms * 3600.;
 	}
 	
 	/**
 	 * calculate 3D speed in km/h between two points
-	 * @param fistLatitude
+	 * @param firstLatitude
 	 * @param firstLongitude
 	 * @param firstAltitude
 	 * @param secondLatitude
@@ -99,14 +99,15 @@ public class GPSHelper {
 	 * @param secondAltitude
 	 * @return speed in km/h
 	 */
-	public static double getSpeed3D_kmh(double fistLatitude, double firstLongitude, double firstAltitude, long firstTime_ms, double secondLatitude, double secondLongitude, double secondAltitude, long secondTime_ms) {
-    //double dx = 111134 * (secondLatitude - fistLatitude);
+	public static double getSpeed3D_kmh(double firstLatitude, double firstLongitude, double firstAltitude, long firstTime_ms, double secondLatitude, double secondLongitude, double secondAltitude, long secondTime_ms) {
+    //double dx = 111134 * (secondLatitude - firstLatitude);
     //double dy = 71500 * (secondLongitude - secondLongitude);
 	  double dz = secondAltitude - firstAltitude;
-	  long deltaTime_ms = secondTime_ms - firstTime_ms;
-	  //return Math.sqrt(Math.pow(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)), 2) + Math.pow(dz, 2)) / deltaTime_ms * 36000.;
-		double dist_m = 6378388. * Math.acos(Math.sin(fistLatitude * rad) * Math.sin(secondLatitude * rad) + Math.cos(fistLatitude * rad) * Math.cos(secondLatitude * rad) * Math.cos((firstLongitude - secondLongitude) * rad));
-	  return Math.sqrt(Math.pow(dist_m, 2) + Math.pow(dz, 2)) / deltaTime_ms * 36000.;
+	  long deltaTime_ms = (secondTime_ms - firstTime_ms) / 10;
+	  //return Math.sqrt(Math.pow(Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)), 2) + Math.pow(dz, 2)) / deltaTime_ms * 3600.;
+		double dist_m = 6378388. * Math.acos(Math.sin(firstLatitude * rad) * Math.sin(secondLatitude * rad) + Math.cos(firstLatitude * rad) * Math.cos(secondLatitude * rad) * Math.cos((firstLongitude - secondLongitude) * rad));
+		//log.log(Level.OFF, String.format("distXYZ_m = %.7f dz = %.7f deltaTime_ms = %d", Math.sqrt(Math.pow(dist_m, 2) + Math.pow(dz, 2)) , dz, deltaTime_ms));
+	  return Math.sqrt(Math.pow(dist_m, 2) + Math.pow(dz, 2)) / deltaTime_ms * 3600.;
 	}
 	
 	/**
@@ -512,6 +513,8 @@ public class GPSHelper {
 		recordSpeed.add(0);
 		recordSpeed.add(0);
 		recordSpeed.add(0);
+		recordSpeed.resetMinMax();
+		recordSpeed.resetStatiticCalculationBase();
 		
 		for (int i=3; i < recordSize - 3; ++i) {
 			recordSpeed.set(i, (recordSpeed.get(i-3) + recordSpeed.get(i-2) + recordSpeed.get(i-1) + recordSpeed.get(i) + recordSpeed.get(i+1) + recordSpeed.get(i+2))/ 6);
@@ -540,24 +543,25 @@ public class GPSHelper {
 		
 		recordSpeed.add(0);
 		recordSpeed.add(0);
-		for (int i=5; i < recordSize - 1; ++i) {
+		for (int i=4; i < recordSize - 1; ++i) {
 			double speed3D_kmh = getSpeed3D_kmh(
-					device.translateValue(recordLatitude, recordLatitude.realGet(i-5)/1000.), 
-					device.translateValue(recordLongitude, recordLongitude.realGet(i-5)/1000.), 
-					device.translateValue(recordAltitude, recordAltitude.realGet(i-5)/1000.), 
-					recordSet.getTime(i-5), 
+					device.translateValue(recordLatitude, recordLatitude.realGet(i-4)/1000.), 
+					device.translateValue(recordLongitude, recordLongitude.realGet(i-4)/1000.), 
+					device.translateValue(recordAltitude, recordAltitude.realGet(i-4)/1000.), 
+					recordSet.getTime(i-4), 
 					device.translateValue(recordLatitude, recordLatitude.realGet(i)/1000.), 
 					device.translateValue(recordLongitude, recordLongitude.realGet(i)/1000.), 
 					device.translateValue(recordAltitude, recordAltitude.realGet(i)/1000.), 
 					recordSet.getTime(i));
-			recordSpeed.add((int)(speed3D_kmh * 1000.));
+			recordSpeed.add(Double.valueOf(speed3D_kmh * 1000.0).intValue());
 		}	
 		recordSpeed.add(0);
 		recordSpeed.add(0);
-		recordSpeed.add(0);
+		recordSpeed.resetMinMax();
+		recordSpeed.resetStatiticCalculationBase();
 		
-		for (int i=2; i < recordSize - 2; ++i) {
-			recordSpeed.set(i, (recordSpeed.get(i-2) + recordSpeed.get(i-1) + recordSpeed.get(i) + recordSpeed.get(i+1))/ 4);
+		for (int i=2; i < recordSize - 5; ++i) {
+			recordSpeed.set(i-1, (recordSpeed.get(i-3) + recordSpeed.get(i-2) + recordSpeed.get(i-1) + recordSpeed.get(i) + recordSpeed.get(i+1) + recordSpeed.get(i+2) + recordSpeed.get(i+3))/ 7);
 		}
 		
 	}

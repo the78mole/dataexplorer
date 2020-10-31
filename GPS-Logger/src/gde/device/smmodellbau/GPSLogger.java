@@ -474,6 +474,8 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			}
 			//recordAzimuth.addAll(GPSHelper.calculateAzimuth(this, recordSet, 0, 1, 2));
 		}
+		//GPSHelper.calculateSpeed2D(this, recordSet, 0, 1, 7);
+		//GPSHelper.calculateSpeed3D(this, recordSet, 0, 1, 8, 7);
 
 		this.application.updateStatisticsData();
 	}
