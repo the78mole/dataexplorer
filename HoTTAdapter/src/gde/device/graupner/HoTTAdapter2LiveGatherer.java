@@ -315,6 +315,20 @@ public class HoTTAdapter2LiveGatherer extends HoTTAdapterLiveGatherer {
 							// ignore and go ahead gathering sensor data
 							this.serialPort.addTimeoutError();
 						}
+						/*
+						try {
+							this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SERVO_POSITION_115200);
+							for (int i = 0; i < 2 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+							}
+							this.device.convertDataBytes(points, this.dataBuffer);
+							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						}
+						catch (TimeOutException e) {
+							// ignore and go ahead gathering sensor data
+							this.serialPort.addTimeoutError();
+						}
+						*/
 					}
 					if (queryRing.size() > 0 && queryRing.firstElement() == 4) {
 						try {

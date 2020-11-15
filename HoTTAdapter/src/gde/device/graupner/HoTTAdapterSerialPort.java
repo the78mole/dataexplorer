@@ -67,7 +67,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 	final static byte[]		QUERY_SENSOR_DATA_GPS						= { 0x04, 0x38 };
 	final static byte[]		QUERY_SENSOR_DATA_MOTOR_DRIVER	= { 0x04, 0x39 };
 	final static byte[]		QUERY_SERVO_POSITIONS						= { 0x04, 0x40 };
-	final static byte[]		QUERY_SWITCHES									= { 0x04, 0x41 };
+	final static byte[]		QUERY_PURPIL_POSITIONS									= { 0x04, 0x41 };
 	final static byte[]		QUERY_CONTROL_POSITIONS1				= { 0x04, 0x42 };
 	final static byte[]		QUERY_CONTROL_POSITIONS2				= { 0x04, 0x43 };
 	final static byte[]		answerRx												= new byte[21];																					//byte array to cache receiver answer data
@@ -416,11 +416,11 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				this.QUERY_SENSOR_TYPE = HoTTAdapterSerialPort.QUERY_SENSOR_DATA_MOTOR_DRIVER;
 				this.DATA_LENGTH = 35;
 				break;
-			case HoTTAdapter.SENSOR_TYPE_SWITCHES_115200:
-				HoTTAdapterSerialPort.log.log(Level.FINE, ">>>Switches<<<");
-				this.ANSWER_DATA = new byte[65];
-				this.QUERY_SENSOR_TYPE = HoTTAdapterSerialPort.QUERY_SWITCHES;
-				this.DATA_LENGTH = 66;
+			case HoTTAdapter.SENSOR_TYPE_PURPIL_POSITION_115200:
+				HoTTAdapterSerialPort.log.log(Level.FINE, ">>>PupilPositions<<<");
+				this.ANSWER_DATA = new byte[61];
+				this.QUERY_SENSOR_TYPE = HoTTAdapterSerialPort.QUERY_PURPIL_POSITIONS;
+				this.DATA_LENGTH = 62;
 				break;
 			case HoTTAdapter.SENSOR_TYPE_SERVO_POSITION_115200:
 				HoTTAdapterSerialPort.log.log(Level.FINE, ">>>ServoPositions<<<");

@@ -425,30 +425,23 @@ public class HoTTAdapterLiveGatherer extends Thread {
 							this.serialPort.getDataDBM(true, this.dataBuffer);
 							recordSetReceiver.addPoints(this.device.convertDataBytes(pointsReceiver, this.dataBuffer), System.nanoTime() / 1000000 - startTime);
 							Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
+						}
+						catch (TimeOutException e) {
+							// ignore and go ahead gathering sensor data
+							this.serialPort.addTimeoutError();
+						}
 							/*
 							try {
-								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SWITCHES_115200);
-								for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
-									Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
-								}
-							}
-							catch (Exception e) {
-								e.printStackTrace();
-							}
-							System.out.print("Smart phone ctrlpos : ");
-							for (int i = 54; i < this.dataBuffer.length - 2; i++) {
-								System.out.print(StringHelper.printBinary(this.dataBuffer[i], false));
-							}
-							System.out.println();
-
-							try {
 								this.serialPort.setSensorType(HoTTAdapter.SENSOR_TYPE_SERVO_POSITION_115200);
-								for (int i = 0; i < 5 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
+								for (int i = 0; i < 2 && !this.serialPort.isCheckSumOK(4, (this.dataBuffer = this.serialPort.getData())); ++i) {
 									Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 								}
+								this.device.convertDataBytes(pointsReceiver, this.dataBuffer);
+								Thread.sleep(HoTTAdapter.QUERY_GAP_MS);
 							}
-							catch (Exception e) {
-								e.printStackTrace();
+							catch (TimeOutException e) {
+								// ignore and go ahead gathering sensor data
+								this.serialPort.addTimeoutError();
 							}
 							*/
 							/* switch change detection
@@ -510,11 +503,6 @@ public class HoTTAdapterLiveGatherer extends Thread {
 								System.out.println(StringHelper.printBinary(this.dataBuffer[26], false));
 							}
 							*/
-						}
-						catch (TimeOutException e) {
-							// ignore and go ahead gathering sensor data
-							this.serialPort.addTimeoutError();
-						}
 					}
 					if (queryRing.size() > 0 && queryRing.firstElement() == 4) {
 						try {

@@ -629,6 +629,16 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					}
 				}
 				break;
+			case HoTTAdapter.SENSOR_TYPE_SERVO_POSITION_115200:
+				if (dataBuffer.length >= 74) {
+					//log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
+					StringBuffer sb = new StringBuffer();
+					for (int i = 0, j = 0; i < 16; i++, j+=2) {
+						sb.append(String.format("%2d = %4d; ", i+1, DataParser.parse2Short(dataBuffer, 8 + j) / 16 + 50));					
+					}
+					log.log(Level.OFF, sb.toString());
+				}
+				break;
 			}
 			break;
 		}

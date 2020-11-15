@@ -125,7 +125,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	final static byte			SENSOR_TYPE_ELECTRIC_115200				= 0x36;
 	final static byte			SENSOR_TYPE_SPEED_CONTROL_115200	= 0x39;
 	final static byte			SENSOR_TYPE_SERVO_POSITION_115200	= 0x40;
-	final static byte			SENSOR_TYPE_SWITCHES_115200				= 0x41;
+	final static byte			SENSOR_TYPE_PURPIL_POSITION_115200= 0x41;
 	final static byte			SENSOR_TYPE_CONTROL_1_115200			= 0x42;
 	final static byte			SENSOR_TYPE_CONTROL_2_115200			= 0x43;
 
@@ -1138,6 +1138,16 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						points[6] = DataParser.parse2Short(dataBuffer, 24) * 1000;
 						// points[7] = dataBuffer[19] * 1000;
 					}
+				}
+				break;
+			case HoTTAdapter.SENSOR_TYPE_SERVO_POSITION_115200:
+				if (dataBuffer.length >= 74) {
+					//log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
+					StringBuffer sb = new StringBuffer();
+					for (int i = 0, j = 0; i < 16; i++, j+=2) {
+						sb.append(String.format("%2d = %4d; ", i+1, DataParser.parse2Short(dataBuffer, 8 + j) / 16 + 50));					
+					}
+					log.log(Level.OFF, sb.toString());
 				}
 				break;
 			}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"	xsi:noNamespaceSchemaLocation="DeviceProperties_V39.xsd">
+<DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"	xsi:noNamespaceSchemaLocation="DeviceProperties_V41.xsd">
 	<Device>
 		<name implementation="gde.device.igc.IGCAdapter">IGCAdapter</name>
 		<manufacturer>-</manufacturer>
@@ -61,6 +61,12 @@
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property description="Regression interval in seconds" type="Integer" value="10" name="regression_interval_sec" />
 				<property description="Regression arithmetic" type="String" value="regression_type_curve" name="regression_type" />
+			</Measurement>
+			<Measurement>
+				<name>speed</name>
+				<symbol>v</symbol>
+				<unit>km/h</unit>
+				<statistics sigma="false" avg="true" max="true" min="true" />
 			</Measurement>
 			<Measurement>
 				<name>FXA</name>
