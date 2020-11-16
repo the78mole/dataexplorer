@@ -325,15 +325,15 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 		for (int i = 0; i < recordSet.size(); ++i) {
 			// since actual record names can differ from device configuration measurement names, match by ordinal
 			record = recordSet.get(i);
-			log.log(java.util.logging.Level.FINE, record.getName() + " = " + this.getMeasurementNameReplacement(recordSet.getChannelConfigNumber(), i)); //$NON-NLS-1$
+			log.log(java.util.logging.Level.FINER, record.getName() + " = " + this.getMeasurementNameReplacement(recordSet.getChannelConfigNumber(), i)); //$NON-NLS-1$
 
 			if (includeReasonableDataCheck) {
 				record.setDisplayable(record.hasReasonableData());
-				log.log(java.util.logging.Level.FINE, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
+				log.log(java.util.logging.Level.FINER, record.getName() + " hasReasonableData = " + record.hasReasonableData()); //$NON-NLS-1$ 
 			}
 
 			if (record.isActive() && record.isDisplayable()) {
-				log.log(java.util.logging.Level.FINE, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
+				log.log(java.util.logging.Level.FINER, "add to displayable counter: " + record.getName()); //$NON-NLS-1$
 				++displayableCounter;
 			}
 		}
@@ -350,7 +350,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	public void makeInActiveDisplayable(RecordSet recordSet) {
 		// since there are measurement point every 10 seconds during capturing only and the calculation will take place directly switch all to displayable
 		if (recordSet.isRaw() && recordSet.isRecalculation()) {
-			// 0=Longitude, 1=Latitude, 2=Altitude(baro), 3=Altitude(GPS), 4=Climb
+			// 0=Longitude, 1=Latitude, 2=Altitude(baro), 3=Altitude(GPS), 4=Climb, 5=Speed
 			// calculate the values required		
 			Record slopeRecord = recordSet.get(4);//2=Steigrate
 			slopeRecord.setDisplayable(false);
@@ -369,11 +369,12 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
 			//GPSHelper.calculateSpeed2D(this, recordSet, 1, 0, 5);
-			recordSet.get(5).setName("Speed");
-			recordSet.get(5).setUnit("km/h");
-			recordSet.setNoneCalculationRecordNames(this.getNoneCalculationMeasurementNames(1, recordSet.getActiveRecordNames()));
+			//recordSet.get(5).setName("Speed");
+			//recordSet.get(5).setUnit("km/h");
+			//recordSet.setNoneCalculationRecordNames(this.getNoneCalculationMeasurementNames(1, recordSet.getActiveRecordNames()));
 			GPSHelper.calculateSpeed3D(this, recordSet, 1, 0, 2, 5);
 		}
+		this.updateVisibilityStatus(recordSet, true);
 		this.application.updateStatisticsData();
 	}	
 

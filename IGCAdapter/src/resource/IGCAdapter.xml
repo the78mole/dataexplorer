@@ -69,28 +69,28 @@
 				<statistics sigma="false" avg="true" max="true" min="true" />
 			</Measurement>
 			<Measurement>
-				<name>FXA</name>
+				<name>_FXA_</name>
 				<symbol></symbol>
 				<unit></unit>
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 			</Measurement>
 			<Measurement>
-				<name>SIU</name>
+				<name>_SIU_</name>
 				<symbol></symbol>
 				<unit></unit>
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 			</Measurement>
 			<Measurement>
-				<name>ENL</name>
+				<name>_ENL_</name>
 				<symbol></symbol>
 				<unit></unit>
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 			</Measurement>
 			<Measurement>
-				<name>RPM</name>
+				<name>_RPM_</name>
 				<symbol></symbol>
 				<unit></unit>
 				<active>true</active>

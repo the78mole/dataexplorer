@@ -131,7 +131,7 @@ public class IGCReaderWriter {
 		int hour, minute, second;
 		int latitude, longitude, altBaro, altGPS;
 		int lastLatitude = 0, lastLongitude = 0, lastAltBaro = 0, lastAltGPS = 0;
-		int values[] = new int[device.getNumberOfMeasurements(1)-1];
+		int values[] = new int[device.getNumberOfMeasurements(1)-2]; //climb and speed will be calculated
 		File inputFile = new File(filePath);
 		boolean isGsentence = false;
 		String dllID = "XXX";
@@ -269,11 +269,19 @@ public class IGCReaderWriter {
 							activeChannel.setActiveRecordSet(recordSetName);
 							activeChannel.applyTemplate(recordSetName, true);
 
+							//values[0] = latitude * 10; // 5 digits after the decimal point only
+							//values[1] = longitude * 10;
+							//values[2] = altBaro * 1000;
+							//values[3] = altGPS * 1000;
+							//values[4] = climb calculated;
+							//values[5] = speed calculated;
 							int i=0;
 							for (IgcExtension extension : extensions) {
-							if (recordSet.realSize() > 5+i && !recordSet.get(5+i).getName().equals(extension.getThreeLetterCode()))
-								recordSet.get(5+i).setName(extension.getThreeLetterCode());
-							++i;
+								if (recordSet.realSize() > 6+i && !recordSet.get(6+i).getName().equals(extension.getThreeLetterCode())) {
+									log.log(Level.OFF, String.format("set record with name %s # %d to name %s", recordSet.get(6+i).getName(), 6+i, extension.getThreeLetterCode()));
+									recordSet.get(6+i).setName(extension.getThreeLetterCode());
+								}
+								++i;
 							}
 
 						}

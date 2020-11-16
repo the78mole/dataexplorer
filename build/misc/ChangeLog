@@ -13,7 +13,7 @@ Device specific changes/fixes
 	* JetiAdapter - update dialog width Windows
 	* Pulsar3 - fix energy calculation
 	* IGCAdapter - consider TDS entries if exist 
-	* IGCAdapter - add 3D speed calculation (replacing FXA) 
+	* IGCAdapter - add 3D speed calculation
 
 Version 3.4.3 - 09 Sep 2020
 Generic changes/fixes
