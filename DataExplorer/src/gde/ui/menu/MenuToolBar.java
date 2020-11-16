@@ -1118,7 +1118,7 @@ public class MenuToolBar {
 		// set the focus controlled to an item which has no slection capability
 		this.deviceObjectToolBar.setFocus();
 		
-		if (GDE.IS_MAC && GDE.IS_ARCH_DATA_MODEL_64) {
+		if (GDE.IS_MAC && GDE.IS_ARCH_DATA_MODEL_64 && settings.isMacTouchbarEnabled()) {
 			try {
 				createTouchBar();
 			}

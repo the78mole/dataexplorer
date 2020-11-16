@@ -223,6 +223,7 @@ public final class Settings extends Properties {
 	public final static String			IS_PARTIAL_DATA_TABLE						= "is_partial_data_table";																																				//$NON-NLS-1$
 	public final static String			IS_DATA_TABLE_EDITABLE					= "is_data_table_editable";																																				//$NON-NLS-1$
 	public final static String			IS_RXTX_COMM_TO_BE_USED					= "is_rxtx_comm_to_be_used";																																				//$NON-NLS-1$
+	public final static String			IS_MAC_TOUCHBAR									= "is_mac_touchbar";																																				//$NON-NLS-1$
 	public final static String			GLOBAL_LOG_LEVEL								= "global_log_level";																																							//$NON-NLS-1$
 	public final static String			UI_LOG_LEVEL										= "ui_log_level";																																									//$NON-NLS-1$
 	public final static String			DEVICE_LOG_LEVEL								= "device_log_level";																																							//$NON-NLS-1$
@@ -776,6 +777,7 @@ public final class Settings extends Properties {
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_LOCK_UUCP_HINTED, this.isLockUucpHinted())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.LAST_UPDATE_CHECK, StringHelper.getDate())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_OBJECT_TEMPLATES_ACTIVE, isObjectTemplatesActive())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_MAC_TOUCHBAR, isMacTouchbarEnabled())); //$NON-NLS-1$
 			// charger specials
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_REDUCE_CHARGE_DISCHARGE, this.isReduceChargeDischarge())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_ALL_IN_ONE_RECORDSET, this.isContinuousRecordSet())); //$NON-NLS-1$
@@ -3036,6 +3038,20 @@ public final class Settings extends Properties {
 	 */
 	public boolean isObjectTemplatesActive() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_OBJECT_TEMPLATES_ACTIVE, "true")); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param enabled true if MAC system support touchbar
+	 */
+	public void setMacTouchbarEnabled(boolean enabled) {
+		this.setProperty(Settings.IS_MAC_TOUCHBAR, String.valueOf(enabled));
+	}
+
+	/**
+	 * @return true if specific templates are available for objects
+	 */
+	public boolean isMacTouchbarEnabled() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_MAC_TOUCHBAR, "false")); //$NON-NLS-1$
 	}
 
 	/**

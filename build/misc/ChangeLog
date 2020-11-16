@@ -1,9 +1,10 @@
 Development history / change log, please read from bottom up
 
-Version 3.4.4 - xx yy 2020
+Version 3.4.4 - 16 Nov 2020
 Generic changes/fixes
 	* fix statistics text position in description group to enable scroll
 	* update DeviceProperties XSD V41
+	* add manual setting to enable MAC OS touch bar support
 
 Device specific changes/fixes
 	* OnLineCommander - fix loading resource bundle
