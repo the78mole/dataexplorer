@@ -1,26 +1,33 @@
-GNU DataExplorer - News - comes with Version 3.4.3 - 09 Sep 2020
+GNU DataExplorer - News - comes with Version 3.4.4 - 16 Nov 2020
 
 Generic changes/fixes
-	* fix display problem of geo-coordinates in degree curve compare
-	* update several naming p.e. "TrackAngle"
-	* KMZ export, remove definition of relative altitude start point out of definition of LookAt
-	
+	* fix statistics text position in description group to enable scroll
+	* update DeviceProperties XSD V41 -> replace existing device XML with new version
+	* add manual setting to enable MAC OS touch bar support (DataExplorer.properties is_mac_touchbar)
 
 Device specific changes/fixes
-	* OnLineCommander - add initial support
-	* iChargerUSB - fix some possible exception in charger dialog reading data from connected device
-	* HoTTAdpter2* - add missing property reduction/offset to Temperature Rx
-	* IGCAdapter - fix flight number parsing, parsing F record, record naming
+	* OnLineCommander - fix loading resource bundle
+	* PolaronEx - fix exception while processing channel 2
+	* Polaron* - fix processing detection channel 2
+	* Core-Telemetry - initial release
+	* JetiAdapter - update dialog width Windows
+	* Pulsar3 - fix energy calculation
+	* IGCAdapter - consider TDS entries if exist 
+	* IGCAdapter - add 3D speed calculation
 
 	
 Generelle Änderungen/Verbesserungen
-    * Anzeigefehler in Geo-Koordinaten in Kurvenvergleich gelöst
-    * einige Namen angepasst, Beispiel "TrackAngle"
-    * KMZ Export, Höhenstartpunkt für die Bestimmung der relativen Starthöhe aus dem Kontext der LookAt Berechnung genommen
-    
+    * Position und Größe des Statistik Beschreibungstextes angepasst
+    * Geräte-XML-Schema auf V41 angehoben -> ersetzt vorhandene Gerätebeschreibungen mit neuer Version
+    * manuelle Einstellung zur Aktivierung der MAC Touchbar hinzugefügt (DataExplorer.properties is_mac_touchbar)
+   
 
 Geräte spezifische Änderungen/Verbesserungen
-    * OnLineCommander - Unterstützung hinzugefügt
- 	* iChargerUSB - eine potentielle Fehlerquellen im iCharger Dialog, die beim Lesen von Daten auftreten können verhindert
-    * HoTTAdpter2* - fehlende Reduktion Temperatur Rx hinzugefügt
-    * IGCAdapter - Korrektur Flugnummer-Parsing, Fehler beim Parsen des F-Record, fehlende Namensanpassung korrigiert
+    * OnLineCommander - Laden der Geräte abhängigen Texte korrigiert
+    * PolaronEx - Fehler bei Datenaufnahme Kanal 2 korrigiert
+    * Polaron* - Fehler Erkennung Kanal 2 korrigiert
+    * Core-Telemetry - initialer Verfügbarkeit
+    * JetiAdapter - Gerätedialog in Größe angepasst
+    * Pulsar3 - Energieberechnung korrigiert
+    * IGCAdapter - berücksichtigt TDS Einträge, wenn vorhanden
+    * IGCAdapter - 3D Geschwindigkeitsberechnung hinzugefügt
