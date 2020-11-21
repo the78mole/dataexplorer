@@ -283,6 +283,40 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 						points[15] = DataParser.parse2Short(dataBuffer, 29) * 1000;
 						points[16] = (dataBuffer[38] & 0xFF) * 1000;
 						points[17] = 0;
+						//18=Satellites 19=Fix 20=HomeDirection 21=Roll 22=Pitch 23=GyroX 24=GyroY 25=GyroZ 26=GPSAltitude 27=Vibration 28=Version
+						points[18] = (dataBuffer[36] & 0xFF) * 1000;
+						switch (dataBuffer[37]) { //sat-fix
+						case '-':
+							points[19] = 0;
+							break;
+						case '2':
+							points[19] = 2000;
+							break;
+						case '3':
+							points[19] = 3000;
+							break;
+						case 'D':
+							points[19] = 4000;
+							break;
+						default:
+							try {
+								points[19] = Integer.valueOf(String.format("%c",dataBuffer[37])) * 1000;
+							}
+							catch (NumberFormatException e1) {
+								points[19] = 1000;
+							}
+							break;
+						}
+						//18=Satellites 19=Fix 20=HomeDirection 21=Roll 22=Pitch 23=Yaw 24=GyroX 25=GyroY 26=GyroZ 27=Vibration 28=Version
+						points[20] = (dataBuffer[38] & 0xFF) * 1000; //Home direction
+						points[21] = dataBuffer[39] * 1000; //Roll
+						points[22] = dataBuffer[40] * 1000; //Pitch
+						points[23] = dataBuffer[41] * 1000; //Yaw
+						points[24] = DataParser.parse2Short(dataBuffer, 42) * 1000;; //Gyro x or GPS time hours
+						points[25] = DataParser.parse2Short(dataBuffer, 44) * 1000;; //Gyro y or GPS time minutes
+						points[26] = DataParser.parse2Short(dataBuffer, 46) * 1000;; //Gyro z or GPS time seconds
+						points[27] = (dataBuffer[48] & 0xFF) * 1000; //ENL
+						points[28] = (dataBuffer[52] & 0xFF) * 1000; //Version
 					}
 				}
 				break;
@@ -455,6 +489,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 					//8=Altitude, 9=Climb 1, 10=Climb 3
 					//12=Latitude, 13=Longitude, 14=Velocity, 15=Distance, 16=Direction, 17=TripDistance
+					//18=Satellites 19=Fix 20=HomeDirection 21=Roll 22=Pitch 23=GyroX 24=GyroY 25=GyroZ 26=GPSAltitude 27=Vibration 28=Version
 					tmpLatitudeGrad = DataParser.parse2Short(dataBuffer, 16);
 					tmpLongitudeGrad = DataParser.parse2Short(dataBuffer, 20);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 14);
@@ -472,6 +507,40 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 						points[16] = DataParser.parse2Short(dataBuffer, 24) * 500;
 						points[17] = 0;
 					}
+					//18=Satellites 19=Fix
+					points[18] = (dataBuffer[33] & 0xFF) * 1000;
+					switch (dataBuffer[34]) { //sat-fix
+					case '-':
+						points[19] = 0;
+						break;
+					case '2':
+						points[19] = 2000;
+						break;
+					case '3':
+						points[19] = 3000;
+						break;
+					case 'D':
+						points[19] = 4000;
+						break;
+					default:
+						try {
+							points[19] = Integer.valueOf(String.format("%c",dataBuffer[34])) * 1000;
+						}
+						catch (NumberFormatException e1) {
+							points[19] = 1000;
+						}
+						break;
+					}
+					points[20] = (dataBuffer[35] & 0xFF) * 1000; //Home direction
+					//18=Satellites 19=Fix 20=HomeDirection 21=Roll 22=Pitch 23=Yaw 24=GyroX 25=GyroY 26=GyroZ 27=Vibration 28=Version
+					points[21] = dataBuffer[36] * 1000; //Roll
+					points[22] = dataBuffer[37] * 1000; //Pitch
+					points[23] = dataBuffer[38] * 1000; //Yaw
+					points[24] = DataParser.parse2Short(dataBuffer, 39) * 1000;; //Gyro x or GPS time hours
+					points[25] = DataParser.parse2Short(dataBuffer, 41) * 1000;; //Gyro y or GPS time minutes
+					points[26] = DataParser.parse2Short(dataBuffer, 43) * 1000;; //Gyro z or GPS time seconds
+					points[27] = (dataBuffer[46] & 0xFF) * 1000; //ENL
+					points[28] = 0; //Version
 				}
 				break;
 
@@ -1105,4 +1174,14 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 		recordSet.setConfiguredDisplayable(displayableCounter);
 		this.setChangePropery(configChanged); //reset configuration change indicator to previous value, do not vote automatic configuration change at all
 	}
+	
+	public static int getStartTime(int HH, int mm, int ss, int SSS) {
+		try {
+			return Integer.valueOf(String.format("%02d%02.0f%02.0f%03d", HH, 100.0 / 60 * mm, 100.0 / 60 * ss, SSS));
+		}
+		catch (NumberFormatException e) {
+			return HoTTbinReaderD.gpsStartTime; //keep time unchanged
+		}
+	}
+
 }

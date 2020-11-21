@@ -107,6 +107,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		//8=Altitude, 9=Climb 1, 10=Climb 3, 11=Climb 10
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=Distance, 16=Direction, 17=TripDistance
 		//18=GPS.Satelites, 19=GPS.Fix, 20=HomeDirection, 21=NorthVelocity, 22=SpeedAccuracy, 23=GPS.Time, 24=EastVelocity, 25=HorizontalAccuracy, 26=Altitude, 27=GPS.Fix2, 28=Version
+		//18=Satellites 19=Fix 20=HomeDirection 21=Roll 22=Pitch 23=Yaw 24=GyroX 25=GyroY 26=GyroZ 27=GPSAltitude 28=Vibration 29=Version
 		//29=VoltageG, 30=CurrentG, 31=CapacityG, 32=PowerG, 33=BalanceG, 34=CellVoltageG 1, 35=CellVoltageG 2 .... 39=CellVoltageG 6, 40=Revolution, 41=FuelLevel, 42=VoltageG 1, 43=VoltageG 2, 44=TemperatureG 1, 45=TemperatureG 2
 		//46=VoltageE, 47=CurrentE, 48=CapacityE, 49=PowerE, 50=BalanceE, 51=CellVoltageE 1, 52=CellVoltageE 2 .... 64=CellVoltageE 14, 65=Revolution, 66=VoltageE 1, 67=VoltageE 2, 68=TemperatureE 1, 69=TemperatureE 2
 		//70=VoltageM, 71=CurrentM, 72=CapacityM, 73=PowerM, 74=RevolutionM, 75=TemperatureM
@@ -722,7 +723,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		}
 		//8=Altitude, 9=Climb 1, 10=Climb 3
 		//12=Latitude, 13=Longitude, 14=Velocity, 15=Distance, 16=Direction, 17=TripDistance
-		//18=GPS.Satelites, 19=GPS.Fix, 20=HomeDirection, 21=NorthVelocity, 22=SpeedAccuracy, 23=GPS.Time, 24=EastVelocity, 25=HorizontalAccuracy, 26=Altitude, 27=GPS.Fix2, 28=Version
+		//18=Satellites 19=Fix 20=HomeDirection 21=Roll 22=Pitch 23=Yaw 24=GyroX 25=GyroY 26=GyroZ 27=Vibration 28=Version
 		if (isGPSData) {
 			for (int j = 8; j < 11; j++) {
 				HoTTbinReaderD.points[j] = HoTTbinReader.pointsGPS[j];
@@ -928,7 +929,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsGPS[15] = DataParser.parse2Short(_buf2, 6) * 1000;
 			HoTTbinReader.pointsGPS[16] = (_buf1[3] & 0xFF) * 1000;
 			HoTTbinReader.pointsGPS[17] = 0;
-			//18=Satellites 19=Fix 20=HomeDirection 21=NorthVelocity 22=SpeedAccuracy 23=Time 24=EastVelocity 25=HorizontalAccuracy 26=AltitudeGPS 27=Fix2 28=Version
+			//18=Satellites 19=Fix 
 			HoTTbinReader.pointsGPS[18] = (_buf3[3] & 0xFF) * 1000;
 			switch (_buf3[4]) { //sat-fix
 			case '-':
@@ -952,31 +953,20 @@ public class HoTTbinReaderD extends HoTTbinReader {
 				}
 				break;
 			}
-			HoTTbinReader.pointsGPS[20] = (_buf3[5] & 0xFF) * 1000;
-			HoTTbinReader.pointsGPS[21] = DataParser.parse2Short(_buf3, 6) * 1000;
-			HoTTbinReader.pointsGPS[22] = (_buf3[8] & 0xFF) * 1000;
-			if (!HoTTbinReaderD.isGpsStartTimeSet) {
-				HoTTbinReaderD.gpsStartTime = getStartTime(_buf3[9]&0xFF, _buf4[0]&0xFF, _buf4[1]&0xFF, _buf4[2]&0xFF);
-				HoTTbinReader.log.log(Level.FINE, String.format("%02d:%02d:%02d.%03d", (_buf3[9] & 0xFF), (_buf4[0] & 0xFF), (_buf4[1] & 0xFF), (_buf4[2] & 0xFF)));
-				HoTTbinReaderD.isGpsStartTimeSet = true;
-				final RecordSet activeRecordSet = HoTTbinReader.application.getActiveRecordSet();
-				if (activeRecordSet != null) {
-					activeRecordSet.setRecordSetDescription(activeRecordSet.getRecordSetDescription() + GDE.STRING_MESSAGE_CONCAT + "GPS start time = "
-							+ String.format("%02d:%02d:%02d.%03d ", (_buf3[9] & 0xFF), (_buf4[0] & 0xFF), (_buf4[1] & 0xFF), (_buf4[2] & 0xFF)));
-				}
-			}
-			//System.out.println(String.format("%02d:%02d:%02d.%03d - %d",(_buf3[9] & 0xFF),(_buf4[0] & 0xFF),(_buf4[1] & 0xFF),(_buf4[2] & 0xFF), (getStartTime(_buf3[9],_buf4[0],_buf4[1],_buf4[2]) - gpsStartTime)));
-			HoTTbinReader.pointsGPS[23] = getStartTime(_buf3[9]&0xFF, _buf4[0]&0xFF, _buf4[1]&0xFF, _buf4[2]&0xFF) - HoTTbinReaderD.gpsStartTime;
-			HoTTbinReader.pointsGPS[24] = DataParser.parse2Short(_buf4, 3) * 1000;
-			HoTTbinReader.pointsGPS[25] = (_buf4[5] & 0xFF) * 1000;
-			HoTTbinReader.pointsGPS[26] = DataParser.parse2Short(_buf4, 6) * 1000;
-			try {
-				HoTTbinReader.pointsGPS[27] = Integer.valueOf(String.format("%c", _buf4[8])) * 1000;
-			}
-			catch (NumberFormatException e) {
-				// ignore
-			}
-			HoTTbinReader.pointsGPS[28] = (_buf4[9] & 0xFF) * 1000;
+			//log.log(Level.OFF, StringHelper.byte2Hex2CharString(_buf3, _buf3.length));
+			HoTTbinReader.pointsGPS[20] = (_buf3[5] & 0xFF) * 1000; //20=HomeDirection
+			//21=Roll 22=Pitch 23=Yaw
+			HoTTbinReader.pointsGPS[21] = _buf3[6] * 1000;
+			HoTTbinReader.pointsGPS[22] = _buf3[7] * 1000;
+			HoTTbinReader.pointsGPS[23] = _buf3[8] * 1000; 
+			//24=GyroX 25=GyroY 26=GyroZ 			
+			HoTTbinReader.pointsGPS[24] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
+			HoTTbinReader.pointsGPS[25] = DataParser.parse2Short(_buf4, 1) * 1000;
+			HoTTbinReader.pointsGPS[26] = DataParser.parse2Short(_buf4, 3) * 1000;
+			//27=Vibration 28=Version			
+			HoTTbinReader.pointsGPS[27] = (_buf4[5] & 0xFF) * 1000;
+			//6,7,8 ASCII
+			HoTTbinReader.pointsGPS[28] = _buf4[9] * 1000;
 		}
 		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E
 		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max
@@ -984,7 +974,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.pointsGPS[129] = (_buf1[1] & 0x0F) * 1000; //inverse event
 	}
 
-	private static int getStartTime(int HH, int mm, int ss, int SSS) {
+	public static int getStartTime(int HH, int mm, int ss, int SSS) {
 		try {
 			return Integer.valueOf(String.format("%02d%02.0f%02.0f%03d", HH, 100.0 / 60 * mm, 100.0 / 60 * ss, SSS));
 		}

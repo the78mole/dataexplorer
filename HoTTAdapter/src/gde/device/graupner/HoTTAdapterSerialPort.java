@@ -264,7 +264,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			data[0] = this.QUERY_SENSOR_TYPE[1];
 			System.arraycopy(answer, 0, data, 1, answer.length);
 
-			if (data[0] == 55) {
+			if (answer.length == 51) {
 				//HoTTAdapterSerialPort.log.logp(Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data));
 				HoTTAdapterSerialPort.log.logp(Level.OFF, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answer, answer.length));
 			}

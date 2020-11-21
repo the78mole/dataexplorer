@@ -1039,6 +1039,21 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						} catch (NumberFormatException e1) {
 							// ignore;
 						}
+						/*
+						 * dataBuffer[34] * 2 = HomeDirection
+						 * dataBuffer[35] = acceleration x-direction
+						 * dataBuffer[36] = acceleration y-direction
+						 * dataBuffer[37] = acceleration z-direction
+						 * dataBuffer[38,39] = gyro x //39 SM GPS-Logger ENL
+						 * dataBuffer[40,41] = gyro y
+						 * dataBuffer[42,43] = gyro z
+						 * dataBuffer[44] = vibration
+						 * dataBuffer[45] = free
+						 * dataBuffer[46] = free
+						 * dataBuffer[47] = free
+						 * dataBuffer[48] = version
+						 * dataBuffer[49,50] = CRC
+						 */
 						points[14] = (dataBuffer[1] & 0x0F) * 1000; // inverse event
 					}
 				}
