@@ -69,7 +69,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 					c.cleanMeasuring();
 					if (c instanceof SummaryComposite) { // cleaning the summary composite is not implemented
 						log.log(Level.FINE, "started");
-						c.drawAreaPaintControl(); // todo check if erasing lines like in CurveSurvey is appropriate
+						c.doRedrawGraphics(); // todo check if erasing lines like in CurveSurvey is appropriate
 					}
 				}
 				setStatusMessage(GDE.STRING_EMPTY);
@@ -119,7 +119,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 		void processMouseUpAction(Point point) {
 			measure.ifPresent(mm -> {
 				getGraphicsComposite().getMeasuring().ifPresent(m -> m.processMouseUpAction(point));
-				getSummaryComposite().ifPresent(AbstractChartComposite::drawAreaPaintControl);
+				getSummaryComposite().ifPresent(AbstractChartComposite::doRedrawGraphics);
 			});
 		}
 

@@ -144,7 +144,6 @@ public abstract class AbstractChartComposite extends Composite {
 	protected Rectangle										canvasBounds;
 	protected Image												canvasImage;
 	protected GC													canvasImageGC;
-	protected GC													canvasGC;
 	protected Rectangle										curveAreaBounds		= new Rectangle(0, 0, 1, 1);
 	protected int													fixedCanvasY			= -1;
 	protected int													fixedCanvasHeight	= -1;
@@ -201,17 +200,7 @@ public abstract class AbstractChartComposite extends Composite {
 	 * Update the graphics canvas, while repeatable redraw calls it optimized to the required area.
 	 */
 	protected synchronized void doRedrawGraphics() {
-		if (!GDE.IS_LINUX) { // old code changed due to Mountain Lion refresh problems
-			log.finer(() -> "this.graphicCanvas.redraw(5,5,5,5,true); // image based - let OS handle the update"); //$NON-NLS-1$
-			Point size = this.graphicCanvas.getSize();
-			this.graphicCanvas.redraw(5, 5, 5, 5, true); // image based - let OS handle the update
-			this.graphicCanvas.redraw(size.x - 5, 5, 5, 5, true);
-			this.graphicCanvas.redraw(5, size.y - 5, 5, 5, true);
-			this.graphicCanvas.redraw(size.x - 5, size.y - 5, 5, 5, true);
-		} else {
-			log.finer(() -> "this.graphicCanvas.redraw(); // do full update where required"); //$NON-NLS-1$
-			this.graphicCanvas.redraw(); // do full update where required
-		}
+		this.graphicCanvas.redraw(); // do full update where required
 		this.recordSetComment.redraw();
 	}
 
@@ -330,7 +319,6 @@ public abstract class AbstractChartComposite extends Composite {
 			this.canvasImageGC.setBackground(this.surroundingBackground);
 			this.canvasImageGC.fillRectangle(this.canvasBounds);
 			this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-			this.canvasGC = new GC(this.graphicCanvas);
 			drawCurves();
 			graphicsImage = new Image(GDE.display, this.canvasBounds.width, graphicsHeight);
 			GC graphicsGC = new GC(graphicsImage);
@@ -347,7 +335,6 @@ public abstract class AbstractChartComposite extends Composite {
 			}
 			graphicsGC.drawImage(this.canvasImage, 0, 30);
 			graphicsGC.dispose();
-			this.canvasGC.dispose();
 			this.canvasImageGC.dispose();
 		}
 		return graphicsImage;
@@ -483,7 +470,7 @@ public abstract class AbstractChartComposite extends Composite {
 	/**
 	 * Draw the containing records and sets the comment.
 	 */
-	public void drawAreaPaintControl() {
+	public void abstractDrawAreaPaintControl(GC canvasGC) {
 		if (windowActor.getTrailRecordSet() == null) return;
 
 		// Get the canvas and its dimensions
@@ -497,8 +484,6 @@ public abstract class AbstractChartComposite extends Composite {
 		this.canvasImageGC.setBackground(this.surroundingBackground);
 		this.canvasImageGC.fillRectangle(this.canvasBounds);
 		this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		// get gc for other drawing operations
-		this.canvasGC = new GC(this.graphicCanvas);
 
 		setRecordSetCommentStandard();
 		windowActor.setStatusMessage(GDE.STRING_EMPTY);
@@ -506,15 +491,12 @@ public abstract class AbstractChartComposite extends Composite {
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
 			drawCurves();
-			this.canvasGC.drawImage(this.canvasImage, 0, 0);
+			canvasGC.drawImage(this.canvasImage, 0, 0);
 
-			this.canvasGC.dispose();
 			if (measuring != null) measuring.drawMeasuring();
 		} else {
-			this.canvasGC.drawImage(this.canvasImage, 0, 0);
-			this.canvasGC.dispose();
+			canvasGC.drawImage(this.canvasImage, 0, 0);
 		}
-
 		this.canvasImageGC.dispose();
 	}
 

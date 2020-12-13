@@ -412,7 +412,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 	private void drawAreaPaintControl(PaintEvent evt) {
 		log.finest(() -> "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
 		long nanoTime = System.nanoTime();
-		drawAreaPaintControl();
+		abstractDrawAreaPaintControl(evt.gc);
 		log.time(() -> "drawTime=" + StringHelper.getFormatedTime("ss:SSS", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime)));
 	}
 
@@ -727,7 +727,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		measuring = new SummaryMeasuring(this, measure);
 		if (this.canvasBounds == null) return; // fixed window size
 		// draw full graph at first because the curve area might have changed (due to new new scales)
-		drawAreaPaintControl();
+		doRedrawGraphics();
 
 		if (this.canvasBounds.height == 0) return; // fixed window size
 		measuring.drawMeasuring();

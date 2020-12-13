@@ -2375,13 +2375,13 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 	public void setCutModeActive(boolean leftEnabled, boolean rightEnabled) {
 		if (leftEnabled || rightEnabled)
 			if (leftEnabled)
-				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsMode.CUT_LEFT, leftEnabled, rightEnabled);
+				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(null, GraphicsMode.CUT_LEFT, leftEnabled, rightEnabled);
 			else if (rightEnabled)
-				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsMode.CUT_RIGHT, leftEnabled, rightEnabled);
+				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(null, GraphicsMode.CUT_RIGHT, leftEnabled, rightEnabled);
 			else
-				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsMode.RESET, false, false);
+				this.graphicsTabItem.getGraphicsComposite().drawCutPointer(null, GraphicsMode.RESET, false, false);
 		else
-			this.graphicsTabItem.getGraphicsComposite().drawCutPointer(GraphicsMode.RESET, false, false);
+			this.graphicsTabItem.getGraphicsComposite().drawCutPointer(null, GraphicsMode.RESET, false, false);
 	}
 
 	@Override
