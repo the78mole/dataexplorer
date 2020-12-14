@@ -60,23 +60,23 @@ public final class SummaryMeasuring extends AbstractMeasuring {
 	 * Draw a refreshed measurement.
 	 */
 	@Override
-	public void drawMeasuring() {
-		drawMeasuring(measure.getTimestampMeasure_ms(), measure.getTimestampDelta_ms());
+	public void drawMeasuring(GC canvasGC) {
+		drawMeasuring(canvasGC, measure.getTimestampMeasure_ms(), measure.getTimestampDelta_ms());
 	}
 
 	/**
 	 * Draw a new measurement based on the timestamp values.
 	 */
-	private void drawMeasuring(long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
+	private void drawMeasuring(GC canvasGC, long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
 		// set the gc properties
-		this.canvasGC = new GC(this.summaryComposite.graphicCanvas);
-		this.canvasGC.setForeground(ColorUtils.getColor(measure.measureRecord.getRGB()));
+		//this.canvasGC = new GC(this.summaryComposite.graphicCanvas);
+		canvasGC.setForeground(ColorUtils.getColor(measure.measureRecord.getRGB()));
 
 		measure.setTimestampMeasure_ms(timestampMeasureNew_ms);
 		measure.setTimestampDelta_ms(timestampDeltaNew_ms);
 
 		drawModeMeasurement(this.canvasGC);
-		this.canvasGC.dispose();
+		//this.canvasGC.dispose();
 	}
 
 	private void drawModeMeasurement(GC canvasImageGC) { // todo move this into a new class analogous to CurveSurvey

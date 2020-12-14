@@ -189,23 +189,22 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 	 * Draw a refreshed measurement.
 	 */
 	@Override
-	public void drawMeasuring() {
-		drawMeasuring(measure.getTimestampMeasure_ms(), measure.getTimestampDelta_ms());
+	public void drawMeasuring(GC canvasGC) {
+		drawMeasuring(canvasGC, measure.getTimestampMeasure_ms(), measure.getTimestampDelta_ms());
 	}
 
 	/**
 	 * Draw a new measurement based on the timestamp values.
 	 */
-	private void drawMeasuring(long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
+	private void drawMeasuring(GC canvasGC, long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
 		Image canvasImage = this.graphicsComposite.canvasImage;
 		// set the gc properties
-		this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
-		this.canvasGC.setForeground(ColorUtils.getColor(measure.measureRecord.getRGB()));
+		//this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
+		canvasGC.setForeground(ColorUtils.getColor(measure.measureRecord.getRGB()));
 
-		this.curveSurvey.setCanvasGC(this.canvasGC);
+		curveSurvey.setCanvasGC(canvasGC);
 		// all obsolete lines are cleaned up now draw new position marker
 		this.curveSurvey.cleanMeasurementPointer(canvasImage);
-
 		measure.setTimestampMeasure_ms(timestampMeasureNew_ms);
 		measure.setTimestampDelta_ms(timestampDeltaNew_ms);
 
@@ -213,7 +212,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 		curveSurvey.setMeasurePosition();
 		curveSurvey.setDeltaPosition();
 		mode.drawMeasurement(this);
-		this.canvasGC.dispose();
+		//this.canvasGC.dispose();
 	}
 
 	/**

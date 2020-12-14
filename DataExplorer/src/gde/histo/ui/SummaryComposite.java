@@ -730,7 +730,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		doRedrawGraphics();
 
 		if (this.canvasBounds.height == 0) return; // fixed window size
-		measuring.drawMeasuring();
+		measuring.drawMeasuring(null);
 	}
 
 	public SummaryLayout getChartData(TrailRecord trailRecord) {

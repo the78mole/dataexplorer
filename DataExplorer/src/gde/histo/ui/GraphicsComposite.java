@@ -376,7 +376,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 	 * @param evt
 	 */
 	private void drawAreaPaintControl(PaintEvent evt) {
-		log.finest(() -> "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
+		log.off(() -> "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
 		long nanoTime = System.nanoTime();
 		abstractDrawAreaPaintControl(evt.gc);
 		log.time(() -> "drawTime=" + StringHelper.getFormatedTime("ss:SSS", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime)));
@@ -642,7 +642,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 		doRedrawGraphics();
 
 		// if (this.canvasBounds.height == 0) return; // fixed window size
-		measuring.drawMeasuring();
+		//measuring.drawMeasuring(null);
 	}
 
 	public HistoTimeLine getTimeLine() {

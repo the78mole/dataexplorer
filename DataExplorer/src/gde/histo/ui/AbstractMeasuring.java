@@ -19,6 +19,7 @@
 
 package gde.histo.ui;
 
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 
 /**
@@ -41,7 +42,7 @@ public abstract class AbstractMeasuring {
 	/**
 	 * Draw a refreshed measurement.
 	 */
-	public abstract void drawMeasuring();
+	public abstract void drawMeasuring(GC canvasGC);
 
 	/**
 	 * Draw the survey graphics while moving the vertical line.

@@ -29,6 +29,7 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
@@ -96,10 +97,10 @@ public abstract class AbstractChartWindow extends CTabItem {
 			}
 		}
 
-		void drawMeasuring() {
+		void drawMeasuring(GC canvasGC) {
 			measure.ifPresent(mm -> {
 				for (AbstractChartComposite c : getCharts()) {
-					c.getMeasuring().ifPresent(AbstractMeasuring::drawMeasuring);
+					c.getMeasuring().ifPresent(m -> m.drawMeasuring(canvasGC));
 				}
 			});
 		}

@@ -473,9 +473,10 @@ public abstract class AbstractChartComposite extends Composite {
 	public void abstractDrawAreaPaintControl(GC canvasGC) {
 		if (windowActor.getTrailRecordSet() == null) return;
 
-		// Get the canvas and its dimensions
+		// Get the canvas and its dimensions 
+		//TODO move outside drawAreaPaintControl call only when required
 		this.canvasBounds = this.graphicCanvas.getClientArea();
-		log.log(Level.FINE, "canvasBounds", this.canvasBounds);
+		log.log(Level.OFF, "canvasBounds", this.canvasBounds);
 		if (this.canvasBounds.height <= 0 || this.canvasBounds.width <= 0) return;
 
 		if (this.canvasImage != null) this.canvasImage.dispose();
@@ -493,7 +494,7 @@ public abstract class AbstractChartComposite extends Composite {
 			drawCurves();
 			canvasGC.drawImage(this.canvasImage, 0, 0);
 
-			if (measuring != null) measuring.drawMeasuring();
+			if (measuring != null) measuring.drawMeasuring(canvasGC);
 		} else {
 			canvasGC.drawImage(this.canvasImage, 0, 0);
 		}
