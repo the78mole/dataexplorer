@@ -107,6 +107,7 @@ public abstract class AbstractChartWindow extends CTabItem {
 
 		void processMouseDownMove(long adjacentTimestamp_ms) {
 			measure.ifPresent(mm -> getGraphicsComposite().getMeasuring().ifPresent(m -> m.processMouseDownMove(adjacentTimestamp_ms)));
+			getSummaryComposite().ifPresent(AbstractChartComposite::doRedrawGraphics);
 		}
 
 		void processMouseUpMove(Point point) {

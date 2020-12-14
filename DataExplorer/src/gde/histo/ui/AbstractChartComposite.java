@@ -494,7 +494,8 @@ public abstract class AbstractChartComposite extends Composite {
 			drawCurves();
 			canvasGC.drawImage(this.canvasImage, 0, 0);
 
-			if (measuring != null) measuring.drawMeasuring(canvasGC);
+			if (measuring != null) 
+				measuring.drawMeasuring(canvasGC);
 		} else {
 			canvasGC.drawImage(this.canvasImage, 0, 0);
 		}

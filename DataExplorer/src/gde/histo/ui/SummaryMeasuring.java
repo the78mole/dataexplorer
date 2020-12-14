@@ -75,7 +75,7 @@ public final class SummaryMeasuring extends AbstractMeasuring {
 		measure.setTimestampMeasure_ms(timestampMeasureNew_ms);
 		measure.setTimestampDelta_ms(timestampDeltaNew_ms);
 
-		drawModeMeasurement(this.canvasGC);
+		drawModeMeasurement(canvasGC);
 		//this.canvasGC.dispose();
 	}
 
