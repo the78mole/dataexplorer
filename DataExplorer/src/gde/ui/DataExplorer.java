@@ -2255,7 +2255,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 			case RESET:
 				recordSet.resetZoomAndMeasurement();
 				this.graphicsTabItem.setModeState(graphicsMode);
-				this.updateGraphicsWindow();
+ 				this.updateGraphicsWindow();
 			}
 		}
 	}
@@ -2322,7 +2322,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 			if (isGraphicsTypeNormal) {
 				recordSet.setMeasurementMode(recordKey, enabled);
 				if (enabled)
-					this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsMode.MEASURE, false);
+					this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(null, recordSet, GraphicsMode.MEASURE, false);
 				else
 					this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 			} else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
@@ -2330,7 +2330,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 				if (recordSet != null && recordSet.containsKey(recordKey)) {
 					recordSet.setMeasurementMode(recordKey, enabled);
 					if (enabled)
-						this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsMode.MEASURE, false);
+						this.compareTabItem.getGraphicsComposite().drawMeasurePointer(null, recordSet, GraphicsMode.MEASURE, false);
 					else
 						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
 				}
@@ -2351,7 +2351,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 			if (isGraphicsTypeNormal) {
 				recordSet.setDeltaMeasurementMode(recordKey, enabled);
 				if (enabled)
-					this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsMode.MEASURE_DELTA, false);
+					this.graphicsTabItem.getGraphicsComposite().drawMeasurePointer(null, recordSet, GraphicsMode.MEASURE_DELTA, false);
 				else
 					this.graphicsTabItem.getGraphicsComposite().cleanMeasurementPointer();
 			} else if (this.compareTabItem != null && !this.compareTabItem.isDisposed()) {
@@ -2359,7 +2359,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 				if (recordSet != null && recordSet.containsKey(recordKey)) {
 					recordSet.setDeltaMeasurementMode(recordKey, enabled);
 					if (enabled)
-						this.compareTabItem.getGraphicsComposite().drawMeasurePointer(recordSet, GraphicsMode.MEASURE_DELTA, false);
+						this.compareTabItem.getGraphicsComposite().drawMeasurePointer(null, recordSet, GraphicsMode.MEASURE_DELTA, false);
 					else
 						this.compareTabItem.getGraphicsComposite().cleanMeasurementPointer();
 				}

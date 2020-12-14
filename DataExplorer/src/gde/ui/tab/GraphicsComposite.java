@@ -142,6 +142,8 @@ public class GraphicsComposite extends Composite {
 	GC												canvasImageGC;
 	Rectangle									curveAreaBounds					= new Rectangle(0, 0, 1, 1);
 
+	GraphicsMode 							actualModeState;
+	
 	boolean										isLeftMouseMeasure			= false;
 	boolean										isRightMouseMeasure			= false;
 	int												xPosMeasure							= 0, yPosMeasure = 0;
@@ -153,6 +155,7 @@ public class GraphicsComposite extends Composite {
 	boolean										isTransientGesture			= false;
 	boolean										isZoomX									= false;
 	boolean										isZoomY									= false;
+	int												leftZoom, topZoom, widthZoom, heightZoom;
 
 	boolean										isPanMouse							= false;
 	int												xDeltaPan								= 0;
@@ -734,13 +737,16 @@ public class GraphicsComposite extends Composite {
 		if (recordSet != null && recordSet.realSize() > 0) {
 
 			if (recordSet.isMeasurementMode(recordSet.getRecordKeyMeasurement()) || recordSet.isDeltaMeasurementMode(recordSet.getRecordKeyMeasurement())) {
-				drawMeasurePointer(recordSet, GraphicsMode.MEASURE, true);
+				drawMeasurePointer(evt.gc, recordSet, GraphicsMode.MEASURE, this.xPosMeasure != 0);
 			}
 			else if (this.isLeftCutMode) {
 				drawCutPointer(evt.gc, GraphicsMode.CUT_LEFT, true, false);
 			}
 			else if (this.isRightCutMode) {
 				drawCutPointer(evt.gc, GraphicsMode.CUT_RIGHT, false, true);
+			}
+			else if (this.isZoomMouse && recordSet.isZoomMode() && this.isResetZoomPosition) {
+				drawZoomBounds(evt.gc);
 			}
 		}
 
@@ -1010,65 +1016,77 @@ public class GraphicsComposite extends Composite {
 	 * @param mode
 	 * @param isRefresh
 	 */
-	public void drawMeasurePointer(RecordSet recordSet, GraphicsMode mode, boolean isRefresh) {
-		this.setModeState(mode); // cleans old pointer if required
+	public void drawMeasurePointer(GC canvasGC, RecordSet recordSet, GraphicsMode mode, boolean isRefresh) {
+		log.log(Level.OFF, "isRefresh = " + isRefresh);
+		if (mode != this.actualModeState)
+			this.setModeState(mode); // cleans old pointer if required
 
 		String measureRecordKey = recordSet.getRecordKeyMeasurement();
-		Record record = recordSet.get(measureRecordKey);
-
-		// set the gc properties
-		GC canvasGC = new GC(this.graphicCanvas);
-		canvasGC.setLineWidth(1);
-		canvasGC.setLineStyle(SWT.LINE_DASH);
-		canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-		IDevice actualDevice = record.getDevice();
-
-		if (recordSet.isMeasurementMode(measureRecordKey)) {
-			// initial measure position
-			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
-			this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
-			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "initial xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
-
-			drawVerticalLine(canvasGC, this.xPosMeasure, 0, this.curveAreaBounds.height);
-			drawHorizontalLine(canvasGC, this.yPosMeasure, 0, this.curveAreaBounds.width);
-
-			this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
-			int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
-			this.calculateMeasurementStatusMessage(actualDevice, record, indexPosMeasure);
-		}
-		else if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
-			this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
-			this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
-
-			// measure position
-			drawVerticalLine(canvasGC, this.xPosMeasure, 0, this.curveAreaBounds.height);
-			drawHorizontalLine(canvasGC, this.yPosMeasure, 0, this.curveAreaBounds.width);
-
-			// delta position
-			this.xPosDelta = isRefresh ? this.xPosDelta : this.curveAreaBounds.width / 3 * 2;
-			this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
-
-			canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-			drawVerticalLine(canvasGC, this.xPosDelta, 0, this.curveAreaBounds.height);
-			drawHorizontalLine(canvasGC, this.yPosDelta, 0, this.curveAreaBounds.width);
-
-			drawConnectingLine(canvasGC, this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
-
+		if (canvasGC != null) {
+			Record record = recordSet.get(measureRecordKey);
+			// set the gc properties
+			canvasGC.setLineWidth(1);
+			canvasGC.setLineStyle(SWT.LINE_DASH);
 			canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-			
-			int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
-			int indexPosDelta = record.getHorizontalPointIndexFromDisplayPoint(this.xPosDelta);		
+			IDevice actualDevice = record.getDevice();
+			if (recordSet.isMeasurementMode(measureRecordKey)) {
+				// initialize measure position if not in refresh 
+				this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
+				this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
+				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "initial xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 
-			if (record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must make sure required measurements available
-					&& record.getOrdinal() == record.getDevice().getAtlitudeTripSpeedOrdinals()[0]) { // returned first ordinal match altitude 								
-				this.calculateSinkAndGlideRatioStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
-			} else {
-				this.calculateDeltaValueStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
+				drawVerticalLine(canvasGC, this.xPosMeasure, 0, this.curveAreaBounds.height);
+				drawHorizontalLine(canvasGC, this.yPosMeasure, 0, this.curveAreaBounds.width);
+
+				this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
+				int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
+				this.calculateMeasurementStatusMessage(actualDevice, record, indexPosMeasure);
 			}
+			else if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
+				this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
+				this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
+
+				// measure position
+				drawVerticalLine(canvasGC, this.xPosMeasure, 0, this.curveAreaBounds.height);
+				drawHorizontalLine(canvasGC, this.yPosMeasure, 0, this.curveAreaBounds.width);
+
+				// delta position
+				this.xPosDelta = isRefresh ? this.xPosDelta : this.curveAreaBounds.width / 3 * 2;
+				this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
+
+				canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
+				drawVerticalLine(canvasGC, this.xPosDelta, 0, this.curveAreaBounds.height);
+				drawHorizontalLine(canvasGC, this.yPosDelta, 0, this.curveAreaBounds.width);
+
+				drawConnectingLine(canvasGC, this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
+
+				canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+
+				int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
+				int indexPosDelta = record.getHorizontalPointIndexFromDisplayPoint(this.xPosDelta);
+
+				if (this.graphicsType == GraphicsType.NORMAL && record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must make sure required measurements available
+						&& record.getOrdinal() == record.getDevice().getAtlitudeTripSpeedOrdinals()[0]) { // returned first ordinal match altitude 								
+					this.calculateSinkAndGlideRatioStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
+				}
+				else {
+					this.calculateDeltaValueStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
+				}
+			} 
 		}
-		canvasGC.dispose();
 	}
 
+	/**
+	 * draw the zoom bounds rectangle
+	 * @param canvasGC paint event canvas GC
+	 */
+	private void drawZoomBounds(GC canvasGC) {
+		canvasGC.setLineWidth(1);
+		canvasGC.setLineStyle(SWT.LINE_DASH);
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "draw  left = " + (leftZoom - this.offSetX) + " top = " + (topZoom - this.offSetY) + " width = " + widthZoom + " height = " + heightZoom); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		canvasGC.drawRectangle(this.leftZoom, this.topZoom, this.widthZoom, this.heightZoom);
+	}
+	
 	/**
 	 * draws horizontal line as defined relative to curve draw area, where there is an offset from left and an offset from top
 	 * for performance reason specify line width, line style and line color outside
@@ -1177,27 +1195,6 @@ public class GraphicsComposite extends Composite {
 	 */
 	public void cleanMeasurementPointer() {
 		try {
-			GC canvasGC = new GC(this.graphicCanvas);
-
-			if ((this.xPosMeasure != 0 && (this.xPosMeasure < this.offSetX || this.xPosMeasure > this.offSetX + this.curveAreaBounds.width))
-					|| (this.yPosMeasure != 0 && (this.yPosMeasure < this.offSetY || this.yPosMeasure > this.offSetY + this.curveAreaBounds.height))
-					|| (this.xPosDelta != 0 && (this.xPosDelta < this.offSetX || this.xPosDelta > this.offSetX + this.curveAreaBounds.width))
-					|| (this.yPosDelta != 0 && (this.yPosDelta < this.offSetY || this.yPosDelta > this.offSetY + this.curveAreaBounds.height))) {
-				this.redrawGraphics();
-				this.xPosMeasure = this.xPosDelta = 0;
-			}
-			else {
-				if (this.xPosMeasure > 0) {
-					eraseVerticalLine(canvasGC, this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
-					eraseHorizontalLine(canvasGC, this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
-				}
-				if (this.xPosDelta > 0) {
-					eraseVerticalLine(canvasGC, this.xPosDelta, 0, this.curveAreaBounds.height, 1);
-					eraseHorizontalLine(canvasGC, this.yPosDelta, 0, this.curveAreaBounds.width, 1);
-					cleanConnectingLineObsoleteRectangle(canvasGC);
-				}
-			}
-			canvasGC.dispose();
 			if (this.recordSetCommentText != null) {
 				this.recordSetComment.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 				this.recordSetComment.setText(this.recordSetCommentText);
@@ -1217,7 +1214,8 @@ public class GraphicsComposite extends Composite {
 	 * @param rightEnabled
 	 */
 	public void drawCutPointer(GC canvasGC, GraphicsMode mode, boolean leftEnabled, boolean rightEnabled) {
-		this.setModeState(mode); // cleans old pointer if required
+		if (mode != actualModeState)
+			this.setModeState(mode); // cleans old pointer if required
 
 		// allow only get the record set to work with
 		boolean isGraphicsWindow = this.graphicsType == GraphicsType.NORMAL;
@@ -1229,7 +1227,6 @@ public class GraphicsComposite extends Composite {
 
 			if (leftEnabled) {
 				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0258));
-				//cleanCutPointer();
 				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 1 / 4;
 				log.log(Level.OFF, "this.xPosCut = " + this.xPosCut);
 				canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
@@ -1239,7 +1236,6 @@ public class GraphicsComposite extends Composite {
 			}
 			else if (rightEnabled) {
 				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0259));
-				//cleanCutPointer();
 				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 3 / 4;
 				canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
 				canvasGC.fillRectangle(this.xPosCut + this.offSetX, 0 + this.offSetY, this.curveAreaBounds.width - this.xPosCut, this.curveAreaBounds.height);
@@ -1265,6 +1261,7 @@ public class GraphicsComposite extends Composite {
 	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
 	 */
 	public void setModeState(GraphicsMode mode) {
+		log.log(Level.OFF, "GraphicsMode = " + mode);
 		this.cleanMeasurementPointer();
 		switch (mode) {
 		case ZOOM:
@@ -1303,7 +1300,6 @@ public class GraphicsComposite extends Composite {
 			this.isLeftCutMode = true;
 			this.isRightCutMode = false;
 			this.isScopeMode = false;
-			this.graphicCanvas.redraw();
 			break;
 		case CUT_RIGHT:
 			this.isZoomMouse = false;
@@ -1313,7 +1309,6 @@ public class GraphicsComposite extends Composite {
 			this.isLeftCutMode = false;
 			this.isRightCutMode = true;
 			this.isScopeMode = false;
-			this.graphicCanvas.redraw();
 			break;
 		case SCOPE:
 			this.isZoomMouse = false;
@@ -1342,10 +1337,12 @@ public class GraphicsComposite extends Composite {
 			this.rightLast = 0;
 			this.bottomLast = 0;
 			updatePanMenueButton();
-			//updateCutModeButtons();
 			this.application.getMenuToolBar().resetZoomToolBar();
 			break;
 		}
+		this.actualModeState = mode;
+		this.xPosMeasure = this.xPosDelta = 0;
+		this.graphicCanvas.redraw();
 	}
 
 	/**
@@ -1389,201 +1386,66 @@ public class GraphicsComposite extends Composite {
 		if (activeChannel != null) {
 			RecordSet recordSet = (this.graphicsType == GraphicsType.NORMAL) ? activeChannel.getActiveRecordSet() : this.application.getCompareSet();
 			if (recordSet != null && this.canvasImage != null) {
-				GC canvasGC = new GC(this.graphicCanvas);
 				Point point = checkCurveBounds(evt.x, evt.y);
 				evt.x = point.x;
 				evt.y = point.y;
 
 				String measureRecordKey = recordSet.getRecordKeyMeasurement();
-				canvasGC.setLineWidth(1);
-				canvasGC.setLineStyle(SWT.LINE_DASH);
-
 				if (log.isLoggable(Level.FINER))
 					log.log(Level.FINER, String.format("xDown = %d, evt.x = %d, xLast = %d  -  yDown = %d, evt.y = %d, yLast = %d", this.xDown, evt.x, this.xLast, this.yDown, evt.y, this.yLast)); //$NON-NLS-1$
 
 				if ((evt.stateMask & SWT.NO_FOCUS) == SWT.NO_FOCUS) {
 					try {
 						if (this.isZoomMouse && recordSet.isZoomMode() && this.isResetZoomPosition) {
-							//clean obsolete rectangle
-							int left = this.xLast - this.xDown > 0 ? this.xDown : this.xLast;
-							int top = this.yLast - this.yDown > 0 ? this.yDown : this.yLast;
-							int width = this.xLast - this.xDown > 0 ? this.xLast - this.xDown : this.xDown - this.xLast;
-							int height = this.yLast - this.yDown > 0 ? this.yLast - this.yDown : this.yDown - this.yLast;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "clean left = " + left + " top = " + top + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-							eraseHorizontalLine(canvasGC, top, left, width + 1, 1);
-							eraseVerticalLine(canvasGC, left, top, height + 1, 1);
-							eraseHorizontalLine(canvasGC, top + height, left + 1, width, 1);
-							eraseVerticalLine(canvasGC, left + width, top + 1, height, 1);
-
-							left = evt.x - this.xDown > 0 ? this.xDown + this.offSetX : evt.x + this.offSetX;
-							top = evt.y - this.yDown > 0 ? this.yDown + this.offSetY : evt.y + this.offSetY;
-							width = evt.x - this.xDown > 0 ? evt.x - this.xDown : this.xDown - evt.x;
-							height = evt.y - this.yDown > 0 ? evt.y - this.yDown : this.yDown - evt.y;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "draw  left = " + (left - this.offSetX) + " top = " + (top - this.offSetY) + " width = " + width + " height = " + height); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-							canvasGC.drawRectangle(left, top, width, height);
+							//define new rectangle
+							this.leftZoom = evt.x - this.xDown > 0 ? this.xDown + this.offSetX : evt.x + this.offSetX;
+							this.topZoom = evt.y - this.yDown > 0 ? this.yDown + this.offSetY : evt.y + this.offSetY;
+							this.widthZoom = evt.x - this.xDown > 0 ? evt.x - this.xDown : this.xDown - evt.x;
+							this.heightZoom = evt.y - this.yDown > 0 ? evt.y - this.yDown : this.yDown - evt.y;
 
 							// detect directions to enable zoom or reset
 							if (this.xDown < evt.x) { // left -> right
-								//System.out.println("left -> right -> zoom selected area");
 								this.isTransientZoom = true;
 							}
 							if (this.xDown > evt.x) { // right -> left
-								//System.out.println("right -> left -> zoom reset");
 								this.isTransientZoom = false;
 							}
 
 							this.xLast = evt.x;
 							this.yLast = evt.y;
+							this.graphicCanvas.redraw();
 						}
 						else if (this.isLeftMouseMeasure) {
-							Record record = recordSet.get(measureRecordKey);
-							IDevice actualDevice = record.getDevice();
-							int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
-							// clear old measure lines
-							eraseVerticalLine(canvasGC, this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
-							//no change don't needs to be calculated, but the calculation limits to bounds
-							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
-							eraseHorizontalLine(canvasGC, this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
 
-							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
-								// clear old delta measure lines
-								eraseVerticalLine(canvasGC, this.xPosDelta, 0, this.curveAreaBounds.height, 1);
-								//no change don't needs to be calculated, but the calculation limits to bounds
-								this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
-								eraseHorizontalLine(canvasGC, this.yPosDelta, 0, this.curveAreaBounds.width, 1);
-
-								//clean obsolete rectangle of connecting line
-								cleanConnectingLineObsoleteRectangle(canvasGC);
-
-								canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-								canvasGC.setLineStyle(SWT.LINE_DASH);
-								drawVerticalLine(canvasGC, this.xPosDelta, 0, this.curveAreaBounds.height);
-								drawHorizontalLine(canvasGC, this.yPosDelta, 0, this.curveAreaBounds.width);
-								canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-							}
 							// all obsolete lines are cleaned up now draw new position marker
 							this.xPosMeasure = evt.x; // evt.x is already relative to curve area
-							drawVerticalLine(canvasGC, this.xPosMeasure, 0, this.curveAreaBounds.height);
-							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
-							drawHorizontalLine(canvasGC, this.yPosMeasure, 0, this.curveAreaBounds.width);
-
-							if (recordSet.isDeltaMeasurementMode(measureRecordKey)) {
-								if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
-									drawConnectingLine(canvasGC, this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
-								}
-								
-								int indexPosDelta = record.getHorizontalPointIndexFromDisplayPoint(this.xPosDelta);									
-
-								if (record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must make sure required measurements available
-										&& record.getOrdinal() == record.getDevice().getAtlitudeTripSpeedOrdinals()[0]) { // returned first ordinal match altitude 								
-									this.calculateSinkAndGlideRatioStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
-								} else {
-									this.calculateDeltaValueStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
-								}
-							}
-							else {
-								this.recordSetComment.setText(this.getSelectedMeasurementsAsTable());
-								this.calculateMeasurementStatusMessage(actualDevice, record, indexPosMeasure);
-							}
+							this.graphicCanvas.redraw();
 						}
 						else if (this.isRightMouseMeasure) {
-							Record record = recordSet.get(measureRecordKey);
-							IDevice actualDevice = record.getDevice();
-							// clear old delta measure lines
-							eraseVerticalLine(canvasGC, this.xPosDelta, 0, this.curveAreaBounds.height, 1);
-							//no change don't needs to be calculated, but the calculation limits to bounds
-							this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
-							eraseHorizontalLine(canvasGC, this.yPosDelta, 0, this.curveAreaBounds.width, 1);
-
-							// clear old measure lines
-							eraseVerticalLine(canvasGC, this.xPosMeasure, 0, this.curveAreaBounds.height, 1);
-							//no change don't needs to be calculated, but the calculation limits to bounds
-							this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
-							eraseHorizontalLine(canvasGC, this.yPosMeasure, 0, this.curveAreaBounds.width, 1);
-
-							//clean obsolete rectangle of connecting line
-							cleanConnectingLineObsoleteRectangle(canvasGC);
-
-							// always needs to draw measurement pointer
-							drawVerticalLine(canvasGC, this.xPosMeasure, 0, this.curveAreaBounds.height);
-							//no change don't needs to be calculated yPosMeasure = record.getDisplayPointDataValue(xPosMeasure, curveAreaBounds);
-							drawHorizontalLine(canvasGC, this.yPosMeasure, 0, this.curveAreaBounds.width);
-
 							// update the new delta position
 							this.xPosDelta = evt.x; // evt.x is already relative to curve area
-							canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLUE));
-							canvasGC.setLineStyle(SWT.LINE_DASH);
-							drawVerticalLine(canvasGC, this.xPosDelta, 0, this.curveAreaBounds.height);
-							this.yPosDelta = record.getVerticalDisplayPointValue(this.xPosDelta);
-							drawHorizontalLine(canvasGC, this.yPosDelta, 0, this.curveAreaBounds.width);
-
-							if (this.xPosMeasure != this.xPosDelta && this.yPosMeasure != this.yPosDelta) {
-								drawConnectingLine(canvasGC, this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta, SWT.COLOR_BLACK);
-							}
-
-							canvasGC.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
-
-							int indexPosMeasure = record.getHorizontalPointIndexFromDisplayPoint(this.xPosMeasure);
-							int indexPosDelta = record.getHorizontalPointIndexFromDisplayPoint(this.xPosDelta);									
-
-							if (record.getDevice().getAtlitudeTripSpeedOrdinals().length == 3 //device must make sure required measurements available
-									&& record.getOrdinal() == record.getDevice().getAtlitudeTripSpeedOrdinals()[0]) { // returned first ordinal match altitude 								
-								this.calculateSinkAndGlideRatioStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
-							} else {
-								this.calculateDeltaValueStatusMessage(actualDevice, record, indexPosMeasure, indexPosDelta);
-							}
-
+							this.graphicCanvas.redraw();
 						}
 						else if (this.isPanMouse) {
 							this.xDeltaPan = (this.xLast != 0 && this.xLast != evt.x) ? (this.xDeltaPan + (this.xLast < evt.x ? -1 : 1)) : 0;
 							this.yDeltaPan = (this.yLast != 0 && this.yLast != evt.y) ? (this.yDeltaPan + (this.yLast < evt.y ? 1 : -1)) : 0;
-							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, " xDeltaPan = " + this.xDeltaPan + " yDeltaPan = " + this.yDeltaPan); //$NON-NLS-1$ //$NON-NLS-2$
+							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, " xDeltaPan = " + this.xDeltaPan + " yDeltaPan = " + this.yDeltaPan); //$NON-NLS-1$ //$NON-NLS-2$
 							if ((this.xDeltaPan != 0 && this.xDeltaPan % 5 == 0) || (this.yDeltaPan != 0 && this.yDeltaPan % 5 == 0)) {
 								recordSet.shift(this.xDeltaPan, this.yDeltaPan); // 10% each direction
-								this.graphicCanvas.redraw();
+								this.doRedrawGraphics();
 								this.xDeltaPan = this.yDeltaPan = 0;
 							}
 							this.xLast = evt.x;
 							this.yLast = evt.y;
 						}
 						else if (this.isLeftCutMode) {
-//							// clear old cut area
-//							if (evt.x < this.xPosCut) {
-//								canvasGC.drawImage(this.canvasImage, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1, this.curveAreaBounds.height, evt.x + this.offSetX, this.offSetY,
-//										this.xPosCut - evt.x + 1, this.curveAreaBounds.height);
-//							}
-//							else { // evt.x > this.xPosCut
-//								canvasGC.drawImage(this.canvasImage, this.xPosCut + this.offSetX, this.offSetY, evt.x - this.xPosCut, this.curveAreaBounds.height, this.xPosCut + this.offSetX, this.offSetY,
-//										evt.x - this.xPosCut, this.curveAreaBounds.height);
-//								canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
-//								canvasGC.fillRectangle(this.xPosCut + this.offSetX, this.offSetY, evt.x - this.xPosCut, this.curveAreaBounds.height);
-//								canvasGC.setAdvanced(false);
-//							}
+							//define new cut position black/left
 							this.xPosCut = evt.x;
-							//canvasGC.setLineStyle(SWT.LINE_SOLID);
-							//drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
-							//this.graphicCanvas.redraw(this.xPosCut + this.offSetX, 0 + this.offSetY, 1, this.curveAreaBounds.height - 1, false);
-							log.log(Level.OFF, String.format("%d, %d, %d, %d", this.offSetX, this.offSetY, this.xPosCut - this.offSetX, this.curveAreaBounds.height));
-							//this.graphicCanvas.redraw(this.offSetX, this.offSetY, this.xPosCut - this.offSetX, this.curveAreaBounds.height - 1, false);
 							this.graphicCanvas.redraw();
 						}
 						else if (this.isRightCutMode) {
-//							// clear old cut lines
-//							if (evt.x > this.xPosCut) {
-//								canvasGC.drawImage(this.canvasImage, this.xPosCut + this.offSetX, this.offSetY, evt.x - this.xPosCut, this.curveAreaBounds.height, this.offSetX + this.xPosCut, this.offSetY,
-//										evt.x - this.xPosCut, this.curveAreaBounds.height);
-//							}
-//							else { // evt.x < this.xPosCut
-//								canvasGC.drawImage(this.canvasImage, evt.x + this.offSetX, this.offSetY, this.xPosCut - evt.x + 1, this.curveAreaBounds.height, evt.x + this.offSetX, this.offSetY,
-//										this.xPosCut - evt.x + 1, this.curveAreaBounds.height);
-//								canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
-//								canvasGC.fillRectangle(evt.x + this.offSetX, 0 + this.offSetY, this.xPosCut - evt.x + 1, this.curveAreaBounds.height);
-//								canvasGC.setAdvanced(false);
-//							}
+							//define new cut position blue/right
 							this.xPosCut = evt.x;
-							//canvasGC.setLineStyle(SWT.LINE_SOLID);
-							//drawVerticalLine(this.xPosCut, 0, this.curveAreaBounds.height);
-							//this.graphicCanvas.redraw(this.xPosCut + this.offSetX, 0 + this.offSetY, 1, this.curveAreaBounds.height - 1, false);
 							this.graphicCanvas.redraw();
 						}
 					}
@@ -1616,7 +1478,6 @@ public class GraphicsComposite extends Composite {
 				else {
 					this.graphicCanvas.setCursor(this.application.getCursor());
 				}
-				canvasGC.dispose();
 			}
 		}
 	}
@@ -1791,7 +1652,6 @@ public class GraphicsComposite extends Composite {
 					setModeState(GraphicsMode.RESET);
 				}
 				updatePanMenueButton();
-				//updateCutModeButtons();
 				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "isMouseMeasure = " + this.isLeftMouseMeasure + " isMouseDeltaMeasure = " + this.isRightMouseMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
@@ -1881,7 +1741,6 @@ public class GraphicsComposite extends Composite {
 	 */
 	void setComponentBounds() {
 		Rectangle graphicsBounds = this.getClientArea();
-		//this.application.setGraphicsSashFormWeights(this.graphicSashForm.getSize().x - graphicsBounds.width);
 		int x = 0;
 		int y = this.headerGap;
 		int width = graphicsBounds.width;
