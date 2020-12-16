@@ -180,7 +180,7 @@ public class CellVoltageDisplay extends Composite {
 				this.cellCanvas.addPaintListener(new PaintListener() {
 					public void paintControl(PaintEvent evt) {
 						if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cellCanvas.paintControl, evt = " + evt); //$NON-NLS-1$
-						voltagePaintControl();
+						voltagePaintControl(evt.gc);
 					}
 				});
 			}
@@ -232,7 +232,7 @@ public class CellVoltageDisplay extends Composite {
 	/**
 	 * 
 	 */
-	void voltagePaintControl() {
+	void voltagePaintControl(GC gc) {
 		//this.cellTextLabel.setText(this.displayHeaderText);
 		String valueText = String.format("%.3f", Double.valueOf(this.voltage / 1000.0)); //$NON-NLS-1$
 		this.cellVoltageDigitalLabel.setText(valueText);
@@ -250,7 +250,7 @@ public class CellVoltageDisplay extends Composite {
 		this.middleVoltage.setText(String.format("%.1f", (lowerLimitVoltage+(upperLimitVoltage-lowerLimitVoltage)/2)/1000.0));
 		this.lowerVoltage.setLocation(10, 300);
 		this.lowerVoltage.setText(String.format("%.1f", lowerLimitVoltage/1000.0));
-		GC gc = new GC(this.cellCanvas); 
+		//GC gc = new GC(this.cellCanvas); 
 
 		this.lastVoltageLevel = checkVoltageLevel();
 		switch (this.lastVoltageLevel) {
@@ -278,7 +278,7 @@ public class CellVoltageDisplay extends Composite {
 		gc.drawLine(0, 0, 0, rect.height+topHeight.x);
 		//gc.drawRectangle(0, 0, rect.width, rect.height+topHeight.x);
 		
-		gc.dispose();
+		//gc.dispose();
 	}
 
 	/**

@@ -381,9 +381,7 @@ public class StepChargeComposite extends ScrolledComposite {
 								canvasImageGC.fillRectangle(new Rectangle(rightEdge1 + rightEdge2 + rightEdge3, canvasBounds.height - StepChargeComposite.this.valueA4 * canvasBounds.height / maxCurrent, rightEdge4,
 										canvasBounds.height));
 								if (centerPos4x < rightEdge4 && centerPos4Y < canvasBounds.height - 4) canvasImageGC.drawString("4", centerPos4x - 4, centerPos4Y - 4);
-								GC stepChargeCanvasGC = new GC(StepChargeComposite.this.stepChargeCanvas);
-								stepChargeCanvasGC.drawImage(canvasImage, 0, 0);
-								stepChargeCanvasGC.dispose();
+								evt.gc.drawImage(canvasImage, 0, 0);
 								canvasImageGC.dispose();
 								canvasImage.dispose();
 							}

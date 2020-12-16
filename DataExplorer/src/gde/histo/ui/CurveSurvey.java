@@ -310,56 +310,56 @@ public final class CurveSurvey {
 			return canvasImage.getBounds().width > this.offSetX + this.width && canvasImage.getBounds().height > this.offSetY + this.height;
 		}
 
-		/**
-		 * erase a vertical line by re-drawing the curve area image
-		 * @param posFromLeft
-		 * @param posFromTop
-		 * @param length
-		 * @param lineWidth
-		 */
-		public void eraseVerticalLine(Image canvasImage, int posFromLeft, int posFromTop, int length, int lineWidth) {
-			log.finer(() -> String.format("imageDisposed=%s posFromLeft=%d posFromTop=%d lineWidth=%d length=%d", canvasImage.isDisposed(), posFromLeft, posFromTop, lineWidth, length));
-			CurveSurvey.this.canvasGC.drawImage(canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length);
-		}
-
-		/**
-		 * erase a horizontal line by re-drawing the curve area image
-		 * @param posFromTop
-		 * @param posFromLeft
-		 * @param length
-		 * @param lineWidth
-		 */
-		public void eraseHorizontalLine(Image canvasImage, int posFromTop, int posFromLeft, int length, int lineWidth) {
-			log.finer(() -> String.format("imageDisposed=%s posFromLeft=%d posFromTop=%d lineWidth=%d length=%d", canvasImage.isDisposed(), posFromLeft, posFromTop, lineWidth, length));
-			// do not erase lines beyond the y axis drawing area
-			if (posFromTop >= 0 && posFromTop <= this.height)
-				CurveSurvey.this.canvasGC.drawImage(canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
-		}
-
-		/**
-		 * Clean survey area lines by re-drawing the untouched curve area image of this rectangle.
-		 */
-		public void cleanRectangle(Image canvasImage) {
-			if (this.yLowerLimit != Integer.MIN_VALUE || this.yUpperLimit != Integer.MAX_VALUE) {
-				int maxLineWidth = 3;
-				{
-					// extend the rectangle to avoid remains of thicker lines or boxplot parts which lie beyond the rectangle
-					int left = Math.max(0, this.xLeftLimit - maxLineWidth); // left is never bigger than width due to the lineWidth
-					int right = Math.min(this.width, this.xRightLimit + maxLineWidth); // right is never less than 0 due to the lineWidth
-					int top = Math.min(this.height, Math.max(0, this.yUpperLimit - maxLineWidth));
-					int bottom = Math.min(this.height, Math.max(0, this.yLowerLimit + maxLineWidth));
-					int tmpWidth = Math.max(0, right - left);
-					int tmpHeight = Math.max(0, bottom - top);
-					log.finer(() -> "left=" + left + " top=" + top + " width=" + tmpWidth + " height=" + tmpHeight);
-
-					CurveSurvey.this.canvasGC.drawImage(canvasImage, left + this.offSetX, top + this.offSetY, tmpWidth, tmpHeight, left + this.offSetX, top + this.offSetY, tmpWidth, tmpHeight);
-				}
-				this.yLowerLimit = Integer.MIN_VALUE;
-				this.yUpperLimit = Integer.MAX_VALUE;
-				this.xLeftLimit = Integer.MAX_VALUE;
-				this.xRightLimit = Integer.MIN_VALUE;
-			}
-		}
+//		/**
+//		 * erase a vertical line by re-drawing the curve area image
+//		 * @param posFromLeft
+//		 * @param posFromTop
+//		 * @param length
+//		 * @param lineWidth
+//		 */
+//		public void eraseVerticalLine(Image canvasImage, int posFromLeft, int posFromTop, int length, int lineWidth) {
+//			log.finer(() -> String.format("imageDisposed=%s posFromLeft=%d posFromTop=%d lineWidth=%d length=%d", canvasImage.isDisposed(), posFromLeft, posFromTop, lineWidth, length));
+//			CurveSurvey.this.canvasGC.drawImage(canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length);
+//		}
+//
+//		/**
+//		 * erase a horizontal line by re-drawing the curve area image
+//		 * @param posFromTop
+//		 * @param posFromLeft
+//		 * @param length
+//		 * @param lineWidth
+//		 */
+//		public void eraseHorizontalLine(Image canvasImage, int posFromTop, int posFromLeft, int length, int lineWidth) {
+//			log.finer(() -> String.format("imageDisposed=%s posFromLeft=%d posFromTop=%d lineWidth=%d length=%d", canvasImage.isDisposed(), posFromLeft, posFromTop, lineWidth, length));
+//			// do not erase lines beyond the y axis drawing area
+//			if (posFromTop >= 0 && posFromTop <= this.height)
+//				CurveSurvey.this.canvasGC.drawImage(canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
+//		}
+//
+//		/**
+//		 * Clean survey area lines by re-drawing the untouched curve area image of this rectangle.
+//		 */
+//		public void cleanRectangle(Image canvasImage) {
+//			if (this.yLowerLimit != Integer.MIN_VALUE || this.yUpperLimit != Integer.MAX_VALUE) {
+//				int maxLineWidth = 3;
+//				{
+//					// extend the rectangle to avoid remains of thicker lines or boxplot parts which lie beyond the rectangle
+//					int left = Math.max(0, this.xLeftLimit - maxLineWidth); // left is never bigger than width due to the lineWidth
+//					int right = Math.min(this.width, this.xRightLimit + maxLineWidth); // right is never less than 0 due to the lineWidth
+//					int top = Math.min(this.height, Math.max(0, this.yUpperLimit - maxLineWidth));
+//					int bottom = Math.min(this.height, Math.max(0, this.yLowerLimit + maxLineWidth));
+//					int tmpWidth = Math.max(0, right - left);
+//					int tmpHeight = Math.max(0, bottom - top);
+//					log.finer(() -> "left=" + left + " top=" + top + " width=" + tmpWidth + " height=" + tmpHeight);
+//
+//					CurveSurvey.this.canvasGC.drawImage(canvasImage, left + this.offSetX, top + this.offSetY, tmpWidth, tmpHeight, left + this.offSetX, top + this.offSetY, tmpWidth, tmpHeight);
+//				}
+//				this.yLowerLimit = Integer.MIN_VALUE;
+//				this.yUpperLimit = Integer.MAX_VALUE;
+//				this.xLeftLimit = Integer.MAX_VALUE;
+//				this.xRightLimit = Integer.MIN_VALUE;
+//			}
+//		}
 
 		/**
 		 * Set the line properties for the next line draw operations.
@@ -378,8 +378,8 @@ public final class CurveSurvey {
 
 		private int getBoxWidth() {
 			int boxWidth = 15;
-			if (Math.abs(CurveSurvey.this.xPosDelta - CurveSurvey.this.xPosMeasure) > boxWidth) {
-				boxWidth += ((int) Math.log(Math.abs(CurveSurvey.this.xPosDelta - CurveSurvey.this.xPosMeasure))) * 4 - 10;
+			if (Math.abs(GraphicsMeasuring.xPosDelta - GraphicsMeasuring.xPosMeasure) > boxWidth) {
+				boxWidth += ((int) Math.log(Math.abs(GraphicsMeasuring.xPosDelta - GraphicsMeasuring.xPosMeasure))) * 4 - 10;
 				log.log(FINEST, "boxwidth=", boxWidth);
 			}
 			return boxWidth + boxWidth * (Settings.getInstance().getBoxplotScaleOrdinal() - 1) / 2;
@@ -402,13 +402,8 @@ public final class CurveSurvey {
 	private LinePainter							linePainter;
 	private GC											canvasGC;
 
-	private int											xPosMeasure	= Integer.MIN_VALUE;
-	private int											yPosMeasure	= Integer.MIN_VALUE;
-	private int											xPosDelta		= Integer.MIN_VALUE;
-	private int											yPosDelta		= Integer.MIN_VALUE;
-
-	public CurveSurvey(GC canvasGC, GraphicsComposite graphicsComposite, Measure measure) {
-		this.canvasGC = canvasGC;
+	public CurveSurvey(GraphicsComposite graphicsComposite, Measure measure) {
+		//this.canvasGC = canvasGC;
 		this.trailRecord = measure.measureRecord;
 		this.graphicsComposite = graphicsComposite;
 		this.timeLine = graphicsComposite.getTimeLine();
@@ -416,10 +411,10 @@ public final class CurveSurvey {
 	}
 
 	public void initialize() {
-		xPosMeasure = Integer.MIN_VALUE;
-		yPosMeasure = Integer.MIN_VALUE;
-		xPosDelta = Integer.MIN_VALUE;
-		yPosDelta = Integer.MIN_VALUE;
+		GraphicsMeasuring.xPosMeasure = Integer.MIN_VALUE;
+		GraphicsMeasuring.yPosMeasure = Integer.MIN_VALUE;
+		GraphicsMeasuring.xPosDelta = Integer.MIN_VALUE;
+		GraphicsMeasuring.yPosDelta = Integer.MIN_VALUE;
 	}
 
 	/**
@@ -429,9 +424,9 @@ public final class CurveSurvey {
 		String statusMessage;
 
 		linePainter = new LinePainter(timeLine.getCurveAreaBounds());
-		this.linePainter.drawCross(this.xPosMeasure, this.yPosMeasure);
+		this.linePainter.drawCross(GraphicsMeasuring.xPosMeasure, GraphicsMeasuring.yPosMeasure);
 
-		if (this.yPosMeasure >= Integer.MIN_VALUE) {
+		if (GraphicsMeasuring.yPosMeasure >= Integer.MIN_VALUE) {
 			statusMessage = measure.getMeasureStatusMessage();
 		} else {
 			statusMessage = measure.getNoRecordsStatusMessage();
@@ -446,9 +441,9 @@ public final class CurveSurvey {
 		String statusMessage;
 
 		linePainter = new LinePainter(timeLine.getCurveAreaBounds());
-		this.linePainter.drawDoubleCross(this.xPosMeasure, this.yPosMeasure, this.xPosDelta, this.yPosDelta);
+		this.linePainter.drawDoubleCross(GraphicsMeasuring.xPosMeasure, GraphicsMeasuring.yPosMeasure, GraphicsMeasuring.xPosDelta, GraphicsMeasuring.yPosDelta);
 
-		if (this.yPosMeasure != Integer.MIN_VALUE || this.yPosDelta != Integer.MIN_VALUE) {
+		if (GraphicsMeasuring.yPosMeasure != Integer.MIN_VALUE || GraphicsMeasuring.yPosDelta != Integer.MIN_VALUE) {
 			if (this.settings.isCurveSurvey()) {
 				drawCurveSurvey();
 				statusMessage = measure.getCurveSurveyStatusMessage();
@@ -477,11 +472,11 @@ public final class CurveSurvey {
 		GraphicsLayout graphicsData = graphicsComposite.getChartData(trailRecord);
 		if (!recordSection.isBoundedParabola()) { // hide these curves for better overview whenever a parabola is shown
 			int yBoundedAvg = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, recordSection.getBoundedAvgValue());
-			this.linePainter.drawAverageLine(yBoundedAvg, this.xPosMeasure, this.xPosDelta - this.xPosMeasure);
+			this.linePainter.drawAverageLine(yBoundedAvg, GraphicsMeasuring.xPosMeasure, GraphicsMeasuring.xPosDelta - GraphicsMeasuring.xPosMeasure);
 
 			int yRegressionPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, recordSection.getBoundedSlopeValue(measure.getTimestampMeasure_ms()));
 			int yRegressionPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, recordSection.getBoundedSlopeValue(measure.getTimestampDelta_ms()));
-			this.linePainter.drawLinearRegressionLine(this.xPosMeasure, yRegressionPosMeasure, this.xPosDelta, yRegressionPosDelta);
+			this.linePainter.drawLinearRegressionLine(GraphicsMeasuring.xPosMeasure, yRegressionPosMeasure, GraphicsMeasuring.xPosDelta, yRegressionPosDelta);
 		} else {
 			List<Spot<Integer>> points = new ArrayList<>();
 			for (Spot<Double> entry : recordSection.getBoundedParabolaValues()) {
@@ -492,7 +487,7 @@ public final class CurveSurvey {
 			this.linePainter.drawRegressionParabolaLine(points);
 		}
 		{
-			int xPosMidBounds = (this.xPosDelta + this.xPosMeasure) / 2;
+			int xPosMidBounds = (GraphicsMeasuring.xPosDelta + GraphicsMeasuring.xPosMeasure) / 2;
 			double[] values = recordSection.getBoundedBoxplotValues();
 			int[] yPosBoxplot = new int[values.length];
 			for (int i = 0; i < values.length; i++) {
@@ -507,19 +502,19 @@ public final class CurveSurvey {
 	 * @param canvasImage
 	 */
 	public void cleanMeasurementPointer(Image canvasImage) {
-		int height = timeLine.getCurveAreaBounds().height;
-		int width = timeLine.getCurveAreaBounds().width;
+		//int height = timeLine.getCurveAreaBounds().height;
+		//int width = timeLine.getCurveAreaBounds().width;
 
 		if (this.linePainter != null && this.linePainter.isSizeForErasure(canvasImage)) {
-			if (xPosMeasure > Integer.MIN_VALUE) {
-				log.finer(() -> "xPosMeasure=" + xPosMeasure + " xPosTimestamp=" + timeLine.getXPosTimestamp(measure.getTimestampMeasure_ms()));
-				linePainter.eraseVerticalLine(canvasImage, xPosMeasure, 0, height, LineMark.MEASURE_CROSS.lineWidth);
-				linePainter.eraseHorizontalLine(canvasImage, yPosMeasure, 0, width, LineMark.MEASURE_CROSS.lineWidth);
+			if (GraphicsMeasuring.xPosMeasure > Integer.MIN_VALUE) {
+				log.finer(() -> "xPosMeasure=" + GraphicsMeasuring.xPosMeasure + " xPosTimestamp=" + timeLine.getXPosTimestamp(measure.getTimestampMeasure_ms()));
+				//linePainter.eraseVerticalLine(canvasImage, GraphicsMeasuring.xPosMeasure, 0, height, LineMark.MEASURE_CROSS.lineWidth);
+				//linePainter.eraseHorizontalLine(canvasImage, GraphicsMeasuring.yPosMeasure, 0, width, LineMark.MEASURE_CROSS.lineWidth);
 			}
-			if (xPosDelta > Integer.MIN_VALUE) {
-				linePainter.eraseVerticalLine(canvasImage, this.xPosDelta, 0, height, LineMark.DELTA_CROSS.lineWidth);
-				linePainter.eraseHorizontalLine(canvasImage, this.yPosDelta, 0, width, LineMark.DELTA_CROSS.lineWidth);
-				this.linePainter.cleanRectangle(canvasImage);
+			if (GraphicsMeasuring.xPosDelta > Integer.MIN_VALUE) {
+				//linePainter.eraseVerticalLine(canvasImage, GraphicsMeasuring.xPosDelta, 0, height, LineMark.DELTA_CROSS.lineWidth);
+				//linePainter.eraseHorizontalLine(canvasImage, GraphicsMeasuring.yPosDelta, 0, width, LineMark.DELTA_CROSS.lineWidth);
+				//this.linePainter.cleanRectangle(canvasImage);
 			}
 		} else {
 			// not erasing the lines provokes a full redraw if the size has changed sufficiently
@@ -531,10 +526,10 @@ public final class CurveSurvey {
 	 */
 	public void setMeasurePosition() {
 		int height = timeLine.getCurveAreaBounds().height;
-		xPosMeasure = timeLine.getXPosTimestamp(measure.getTimestampMeasure_ms());
+		GraphicsMeasuring.xPosMeasure = timeLine.getXPosTimestamp(measure.getTimestampMeasure_ms());
 		GraphicsLayout graphicsData = graphicsComposite.getChartData(trailRecord);
-		yPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, trailRecord.getParent().getIndex(measure.getTimestampMeasure_ms()));
-		log.finer(() -> String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", measure.getTimestampMeasure_ms(), this.xPosMeasure, this.yPosMeasure));
+		GraphicsMeasuring.yPosMeasure = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, trailRecord.getParent().getIndex(measure.getTimestampMeasure_ms()));
+		log.finer(() -> String.format("timestampMeasure_ms=%d xPosMeasure=%d yPosMeasure=%d", measure.getTimestampMeasure_ms(), GraphicsMeasuring.xPosMeasure, GraphicsMeasuring.yPosMeasure));
 	}
 
 	/**
@@ -542,10 +537,10 @@ public final class CurveSurvey {
 	 */
 	public void setDeltaPosition() {
 		int height = timeLine.getCurveAreaBounds().height;
-		xPosDelta = timeLine.getXPosTimestamp(measure.getTimestampDelta_ms());
+		GraphicsMeasuring.xPosDelta = timeLine.getXPosTimestamp(measure.getTimestampDelta_ms());
 		GraphicsLayout graphicsData = graphicsComposite.getChartData(trailRecord);
-		yPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, trailRecord.getParent().getIndex(measure.getTimestampDelta_ms()));
-		log.fine(() -> String.format("timestampDelta_ms=%d xPosDelta=%d yPosDelta=%d", measure.getTimestampDelta_ms(), this.xPosDelta, this.yPosDelta));
+		GraphicsMeasuring.yPosDelta = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, trailRecord.getParent().getIndex(measure.getTimestampDelta_ms()));
+		log.fine(() -> String.format("timestampDelta_ms=%d xPosDelta=%d yPosDelta=%d", measure.getTimestampDelta_ms(), GraphicsMeasuring.xPosDelta, GraphicsMeasuring.yPosDelta));
 	}
 
 	/**
@@ -553,7 +548,7 @@ public final class CurveSurvey {
 	 * @return true if the x position is close to the vertical line
 	 */
 	public boolean isNearDeltaLine(int xPos) {
-		return this.xPosDelta + 1 >= xPos && this.xPosDelta - 1 <= xPos;
+		return GraphicsMeasuring.xPosDelta + 1 >= xPos && GraphicsMeasuring.xPosDelta - 1 <= xPos;
 	}
 
 	/**
@@ -561,7 +556,7 @@ public final class CurveSurvey {
 	 * @return true if the x position is close to the vertical line
 	 */
 	public boolean isNearMeasureLine(int xPos) {
-		return this.xPosMeasure + X_TOLERANCE >= xPos && this.xPosMeasure - X_TOLERANCE <= xPos;
+		return GraphicsMeasuring.xPosMeasure + X_TOLERANCE >= xPos && GraphicsMeasuring.xPosMeasure - X_TOLERANCE <= xPos;
 	}
 
 	/**
@@ -569,16 +564,16 @@ public final class CurveSurvey {
 	 * @return true if the x position is exactly over the measurement or delta vertical line
 	 */
 	public boolean isOverVerticalLine(int xPos) {
-		return xPos > Integer.MIN_VALUE && this.xPosMeasure > Integer.MIN_VALUE && isNearMeasureLine(xPos) //
-				|| xPos > Integer.MIN_VALUE && this.xPosDelta > Integer.MIN_VALUE && isNearDeltaLine(xPos);
+		return xPos > Integer.MIN_VALUE && GraphicsMeasuring.xPosMeasure > Integer.MIN_VALUE && isNearMeasureLine(xPos) //
+				|| xPos > Integer.MIN_VALUE && GraphicsMeasuring.xPosDelta > Integer.MIN_VALUE && isNearDeltaLine(xPos);
 	}
 
 	public boolean isNewMeasureSpot(long timestampNew_ms, int yPosNew) {
-		return yPosNew != Integer.MIN_VALUE && (timestampNew_ms != measure.getTimestampMeasure_ms() || yPosNew != this.yPosMeasure);
+		return yPosNew != Integer.MIN_VALUE && (timestampNew_ms != measure.getTimestampMeasure_ms() || yPosNew != GraphicsMeasuring.yPosMeasure);
 	}
 
 	public boolean isNewDeltaSpot(long timestampNew_ms, int yPosNew) {
-		return yPosNew != Integer.MIN_VALUE && (timestampNew_ms != measure.getTimestampDelta_ms() || yPosNew != this.yPosDelta);
+		return yPosNew != Integer.MIN_VALUE && (timestampNew_ms != measure.getTimestampDelta_ms() || yPosNew != GraphicsMeasuring.yPosDelta);
 	}
 
 	public void setCanvasGC(GC canvasGC) {
@@ -587,7 +582,7 @@ public final class CurveSurvey {
 
 	@Override
 	public String toString() {
-		return "CurveSurvey [xPosMeasure=" + this.xPosMeasure + ", yPosMeasure=" + this.yPosMeasure + ", xPosDelta=" + this.xPosDelta + ", yPosDelta=" + this.yPosDelta + "]";
+		return "CurveSurvey [xPosMeasure=" + GraphicsMeasuring.xPosMeasure + ", yPosMeasure=" + GraphicsMeasuring.yPosMeasure + ", xPosDelta=" + GraphicsMeasuring.xPosDelta + ", yPosDelta=" + GraphicsMeasuring.yPosDelta + "]";
 	}
 
 }

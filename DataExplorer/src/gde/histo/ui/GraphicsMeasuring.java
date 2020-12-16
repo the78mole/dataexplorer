@@ -23,13 +23,13 @@ import java.util.Date;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Text;
 
 import gde.GDE;
 import gde.histo.recordings.HistoGraphicsMapper;
 import gde.histo.recordings.TrailRecordSetFormatter;
+import gde.log.Level;
 import gde.log.Logger;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
@@ -57,7 +57,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 			}
 
 			@Override
-			void drawMeasurement(GraphicsMeasuring hgm) {
+			void drawMeasurement(GC canvasGC, GraphicsMeasuring hgm) {
 				AbstractChartComposite hgc = hgm.graphicsComposite;
 
 				String statusMessage = hgm.curveSurvey.drawMeasurementGraphics();
@@ -68,7 +68,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 			}
 
 			@Override
-			void drawLeftMeasurement(GraphicsMeasuring hgm) {
+			void drawLeftMeasurement(GC canvasGC, GraphicsMeasuring hgm) {
 				AbstractChartComposite hgc = hgm.graphicsComposite;
 				long startTime = new Date().getTime();
 				String statusMessage = hgm.curveSurvey.drawMeasurementGraphics();
@@ -80,7 +80,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 			}
 
 			@Override
-			void drawRightMeasurement(GraphicsMeasuring hgm) {
+			void drawRightMeasurement(GC canvasGC, GraphicsMeasuring hgm) {
 				// simple measure has only a left measurement
 			}
 		},
@@ -94,7 +94,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 			}
 
 			@Override
-			void drawMeasurement(GraphicsMeasuring hgm) {
+			void drawMeasurement(GC canvasGC, GraphicsMeasuring hgm) {
 				AbstractChartComposite hgc = hgm.graphicsComposite;
 
 				String statusMessage = hgm.curveSurvey.drawDeltaMeasurementGraphics();
@@ -105,7 +105,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 			}
 
 			@Override
-			void drawLeftMeasurement(GraphicsMeasuring hgm) {
+			void drawLeftMeasurement(GC canvasGC, GraphicsMeasuring hgm) {
 				AbstractChartComposite hgc = hgm.graphicsComposite;
 				long startTime = new Date().getTime();
 				String statusMessage = hgm.curveSurvey.drawDeltaMeasurementGraphics();
@@ -117,7 +117,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 			}
 
 			@Override
-			void drawRightMeasurement(GraphicsMeasuring hgm) {
+			void drawRightMeasurement(GC canvasGC, GraphicsMeasuring hgm) {
 				AbstractChartComposite hgc = hgm.graphicsComposite;
 				long startTime = new Date().getTime();
 				String statusMessage = hgm.curveSurvey.drawDeltaMeasurementGraphics();
@@ -137,18 +137,18 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 		/**
 		 * Perform the UI activities required for a measurement.
 		 */
-		abstract void drawMeasurement(GraphicsMeasuring hgm);
+		abstract void drawMeasurement(GC canvasGC, GraphicsMeasuring hgm);
 
 		/**
 		 * Perform the UI activities for the first measurement timestamp.
 		 * In case of delta measurement: the timestamp which is initially on the left.
 		 */
-		abstract void drawLeftMeasurement(GraphicsMeasuring hgm);
+		abstract void drawLeftMeasurement(GC canvasGC, GraphicsMeasuring hgm);
 
 		/**
 		 * Perform the UI activities for the second measurement timestamp used for delta measurement.
 		 */
-		abstract void drawRightMeasurement(GraphicsMeasuring hgm);
+		abstract void drawRightMeasurement(GC canvasGC, GraphicsMeasuring hgm);
 
 		private static String getSelectedMeasurementsAsTable(Text recordSetComment, long timestamp_ms) {
 			recordSetComment.setFont(SWTResourceManager.getFont("Courier New", GDE.WIDGET_FONT_SIZE - 1, SWT.BOLD));
@@ -172,6 +172,12 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 
 	private GC											canvasGC;
 	private MeasuringMode						mode;
+	
+	public static int							xPosMeasure	= Integer.MIN_VALUE;
+	public static int							yPosMeasure	= Integer.MIN_VALUE;
+	public static int							xPosDelta		= Integer.MIN_VALUE;
+	public static int							yPosDelta		= Integer.MIN_VALUE;
+
 
 	public GraphicsMeasuring(GraphicsComposite graphicsComposite, Measure measure) {
 		super(measure);
@@ -179,8 +185,8 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 		this.mode = MeasuringMode.getMode(measure.isDeltaMeasure);
 		this.mode.setMode(this);
 
-		this.curveSurvey = new CurveSurvey(this.canvasGC, graphicsComposite, measure);
-		this.curveSurvey.initialize();
+		this.curveSurvey = new CurveSurvey(graphicsComposite, measure);
+		//this.curveSurvey.initialize();
 		this.curveSurvey.setMeasurePosition();
 		this.curveSurvey.setDeltaPosition();
 	}
@@ -197,21 +203,20 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 	 * Draw a new measurement based on the timestamp values.
 	 */
 	private void drawMeasuring(GC canvasGC, long timestampMeasureNew_ms, long timestampDeltaNew_ms) {
-		Image canvasImage = this.graphicsComposite.canvasImage;
+		//Image canvasImage = this.graphicsComposite.canvasImage;
 		// set the gc properties
-		//this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
 		canvasGC.setForeground(ColorUtils.getColor(measure.measureRecord.getRGB()));
 
 		curveSurvey.setCanvasGC(canvasGC);
 		// all obsolete lines are cleaned up now draw new position marker
-		this.curveSurvey.cleanMeasurementPointer(canvasImage);
+		//this.curveSurvey.cleanMeasurementPointer(canvasImage);
 		measure.setTimestampMeasure_ms(timestampMeasureNew_ms);
 		measure.setTimestampDelta_ms(timestampDeltaNew_ms);
 
-		curveSurvey.initialize();
+		//curveSurvey.initialize();
 		curveSurvey.setMeasurePosition();
 		curveSurvey.setDeltaPosition();
-		mode.drawMeasurement(this);
+		mode.drawMeasurement(canvasGC, this);
 		//this.canvasGC.dispose();
 	}
 
@@ -224,11 +229,10 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 		this.isRightMouseMeasure = false;
 
 		if (curveSurvey != null) { // required if this chart was not yet displayed
-			this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
 			this.curveSurvey.setCanvasGC(this.canvasGC);
 
-			this.curveSurvey.cleanMeasurementPointer(this.graphicsComposite.canvasImage);
-			this.canvasGC.dispose();
+			//this.curveSurvey.cleanMeasurementPointer(this.graphicsComposite.canvasImage);
+			//this.canvasGC.dispose();
 		}
 		this.graphicsComposite.setRecordSetCommentStandard();
 	}
@@ -238,33 +242,32 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 	 */
 	@Override
 	public void processMouseDownMove(long timestamp_ms) {
-		this.canvasGC = new GC(this.graphicsComposite.graphicCanvas);
-		this.curveSurvey.setCanvasGC(this.canvasGC);
-		this.canvasGC.setForeground(ColorUtils.getColor(measure.measureRecord.getRGB()));
+		//this.curveSurvey.setCanvasGC(this.canvasGC);
+		//this.canvasGC.setForeground(ColorUtils.getColor(measure.measureRecord.getRGB()));
 
 		if (this.isLeftMouseMeasure) {
 			int height = graphicsComposite.curveAreaBounds.height;
 			int yPosMeasureNew = HistoGraphicsMapper.getVerticalDisplayPos(graphicsComposite.getChartData(measure.measureRecord), height, measure.measureRecord.getParent().getIndex(timestamp_ms));
 			if (this.curveSurvey.isNewMeasureSpot(timestamp_ms, yPosMeasureNew)) {
-				curveSurvey.cleanMeasurementPointer(graphicsComposite.canvasImage);
+			//	curveSurvey.cleanMeasurementPointer(graphicsComposite.canvasImage);
 
 				measure.setTimestampMeasure_ms(timestamp_ms);
 				curveSurvey.setMeasurePosition();
-				mode.drawLeftMeasurement(this);
+				//mode.drawLeftMeasurement(this);
 			}
 		} else if (this.isRightMouseMeasure) {
 			int height = graphicsComposite.curveAreaBounds.height;
 			int yPosDeltaNew = HistoGraphicsMapper.getVerticalDisplayPos(graphicsComposite.getChartData(measure.measureRecord), height, measure.measureRecord.getParent().getIndex(timestamp_ms));
 			if (this.curveSurvey.isNewDeltaSpot(timestamp_ms, yPosDeltaNew)) {
-				curveSurvey.cleanMeasurementPointer(graphicsComposite.canvasImage);
+				//curveSurvey.cleanMeasurementPointer(graphicsComposite.canvasImage);
 
 				measure.setTimestampDelta_ms(timestamp_ms);
 				curveSurvey.setDeltaPosition();
-				mode.drawRightMeasurement(this);
+				//mode.drawRightMeasurement(this);
 			}
 		}
-
-		this.canvasGC.dispose();
+		//this.canvasGC.dispose();
+		this.graphicsComposite.graphicCanvas.redraw();
 	}
 
 	/**
@@ -284,6 +287,7 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 	 */
 	@Override
 	public void processMouseDownAction(Point point) {
+		log.log(Level.OFF, point.toString());
 		if (this.curveSurvey.isOverVerticalLine(point.x)) {
 			if (this.curveSurvey.isNearMeasureLine(point.x)) {
 				this.isLeftMouseMeasure = true;

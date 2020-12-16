@@ -200,6 +200,8 @@ public abstract class AbstractChartComposite extends Composite {
 	 * Update the graphics canvas, while repeatable redraw calls it optimized to the required area.
 	 */
 	protected synchronized void doRedrawGraphics() {
+		log.log(Level.OFF, "refresch graphics");
+		this.drawCurves();
 		this.graphicCanvas.redraw(); // do full update where required
 		this.recordSetComment.redraw();
 	}
@@ -344,14 +346,30 @@ public abstract class AbstractChartComposite extends Composite {
 	 * Draw the record graphs with their scales and define the curve area.
 	 */
 	protected void drawCurves() {
-		// changed curve selection may change the scale end values
-		windowActor.getTrailRecordSet().syncScaleOfSyncableRecords();
-
-		int dataScaleWidth = defineDataScaleWidth();
-		curveAreaBounds = defineCurveAreaBounds(dataScaleWidth, defineNumberLeftRightScales());
-		defineLayoutParams(); // initialize early in order to avoid problems in mouse move events
-
-		drawCurveArea(dataScaleWidth);
+		if (windowActor.getTrailRecordSet() != null) {
+			// Get the canvas and its dimensions draw image outside paint event
+			this.canvasBounds = this.graphicCanvas.getClientArea();
+			log.log(Level.OFF, "canvasBounds", this.canvasBounds);
+			if (this.canvasBounds.height <= 0 || this.canvasBounds.width <= 0) return;
+	
+			if (this.canvasImage != null) this.canvasImage.dispose();
+				this.canvasImage = new Image(GDE.display, this.canvasBounds);
+			this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
+			this.canvasImageGC.setBackground(this.surroundingBackground);
+			this.canvasImageGC.fillRectangle(this.canvasBounds);
+			this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+	
+			// changed curve selection may change the scale end values
+			windowActor.getTrailRecordSet().syncScaleOfSyncableRecords();
+	
+			int dataScaleWidth = defineDataScaleWidth();
+			curveAreaBounds = defineCurveAreaBounds(dataScaleWidth, defineNumberLeftRightScales());
+			defineLayoutParams(); // initialize early in order to avoid problems in mouse move events
+	
+			drawCurveArea(dataScaleWidth);
+			
+			this.canvasImageGC.dispose();
+		}
 	}
 
 	/**
@@ -463,7 +481,7 @@ public abstract class AbstractChartComposite extends Composite {
 	 * Reset the graphic area and comment.
 	 */
 	public void cleanMeasuring() {
-		measuring.cleanMeasuring();
+		//measuring.cleanMeasuring();
 		measuring = null;
 	}
 
@@ -473,25 +491,12 @@ public abstract class AbstractChartComposite extends Composite {
 	public void abstractDrawAreaPaintControl(GC canvasGC) {
 		if (windowActor.getTrailRecordSet() == null) return;
 
-		// Get the canvas and its dimensions 
-		//TODO move outside drawAreaPaintControl call only when required
-		this.canvasBounds = this.graphicCanvas.getClientArea();
-		log.log(Level.OFF, "canvasBounds", this.canvasBounds);
-		if (this.canvasBounds.height <= 0 || this.canvasBounds.width <= 0) return;
-
-		if (this.canvasImage != null) this.canvasImage.dispose();
-			this.canvasImage = new Image(GDE.display, this.canvasBounds);
-		this.canvasImageGC = new GC(this.canvasImage); // SWTResourceManager.getGC(this.canvasImage);
-		this.canvasImageGC.setBackground(this.surroundingBackground);
-		this.canvasImageGC.fillRectangle(this.canvasBounds);
-		this.canvasImageGC.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 
 		setRecordSetCommentStandard();
 		windowActor.setStatusMessage(GDE.STRING_EMPTY);
 
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet != null && trailRecordSet.getTimeStepSize() > 0) {
-			drawCurves();
 			canvasGC.drawImage(this.canvasImage, 0, 0);
 
 			if (measuring != null) 
@@ -499,7 +504,6 @@ public abstract class AbstractChartComposite extends Composite {
 		} else {
 			canvasGC.drawImage(this.canvasImage, 0, 0);
 		}
-		this.canvasImageGC.dispose();
 	}
 
 	/**

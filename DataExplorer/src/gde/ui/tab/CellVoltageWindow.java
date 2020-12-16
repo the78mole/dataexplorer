@@ -412,7 +412,7 @@ public class CellVoltageWindow extends CTabItem {
 			for (int i = 0; i < this.voltageVector.size(); ++i) {
 				if (this.displays.get(i).getVoltage() != this.voltageVector.get(i).getVoltage()) {
 					this.displays.get(i).setVoltage(this.voltageVector.get(i).getVoltage());
-					this.displays.get(i).voltagePaintControl();
+					this.displays.get(i).redraw();
 					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "setVoltage cell " + i + " - " + this.voltageVector.get(i).getVoltage()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}

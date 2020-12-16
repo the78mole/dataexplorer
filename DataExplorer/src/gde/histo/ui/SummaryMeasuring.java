@@ -122,11 +122,11 @@ public final class SummaryMeasuring extends AbstractMeasuring {
 		log.finer(() -> "canvasGC=" + canvasGC + " curveSurvey=" + curveSurvey + " height=" + summaryComposite.graphicCanvas.getBounds().height);
 		// if (this.summaryComposite.graphicCanvas.getBounds().height != 0) { // canvas was not yet drawn
 		if (curveSurvey != null) { // required if this chart was not yet displayed
-			this.canvasGC = new GC(this.summaryComposite.graphicCanvas);
-			this.curveSurvey.setCanvasGC(this.canvasGC);
+			//this.canvasGC = new GC(this.summaryComposite.graphicCanvas);
+			//this.curveSurvey.setCanvasGC(this.canvasGC);
 
-			this.curveSurvey.cleanMeasurementPointer(this.summaryComposite.canvasImage);
-			this.canvasGC.dispose();
+			//this.curveSurvey.cleanMeasurementPointer(this.summaryComposite.canvasImage);
+			//this.canvasGC.dispose();
 			throw new UnsupportedOperationException();
 		}
 // }
