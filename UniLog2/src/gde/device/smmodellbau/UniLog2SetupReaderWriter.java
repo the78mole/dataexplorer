@@ -439,8 +439,8 @@ public class UniLog2SetupReaderWriter {
 				buffer[190] = (byte) (tmpCheckSum & 0x00FF);
 				buffer[191] = (byte) ((tmpCheckSum & 0xFF00) >> 8);
 
-				if (UniLog2SetupReaderWriter.log.isLoggable(java.util.logging.Level.OFF))
-					UniLog2SetupReaderWriter.log.log(java.util.logging.Level.OFF, "$UL2SETUP," + StringHelper.byte2Hex2CharString(buffer, buffer.length)); //$NON-NLS-1$
+				if (UniLog2SetupReaderWriter.log.isLoggable(java.util.logging.Level.FINE))
+					UniLog2SetupReaderWriter.log.log(java.util.logging.Level.FINE, "$UL2SETUP," + StringHelper.byte2Hex2CharString(buffer, buffer.length)); //$NON-NLS-1$
 				FileOutputStream file_out = new FileOutputStream(setupFile);
 				DataOutputStream data_out = new DataOutputStream(file_out);
 				data_out.write(buffer);

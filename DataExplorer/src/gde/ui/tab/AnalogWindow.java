@@ -63,7 +63,7 @@ public class AnalogWindow extends CTabItem {
 
 	Color														surroundingBackground;
 
-	final DataExplorer		application;
+	final DataExplorer							application;
 	final Channels									channels;
 	final CTabFolder								displayTab;
 	final Menu											popupmenu;
@@ -140,7 +140,7 @@ public class AnalogWindow extends CTabItem {
 	 */
 	public synchronized void update(boolean forceUpdate) {
 		Channel activeChannel = this.channels.getActiveChannel();
-		if (activeChannel != null && this.analogMainComposite.isVisible()) {
+		if (activeChannel != null) {
 			if (log.isLoggable(Level.FINE)) log.log(Level.FINE, GDE.STRING_BLANK);
 			RecordSet recordSet = activeChannel.getActiveRecordSet();
 			// check if just created  or device switched or disabled

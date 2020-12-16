@@ -1069,7 +1069,7 @@ public class MenuBar {
 					this.refreshItem.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "refreshItem.widgetSelected, event=" + evt); //$NON-NLS-1$
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "refreshItem.widgetSelected, event=" + evt); //$NON-NLS-1$
 							MenuBar.this.application.getHistoExplorer().ifPresent(h -> {
 								h.resetHisto();
 							});

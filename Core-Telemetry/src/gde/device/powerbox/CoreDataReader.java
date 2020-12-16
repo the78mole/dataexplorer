@@ -153,9 +153,9 @@ public class CoreDataReader {
 							break;
 						}
 					}
-					if (CoreDataReader.log.isLoggable(Level.FINER)) CoreDataReader.log.log(Level.OFF, "best fit # values = " + numValues);
+					if (CoreDataReader.log.isLoggable(Level.FINER)) CoreDataReader.log.log(Level.FINER, "best fit # values = " + numValues);
 					timeStep_ms = data.getMaxTimestamp() * 1000.0 / numValues;
-					if (CoreDataReader.log.isLoggable(Level.FINER)) CoreDataReader.log.log(Level.OFF, String.format("best fit timeStep_ms = %.1f", timeStep_ms));
+					if (CoreDataReader.log.isLoggable(Level.FINER)) CoreDataReader.log.log(Level.FINER, String.format("best fit timeStep_ms = %.1f", timeStep_ms));
 
 					try {
 						recordSetNameExtend = device.getRecordSetStateNameReplacement(1); // state name

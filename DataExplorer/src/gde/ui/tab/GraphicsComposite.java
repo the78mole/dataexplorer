@@ -709,7 +709,7 @@ public class GraphicsComposite extends Composite {
 	 * @param evt
 	 */
 	void drawAreaPaintControl(PaintEvent evt) {
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
 
 		//get gc for drawing operations
 		evt.gc.drawImage(this.canvasImage, 0, 0);
@@ -1017,7 +1017,7 @@ public class GraphicsComposite extends Composite {
 	 * @param isRefresh
 	 */
 	public void drawMeasurePointer(GC canvasGC, RecordSet recordSet, GraphicsMode mode, boolean isRefresh) {
-		log.log(Level.OFF, "isRefresh = " + isRefresh);
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "isRefresh = " + isRefresh);
 		if (mode != this.actualModeState)
 			this.setModeState(mode); // cleans old pointer if required
 
@@ -1033,7 +1033,7 @@ public class GraphicsComposite extends Composite {
 				// initialize measure position if not in refresh 
 				this.xPosMeasure = isRefresh ? this.xPosMeasure : this.curveAreaBounds.width / 4;
 				this.yPosMeasure = record.getVerticalDisplayPointValue(this.xPosMeasure);
-				if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "initial xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "initial xPosMeasure = " + this.xPosMeasure + " yPosMeasure = " + this.yPosMeasure); //$NON-NLS-1$ //$NON-NLS-2$
 
 				drawVerticalLine(canvasGC, this.xPosMeasure, 0, this.curveAreaBounds.height);
 				drawHorizontalLine(canvasGC, this.yPosMeasure, 0, this.curveAreaBounds.width);
@@ -1228,7 +1228,7 @@ public class GraphicsComposite extends Composite {
 			if (leftEnabled) {
 				this.application.setStatusMessage(Messages.getString(MessageIds.GDE_MSGT0258));
 				this.xPosCut = this.xPosCut > 0 ? this.xPosCut : this.curveAreaBounds.width * 1 / 4;
-				log.log(Level.OFF, "this.xPosCut = " + this.xPosCut);
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "this.xPosCut = " + this.xPosCut);
 				canvasGC.setBackgroundPattern(SWTResourceManager.getPattern(0, 0, 50, 50, SWT.COLOR_CYAN, 128, SWT.COLOR_WIDGET_BACKGROUND, 128));
 				canvasGC.fillRectangle(0 + this.offSetX, 0 + this.offSetY, this.xPosCut, this.curveAreaBounds.height);
 				canvasGC.setAdvanced(false);
@@ -1261,7 +1261,7 @@ public class GraphicsComposite extends Composite {
 	 * @param mode MODE_RESET, MODE_ZOOM, MODE_MEASURE, MODE_DELTA_MEASURE
 	 */
 	public void setModeState(GraphicsMode mode) {
-		log.log(Level.OFF, "GraphicsMode = " + mode);
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "GraphicsMode = " + mode);
 		this.cleanMeasurementPointer();
 		switch (mode) {
 		case ZOOM:
@@ -1429,7 +1429,7 @@ public class GraphicsComposite extends Composite {
 						else if (this.isPanMouse) {
 							this.xDeltaPan = (this.xLast != 0 && this.xLast != evt.x) ? (this.xDeltaPan + (this.xLast < evt.x ? -1 : 1)) : 0;
 							this.yDeltaPan = (this.yLast != 0 && this.yLast != evt.y) ? (this.yDeltaPan + (this.yLast < evt.y ? 1 : -1)) : 0;
-							if (log.isLoggable(Level.OFF)) log.log(Level.OFF, " xDeltaPan = " + this.xDeltaPan + " yDeltaPan = " + this.yDeltaPan); //$NON-NLS-1$ //$NON-NLS-2$
+							if (log.isLoggable(Level.FINER)) log.log(Level.FINER, " xDeltaPan = " + this.xDeltaPan + " yDeltaPan = " + this.yDeltaPan); //$NON-NLS-1$ //$NON-NLS-2$
 							if ((this.xDeltaPan != 0 && this.xDeltaPan % 5 == 0) || (this.yDeltaPan != 0 && this.yDeltaPan % 5 == 0)) {
 								recordSet.shift(this.xDeltaPan, this.yDeltaPan); // 10% each direction
 								this.doRedrawGraphics();

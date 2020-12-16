@@ -278,7 +278,7 @@ public class IGCReaderWriter {
 							int i=0;
 							for (IgcExtension extension : extensions) {
 								if (recordSet.realSize() > 6+i && !recordSet.get(6+i).getName().equals(extension.getThreeLetterCode())) {
-									log.log(Level.OFF, String.format("set record with name %s # %d to name %s", recordSet.get(6+i).getName(), 6+i, extension.getThreeLetterCode()));
+									if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("set record with name %s # %d to name %s", recordSet.get(6+i).getName(), 6+i, extension.getThreeLetterCode()));
 									recordSet.get(6+i).setName(extension.getThreeLetterCode());
 								}
 								++i;

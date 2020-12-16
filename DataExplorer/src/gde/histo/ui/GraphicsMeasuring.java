@@ -287,7 +287,6 @@ public final class GraphicsMeasuring extends AbstractMeasuring {
 	 */
 	@Override
 	public void processMouseDownAction(Point point) {
-		log.log(Level.OFF, point.toString());
 		if (this.curveSurvey.isOverVerticalLine(point.x)) {
 			if (this.curveSurvey.isNearMeasureLine(point.x)) {
 				this.isLeftMouseMeasure = true;

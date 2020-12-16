@@ -200,7 +200,7 @@ public abstract class AbstractChartComposite extends Composite {
 	 * Update the graphics canvas, while repeatable redraw calls it optimized to the required area.
 	 */
 	protected synchronized void doRedrawGraphics() {
-		log.log(Level.OFF, "refresch graphics");
+		log.fine(() -> "refresch graphics");
 		this.drawCurves();
 		this.graphicCanvas.redraw(); // do full update where required
 		this.recordSetComment.redraw();
@@ -349,7 +349,7 @@ public abstract class AbstractChartComposite extends Composite {
 		if (windowActor.getTrailRecordSet() != null) {
 			// Get the canvas and its dimensions draw image outside paint event
 			this.canvasBounds = this.graphicCanvas.getClientArea();
-			log.log(Level.OFF, "canvasBounds", this.canvasBounds);
+			log.finer(() -> "canvasBounds" + this.canvasBounds);
 			if (this.canvasBounds.height <= 0 || this.canvasBounds.width <= 0) return;
 	
 			if (this.canvasImage != null) this.canvasImage.dispose();

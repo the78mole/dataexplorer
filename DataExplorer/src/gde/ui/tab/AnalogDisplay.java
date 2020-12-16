@@ -239,7 +239,7 @@ public class AnalogDisplay extends Composite {
 				if (tmpMinValue != this.minValue || tmpMaxValue != this.maxValue) {
 					this.minValue = tmpMinValue;
 					this.maxValue = tmpMaxValue;
-					redraw(this.tachoImageBounds.x, this.tachoImageBounds.y, this.tachoImageBounds.width, this.tachoImageBounds.height, true);
+					tacho.redraw();
 				}
 
 				//draw the new needle if required

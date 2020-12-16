@@ -621,7 +621,7 @@ public class MenuToolBar {
 			{ // begin zoom tool bar
 				this.zoomToolBar = new ToolBar(this.coolBar, SWT.NONE);
 				this.zoomToolBar.setBackground(this.application.COLOR_BACKGROUND);
-				log.log(Level.OFF, "Border width = " + this.zoomToolBar.getBorderWidth());
+				if (log.isLoggable(Level.FINER)) log.log(Level.FINER, "Border width = " + this.zoomToolBar.getBorderWidth());
 				this.zoomCoolItem.setControl(this.zoomToolBar);
 				{
 					this.zoomWindowItem = new ToolItem(this.zoomToolBar, SWT.NONE);

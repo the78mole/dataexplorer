@@ -954,7 +954,7 @@ public class TelemetryData {
 				sensor = param;
 				//Insert a new sensor and exit the queue
 				if (timestamp == 0 && paramId == 0) {
-					if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.OFF, "adding sensor " + sensor);
+					if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, "adding sensor " + sensor);
 					TelemetrySensor telemetrySensor = new TelemetrySensor(deviceId, sensor);
 					this.data.add(telemetrySensor);
 				}
@@ -971,7 +971,7 @@ public class TelemetryData {
 				TelemetryVar var = new TelemetryVar(paramId, label, unit);
 				TelemetrySensor s = this.getSensor(deviceId);
 				if (s != null) {
-					if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.OFF, String.format("%s %03d add variable %s[%s] ID=%d", s.getName(), deviceId, var.name, unit, paramId));
+					if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, String.format("%s %03d add variable %s[%s] ID=%d", s.getName(), deviceId, var.name, unit, paramId));
 					s.addVariable(var);
 				}
 				//no function
@@ -1049,8 +1049,8 @@ public class TelemetryData {
 								decimals=0;
 							break;
 						}
-						if (TelemetryData.log.isLoggable(Level.FINER) && deviceId == 200 && paramId >= 20) //GPS-Logger Höhe
-							log.log(Level.OFF, String.format("TelemetryData: deviceId=%03d, paramId=%02d, value=%d, decimals=%d timeStamp=%d", deviceId, paramId, val, decimals, timestamp));
+						if (TelemetryData.log.isLoggable(Level.FINE) && deviceId == 200 && paramId >= 20) //GPS-Logger Höhe
+							log.log(Level.FINE, String.format("TelemetryData: deviceId=%03d, paramId=%02d, value=%d, decimals=%d timeStamp=%d", deviceId, paramId, val, decimals, timestamp));
 						TelemetryItem item = new TelemetryItem(dataType, decimals, val, timestamp);
 
 						if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, "add sensor variable value " + par.name + "=" + item.value);
@@ -1058,7 +1058,7 @@ public class TelemetryData {
 //							log.log(Level.OFF, String.format("TelemetryData: deviceId=%03d, paramId=%02d, name= %s, untit='%s', value=%d, timeStamp=%d", deviceId, paramId, par.name, par.unit, val, timestamp));
 						par.addItem(item, false);
 						if (this.startTimeStamp == 0) {
-							if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.OFF, "set startTimeStamp = " + timestamp);
+							if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, "set startTimeStamp = " + timestamp);
 							this.startTimeStamp = timestamp;
 						}
 					}

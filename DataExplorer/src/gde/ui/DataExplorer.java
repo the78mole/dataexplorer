@@ -731,7 +731,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 					if (DataExplorer.this.histoExplorer.isPresent()) {
 						try {
 							if (log.isLoggable(Level.FINER))
-								log.logp(Level.OFF, $CLASS_NAME, $METHOD_NAME, "old=" + tabPreviousIndex + " new=" + tabSelectionIndex + " addSelectionListener, event=" + evt); //$NON-NLS-1$
+								log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, "old=" + tabPreviousIndex + " new=" + tabSelectionIndex + " addSelectionListener, event=" + evt); //$NON-NLS-1$
 							if (tabFolder.getItem(tabPreviousIndex) instanceof HistoSummaryWindow) {
 								DataExplorer.this.setStatusMessage(GDE.STRING_EMPTY);
 							}
@@ -3218,7 +3218,7 @@ COLOR_FOREGROUND									= SWTResourceManager.getColor(SWT.COLOR_WIDGET_FOREGROU
 											String installpath = url.getFile().substring(0, url.getPath().lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
 											installpath = installpath.substring(0, installpath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX));
 											String command = "cd " + installpath + "; sudo tar -xzf " + targetFilePath + "\"";
-											log.log(Level.OFF, "command = " + command);
+											log.log(Level.FINE, "command = " + command);
 											MessageBox message = new MessageBox(GDE.shell, SWT.ICON_INFORMATION);
 											message.setText(GDE.NAME_LONG);
 											message.setMessage(Messages.getString(MessageIds.GDE_MSGI0055, new String[] { command }));
