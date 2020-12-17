@@ -33,7 +33,6 @@ import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 
 import gde.config.Settings;
@@ -301,67 +300,6 @@ public final class CurveSurvey {
 		}
 
 		/**
-		 * Required for resizings down to a very small area.
-		 * If the canvas image is too small we will not be able to use it as a source for copy.
-		 * @param canvasImage
-		 * @return true if the canvas image is bigger than the curve area bounds at the time of the last drawing
-		 */
-		public boolean isSizeForErasure(Image canvasImage) {
-			return canvasImage.getBounds().width > this.offSetX + this.width && canvasImage.getBounds().height > this.offSetY + this.height;
-		}
-
-//		/**
-//		 * erase a vertical line by re-drawing the curve area image
-//		 * @param posFromLeft
-//		 * @param posFromTop
-//		 * @param length
-//		 * @param lineWidth
-//		 */
-//		public void eraseVerticalLine(Image canvasImage, int posFromLeft, int posFromTop, int length, int lineWidth) {
-//			log.finer(() -> String.format("imageDisposed=%s posFromLeft=%d posFromTop=%d lineWidth=%d length=%d", canvasImage.isDisposed(), posFromLeft, posFromTop, lineWidth, length));
-//			CurveSurvey.this.canvasGC.drawImage(canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length, posFromLeft + this.offSetX, posFromTop + this.offSetY, lineWidth, length);
-//		}
-//
-//		/**
-//		 * erase a horizontal line by re-drawing the curve area image
-//		 * @param posFromTop
-//		 * @param posFromLeft
-//		 * @param length
-//		 * @param lineWidth
-//		 */
-//		public void eraseHorizontalLine(Image canvasImage, int posFromTop, int posFromLeft, int length, int lineWidth) {
-//			log.finer(() -> String.format("imageDisposed=%s posFromLeft=%d posFromTop=%d lineWidth=%d length=%d", canvasImage.isDisposed(), posFromLeft, posFromTop, lineWidth, length));
-//			// do not erase lines beyond the y axis drawing area
-//			if (posFromTop >= 0 && posFromTop <= this.height)
-//				CurveSurvey.this.canvasGC.drawImage(canvasImage, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth, posFromLeft + this.offSetX, posFromTop + this.offSetY, length, lineWidth);
-//		}
-//
-//		/**
-//		 * Clean survey area lines by re-drawing the untouched curve area image of this rectangle.
-//		 */
-//		public void cleanRectangle(Image canvasImage) {
-//			if (this.yLowerLimit != Integer.MIN_VALUE || this.yUpperLimit != Integer.MAX_VALUE) {
-//				int maxLineWidth = 3;
-//				{
-//					// extend the rectangle to avoid remains of thicker lines or boxplot parts which lie beyond the rectangle
-//					int left = Math.max(0, this.xLeftLimit - maxLineWidth); // left is never bigger than width due to the lineWidth
-//					int right = Math.min(this.width, this.xRightLimit + maxLineWidth); // right is never less than 0 due to the lineWidth
-//					int top = Math.min(this.height, Math.max(0, this.yUpperLimit - maxLineWidth));
-//					int bottom = Math.min(this.height, Math.max(0, this.yLowerLimit + maxLineWidth));
-//					int tmpWidth = Math.max(0, right - left);
-//					int tmpHeight = Math.max(0, bottom - top);
-//					log.finer(() -> "left=" + left + " top=" + top + " width=" + tmpWidth + " height=" + tmpHeight);
-//
-//					CurveSurvey.this.canvasGC.drawImage(canvasImage, left + this.offSetX, top + this.offSetY, tmpWidth, tmpHeight, left + this.offSetX, top + this.offSetY, tmpWidth, tmpHeight);
-//				}
-//				this.yLowerLimit = Integer.MIN_VALUE;
-//				this.yUpperLimit = Integer.MAX_VALUE;
-//				this.xLeftLimit = Integer.MAX_VALUE;
-//				this.xRightLimit = Integer.MIN_VALUE;
-//			}
-//		}
-
-		/**
 		 * Set the line properties for the next line draw operations.
 		 * @param lineMark
 		 * @param defaultColor in case of a null color in the lineMark
@@ -403,7 +341,6 @@ public final class CurveSurvey {
 	private GC											canvasGC;
 
 	public CurveSurvey(GraphicsComposite graphicsComposite, Measure measure) {
-		//this.canvasGC = canvasGC;
 		this.trailRecord = measure.measureRecord;
 		this.graphicsComposite = graphicsComposite;
 		this.timeLine = graphicsComposite.getTimeLine();
@@ -494,30 +431,6 @@ public final class CurveSurvey {
 				yPosBoxplot[i] = HistoGraphicsMapper.getVerticalDisplayPos(graphicsData, height, values[i]);
 			}
 			this.linePainter.drawBoxplot(xPosMidBounds, yPosBoxplot);
-		}
-	}
-
-	/**
-	 * clean (old) measurement pointer - check pointer in curve area
-	 * @param canvasImage
-	 */
-	public void cleanMeasurementPointer(Image canvasImage) {
-		//int height = timeLine.getCurveAreaBounds().height;
-		//int width = timeLine.getCurveAreaBounds().width;
-
-		if (this.linePainter != null && this.linePainter.isSizeForErasure(canvasImage)) {
-			if (GraphicsMeasuring.xPosMeasure > Integer.MIN_VALUE) {
-				log.finer(() -> "xPosMeasure=" + GraphicsMeasuring.xPosMeasure + " xPosTimestamp=" + timeLine.getXPosTimestamp(measure.getTimestampMeasure_ms()));
-				//linePainter.eraseVerticalLine(canvasImage, GraphicsMeasuring.xPosMeasure, 0, height, LineMark.MEASURE_CROSS.lineWidth);
-				//linePainter.eraseHorizontalLine(canvasImage, GraphicsMeasuring.yPosMeasure, 0, width, LineMark.MEASURE_CROSS.lineWidth);
-			}
-			if (GraphicsMeasuring.xPosDelta > Integer.MIN_VALUE) {
-				//linePainter.eraseVerticalLine(canvasImage, GraphicsMeasuring.xPosDelta, 0, height, LineMark.DELTA_CROSS.lineWidth);
-				//linePainter.eraseHorizontalLine(canvasImage, GraphicsMeasuring.yPosDelta, 0, width, LineMark.DELTA_CROSS.lineWidth);
-				//this.linePainter.cleanRectangle(canvasImage);
-			}
-		} else {
-			// not erasing the lines provokes a full redraw if the size has changed sufficiently
 		}
 	}
 

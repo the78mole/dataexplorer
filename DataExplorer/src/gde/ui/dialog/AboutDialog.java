@@ -21,8 +21,6 @@ package gde.ui.dialog;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -180,14 +178,8 @@ public class AboutDialog extends org.eclipse.swt.widgets.Dialog {
 				this.aboutImage.moveAbove(this.version);
 
 				final Image ideaImage = SWTResourceManager.getImage("gde/resource/DataExplorer.png");
-				this.aboutImage.addPaintListener(new PaintListener() {
-					@Override
-					public void paintControl(PaintEvent e) {
-						/* we need to use this instead of setBackgroundImage() as otherwise
-						 * the transparency wouldn´t work
-						 */
-						e.gc.drawImage(ideaImage,0,0);
-					}
+				this.aboutImage.addPaintListener(event -> {
+					event.gc.drawImage(ideaImage,0,0);
 				});
 
 			}

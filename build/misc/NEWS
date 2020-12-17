@@ -1,33 +1,14 @@
-GNU DataExplorer - News - comes with Version 3.4.4 - 16 Nov 2020
+GNU DataExplorer - News - comes with Version 3.4.5 - 17 Dec 2020
 
 Generic changes/fixes
-	* fix statistics text position in description group to enable scroll
-	* update DeviceProperties XSD V41 -> replace existing device XML with new version
-	* add manual setting to enable MAC OS touch bar support (DataExplorer.properties is_mac_touchbar)
+	* fix graphics update problem initiated by MAC OS update to 11.*
 
 Device specific changes/fixes
-	* OnLineCommander - fix loading resource bundle
-	* PolaronEx - fix exception while processing channel 2
-	* Polaron* - fix processing detection channel 2
-	* Core-Telemetry - initial release
-	* JetiAdapter - update dialog width Windows
-	* Pulsar3 - fix energy calculation
-	* IGCAdapter - consider TDS entries if exist 
-	* IGCAdapter - add 3D speed calculation
-
+	* 
 	
 Generelle Änderungen/Verbesserungen
-    * Position und Größe des Statistik Beschreibungstextes angepasst
-    * Geräte-XML-Schema auf V41 angehoben -> ersetzt vorhandene Gerätebeschreibungen mit neuer Version
-    * manuelle Einstellung zur Aktivierung der MAC Touchbar hinzugefügt (DataExplorer.properties is_mac_touchbar)
+    * Korrektur des Grafik-Update-Problems hervorgerufen durch MAC OS Update 11.*
    
 
 Geräte spezifische Änderungen/Verbesserungen
-    * OnLineCommander - Laden der Geräte abhängigen Texte korrigiert
-    * PolaronEx - Fehler bei Datenaufnahme Kanal 2 korrigiert
-    * Polaron* - Fehler Erkennung Kanal 2 korrigiert
-    * Core-Telemetry - initialer Verfügbarkeit
-    * JetiAdapter - Gerätedialog in Größe angepasst
-    * Pulsar3 - Energieberechnung korrigiert
-    * IGCAdapter - berücksichtigt TDS Einträge, wenn vorhanden
-    * IGCAdapter - 3D Geschwindigkeitsberechnung hinzugefügt
+    * 

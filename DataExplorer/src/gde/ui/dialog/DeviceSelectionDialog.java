@@ -40,6 +40,8 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -129,6 +131,7 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 	Label																	deviceNameDescription;
 	Label																	manufacturerDescription;
 	Canvas																deviceCanvas;
+	Image																	deviceImage;
 	Label																	deviceGroupText;
 	Slider																deviceSlider;
 	CCombo																deviceSelectCombo;
@@ -326,6 +329,16 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 								{
 									this.deviceCanvas = new Canvas(this.deviceSelectionGroup, SWT.BORDER);
 									this.deviceCanvas.setBounds(12, 70, 227, 165);
+									this.deviceCanvas.addPaintListener(event -> {
+											if (DeviceSelectionDialog.this.deviceImage != null) {
+												Rectangle canvasBounds = DeviceSelectionDialog.this.deviceCanvas.getClientArea();
+												Rectangle imageBounds = DeviceSelectionDialog.this.deviceImage.getBounds();
+												if (imageBounds.width != canvasBounds.width || imageBounds.height != canvasBounds.height)
+													event.gc.drawImage(DeviceSelectionDialog.this.deviceImage, 0, 0, imageBounds.width, imageBounds.height, 0, 0, canvasBounds.width, canvasBounds.height);
+												else
+													event.gc.drawImage(DeviceSelectionDialog.this.deviceImage, 0, 0);
+											}		
+									});
 								}
 								{
 									this.manufacturerDescription = new Label(this.deviceSelectionGroup, SWT.WRAP);
@@ -846,7 +859,8 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 				IDevice selectedDevice = getInstanceOfDevice();
 				if (selectedDevice != null) {
 					log.log(Level.FINE, Settings.getDevicesPath() + this.selectedActiveDeviceConfig.getImageFileName());
-					this.deviceCanvas.setBackgroundImage(SWTResourceManager.getImage(selectedDevice, "resource/" + this.selectedActiveDeviceConfig.getImageFileName()));
+					this.deviceImage = SWTResourceManager.getImage(selectedDevice, "resource/" + this.selectedActiveDeviceConfig.getImageFileName());
+					this.deviceCanvas.redraw();
 					this.manufacturerName.setText(this.selectedActiveDeviceConfig.getManufacturer());
 					this.deviceText.setText(this.selectedActiveDeviceConfig.getName());
 					this.deviceTypeText.setText(this.selectedActiveDeviceConfig.getDeviceGroup().name());
