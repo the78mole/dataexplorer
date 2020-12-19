@@ -171,7 +171,7 @@ public class LogReader {
 			this.factor = DataParser.byte2Double(bytes, true)[0];
 			this.factor = (this.factor - 0.0) < Measurement.DBL_EPSILON ? 1.0 : this.factor;
 			this.unit = new String(buffer, 83, 8).trim();
-			if (LogReader.log.isLoggable(java.util.logging.Level.FINER))
+			if (LogReader.log.isLoggable(Level.FINER))
 				System.out.println(String.format(Locale.ENGLISH, "%s[%s] factor=%f offset=%f Id=%d type=%d;", this.name, this.unit, this.factor, this.offset, this.id, this.dataType.value));
 		}
 
@@ -617,14 +617,14 @@ public class LogReader {
 
 		public ConfigSection(final byte[] buffer, final int offset) {
 			this.count = DataParser.parse2UnsignedShort(buffer, 0 + offset);
-			if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.print(String.format("config sections %3d, ", this.count));
+			if (LogReader.log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("config sections %3d, ", this.count));
 			this.interval = (buffer[2 + offset] & 0xFF);
-			if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.print(String.format("interval %3d, IDs ", this.interval));
+			if (LogReader.log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("interval %3d, IDs ", this.interval));
 			this.lengthBytes = 3 + this.count * 2;
 			for (int i = 0; i < this.count; i++) {
 				this.ids.add(DataParser.parse2UnsignedShort(buffer, 3 + offset + i * 2));
 			}
-			if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.println();
+			if (LogReader.log.isLoggable(Level.FINE)) log.log(Level.FINE, this.ids.toString());
 		}
 
 		public int getId(final int index) {
@@ -717,7 +717,7 @@ public class LogReader {
 				this.value = (int) DataParser.getUInt32(buffer, offset);
 				break;
 			case Float: /* single float according IEEE754 */
-				LogReader.log.log(java.util.logging.Level.WARNING, "Float data item received, can not handle");
+				LogReader.log.log(Level.WARNING, "Float data item received, can not handle");
 				break;
 			case PaketGPS: /* 20 Bytes */
 				//"4_Latitude","4_Longitude","2_Speed","2_Altitude","2_Course","1_isValid","4+1_UTC"
@@ -786,7 +786,7 @@ public class LogReader {
 			switch (this.dataType) {
 			case PaketGPS: /* 20 Bytes */
 				//"4_Latitude","4_Longitude","2_Speed","2_Altitude","2_Course","1_isValid","4+1_UTC"
-				if (LogReader.log.isLoggable(java.util.logging.Level.FINER))
+				if (LogReader.log.isLoggable(Level.FINER))
 					System.out.print(String.format(Locale.ENGLISH, "%.6f°;%.6f°;%.1fkn;%.1fm;%.2f°;%d;%d;", this.latitude / 6000000.0f, this.longitude / 6000000.0f, this.speed / 10.0f, this.altitude / 10.0f,
 							this.course / 100.0f, this.isValid, this.timeStamp_ms_utc));
 
@@ -797,12 +797,12 @@ public class LogReader {
 				break;
 			case PowerSupply: /* 64 Bytes */
 				//"_Main_Status","_Main_Voltage","_Main_Current","_Main_InputVoltage","_Main_InputCurrent","_Main_MainVoltage","_Main_ReserveVoltage","_Main_InputTemperature"
-				if (LogReader.log.isLoggable(java.util.logging.Level.FINER))
+				if (LogReader.log.isLoggable(Level.FINER))
 					System.out.print(String.format(Locale.ENGLISH, "%d;%.3fV;%.3fA;%.3fV;%.3fA;%.3fV;%.3fV;%d°C;", this.status, this.voltage / 1000.0f, this.current / 1000.0f, this.inVoltage / 1000.0f,
 							this.inCurrent / 1000.0f, this.mainVoltage / 1000.0f, this.reserveVoltage / 1000.0f, this.inTemperature));
 
 				//"_Cell%d_Status","_Cell%d_Voltage","_Cell%d_Current","_Cell%d_Capacity","_Cell%d_Temperature"
-				if (LogReader.log.isLoggable(java.util.logging.Level.FINER)) {
+				if (LogReader.log.isLoggable(Level.FINER)) {
 					System.out.print(String.format(Locale.ENGLISH, "%d;%.3fV;%.3fA;%.3fAh;%d°C;", this.cell1_Status, this.cell1_Voltage / 1000.0f, this.cell1_Current / 1000.0f, this.cell1_Capacity / 1000.0f,
 							this.cell1_Temperature));
 					System.out.print(String.format(Locale.ENGLISH, "%d;%.3fV;%.3fA;%.3fAh;%d°C;", this.cell2_Status, this.cell2_Voltage / 1000.0f, this.cell2_Current / 1000.0f, this.cell2_Capacity / 1000.0f,
@@ -822,7 +822,7 @@ public class LogReader {
 				break;
 			default:
 				String format = "%." + getDecimalPoints(this.measurement.factor) + "f%s;";
-				if (LogReader.log.isLoggable(java.util.logging.Level.FINER))
+				if (LogReader.log.isLoggable(Level.FINER))
 					System.out.print(String.format(Locale.ENGLISH, format, this.value * this.measurement.factor + this.measurement.offset, this.measurement.getUnit()));
 
 				if (this.dataSectionTimeStamp_ms + 2000 < dataSectionTimeStamp) {
@@ -906,11 +906,14 @@ public class LogReader {
 		int	interval;
 		int	readBytes;
 
-		public DataSection(final byte[] buffer, int offset, final Vector<ConfigSection> configSections, final RecordHeader recordHeader, final long sectionTimeStamp) {
+		public DataSection(final byte[] buffer, int offset, final Vector<ConfigSection> configSections, final RecordHeader recordHeader, final long sectionTimeStamp) throws DataInconsitsentException {
 			this.length = DataParser.parse2Int(buffer, 0 + offset);
 			this.interval = (buffer[4 + offset] & 0xFF);
-			if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.println(String.format("data sections %3d, interval %3d", this.length, this.interval));
+			if (LogReader.log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("data sections %3d, interval %3d", this.length, this.interval));
 			this.readBytes = 5;
+			
+			if (this.length == 0)
+				throw new DataInconsitsentException("DataSection with length 0 detected!");
 
 			for (ConfigSection configSection : configSections) {
 				if (configSection.getInterval() == this.interval) {
@@ -955,42 +958,42 @@ public class LogReader {
 
 		Vector<ConfigSection>	configSections			= new Vector<LogReader.ConfigSection>();
 		int										configSectionCount;
-		int										shortestInerterval	= 13;	//0.1Hz
+		int										shortestInterval	  = 13;	//0.1Hz
 		int										measurementCount		= 0;
 
 		DataSection						dataSection;
 
-		public RecordData(final byte[] buffer, final RecordHeader recordHeader, final long inTimeStamp_ms, final long startTimeStamp_ms) {
+		public RecordData(final byte[] buffer, final RecordHeader recordHeader, final long inTimeStamp_ms, final long startTimeStamp_ms) throws DataInconsitsentException {
 			super();
 
 			this.configSectionCount = buffer[0 + this.offset];
-			if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.println("configSectionCount = " + this.configSectionCount);
+			if (LogReader.log.isLoggable(Level.FINE)) log.log(Level.FINE, "configSectionCount = " + this.configSectionCount);
 			int configSectionBytes = 0;
 			for (int section = 0; section < this.configSectionCount; section++) {
 				ConfigSection configSection = new ConfigSection(buffer, 1 + this.offset + configSectionBytes);
-				this.shortestInerterval = Math.min(this.shortestInerterval, configSection.getInterval());
+				this.shortestInterval = Math.min(this.shortestInterval, configSection.getInterval());
 				this.configSections.add(configSection);
 				configSectionBytes += configSection.getLength();
 				this.measurementCount += configSection.getCount();
 			}
-			if (LogReader.log.isLoggable(java.util.logging.Level.FINER))
-				System.out.println(String.format("header measurement count = %d, config section measurement count = %d", recordHeader.getMeasurementCount(), this.measurementCount));
+			if (LogReader.log.isLoggable(Level.FINE))
+				log.log(Level.FINE, String.format("header measurement count = %d, config section measurement count = %d", recordHeader.getMeasurementCount(), this.measurementCount));
 			this.offset = configSectionBytes + 4 + 8 + 1 + 1; //length, timeStamp, recordType, configSectionCount
 
-			long timeOffset = getTimeOffset(this.shortestInerterval);
+			long timeOffset = getTimeOffset(this.shortestInterval);
 			int count = 0;
 			while (this.offset < (buffer.length - 2)) { // record contains measurement data
-				if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.println("\n -> offset = " + this.offset + " buffer.length-2 = " + (buffer.length - 2));
+				if (LogReader.log.isLoggable(Level.FINE)) log.log(Level.FINE, " -> offset = " + this.offset + " buffer.length-2 = " + (buffer.length - 2));
 				DataSection tmpDataSection = new DataSection(buffer, this.offset, this.configSections, recordHeader, inTimeStamp_ms);
 
 				//print values after receiving data section with shortest interval
-				if (tmpDataSection.interval == this.shortestInerterval) {
+				if (tmpDataSection.interval == this.shortestInterval) {
 					long timeStamp_ms = inTimeStamp_ms + timeOffset * count++;
 					//debug, enable stop at defined time
 					//					String timeStamp = StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS;", timeStamp_ms);
 					//					if (timeStamp.equals("2015-10-03 15:38:08.342;"))
 					//						System.out.println(timeStamp);
-					if (LogReader.log.isLoggable(java.util.logging.Level.FINER)) System.out.print(StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS;", timeStamp_ms));
+					if (LogReader.log.isLoggable(Level.FINE)) log.log(Level.FINE, StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS;", timeStamp_ms));
 
 					Iterator<Integer> iteratorMeasurementIds = LogReader.usedMeasurementIds.iterator();
 
@@ -1003,19 +1006,19 @@ public class LogReader {
 							case PaketGPS:
 								for (int i = 0; i < (WeatronicAdapter.isUtcFilter ? 6 : 7); i++) {
 									LogReader.pointsVector.add(0);
-									if (LogReader.log.isLoggable(java.util.logging.Level.FINER)) System.out.print("-;");
+									if (LogReader.log.isLoggable(Level.FINER)) System.out.print("-;");
 								}
 								break;
 							case PowerSupply:
 								for (int i = 0; i < (WeatronicAdapter.isStatusFilter ? 23 : 28); i++) {
 									LogReader.pointsVector.add(0);
-									if (LogReader.log.isLoggable(java.util.logging.Level.FINER)) System.out.print("-;");
+									if (LogReader.log.isLoggable(Level.FINER)) System.out.print("-;");
 								}
 								break;
 
 							default:
 								LogReader.pointsVector.add(0);
-								if (LogReader.log.isLoggable(java.util.logging.Level.FINER)) System.out.print("-;");
+								if (LogReader.log.isLoggable(Level.FINER)) System.out.print("-;");
 								break;
 							}
 						}
@@ -1039,11 +1042,12 @@ public class LogReader {
 						LogReader.application.openMessageDialogAsync(e.getMessage());
 						LogReader.log.log(Level.WARNING, e.getMessage(), e);
 					}
-					if (LogReader.log.isLoggable(java.util.logging.Level.FINER)) System.out.println();
+					if (LogReader.log.isLoggable(Level.FINER)) System.out.println();
 					LogReader.pointsVector.clear();
 				}
-				if (LogReader.log.isLoggable(java.util.logging.Level.FINEST))
-					if (tmpDataSection.getLength() != tmpDataSection.getReadBytes()) System.out.println("tmpDataSection.getLength() != tmpDataSection.getReadBytes()");
+				if (LogReader.log.isLoggable(Level.FINER))
+					if (tmpDataSection.getLength() != tmpDataSection.getReadBytes()) 
+						log.log(Level.FINER, "dataSection.getLength() = " + tmpDataSection.getLength() + " != dataSection.getReadBytes() = " + tmpDataSection.getReadBytes());
 				this.offset += tmpDataSection.getLength(); //tmpDataSection.getReadBytes();
 			}
 		}
@@ -1073,28 +1077,28 @@ public class LogReader {
 		RecordHeader	recordHeader;
 		short					crc;
 
-		public LogRecord(final byte[] buffer, final RecordHeader header) {
+		public LogRecord(final byte[] buffer, final RecordHeader header) throws DataInconsitsentException {
 			this.recordHeader = header;
 			this.length = DataParser.parse2Int(buffer, 0);
 			this.timeStamp_ms = DataParser.parse2Long(buffer, 4);
 			this.recordType = RecordType.values()[buffer[12]];
 			switch (this.recordType) {
 			case HEADER: //RecordType.HEADER
-				if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.println("RecordType.HEADER");
+				if (LogReader.log.isLoggable(Level.FINEST)) System.out.println("RecordType.HEADER");
 				this.recordHeader = new RecordHeader(buffer);
 				break;
 			case DATA: //RecordType.DATA
-				if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.println("RecordType.DATA");
+				if (LogReader.log.isLoggable(Level.FINEST)) System.out.println("RecordType.DATA");
 				this.recordData = new RecordData(buffer, header, this.timeStamp_ms, LogReader.startTimeStamp_ms);
 				break;
 			case EVENT: //RecordType.EVENT
-				if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.println("RecordType.EVENT");
+				if (LogReader.log.isLoggable(Level.FINEST)) System.out.println("RecordType.EVENT");
 				//structure of record type event is unknown and not included in available specification
 				this.recordEvent = new RecordEvent(buffer);
 				break;
 
 			default:
-				LogReader.log.log(java.util.logging.Level.WARNING, "RecordType_UNKNOWN");
+				LogReader.log.log(Level.WARNING, "RecordType_UNKNOWN");
 				LogReader.application.openMessageDialogAsync("RecordType_UNKNOWN");
 				break;
 			}
@@ -1176,7 +1180,7 @@ public class LogReader {
 					LogReader.buf_length = new byte[4];
 					data_in.read(LogReader.buf_length);
 					final int logRecordLength = DataParser.parse2Int(LogReader.buf_length, 0);
-					if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) System.out.println("logRecordLength = " + logRecordLength);
+					if (LogReader.log.isLoggable(Level.FINEST)) System.out.println("logRecordLength = " + logRecordLength);
 					LogReader.buf_log_record = new byte[logRecordLength];
 					System.arraycopy(LogReader.buf_length, 0, LogReader.buf_log_record, 0, 4);
 					readByteCount += 4;
@@ -1189,7 +1193,12 @@ public class LogReader {
 					RecordType recordType = RecordType.values()[LogReader.buf_log_record[12]];
 					if (LogReader.startTimeStamp_ms == 0 && recordType == RecordType.DATA) LogReader.startTimeStamp_ms = timeStamp;
 
-					logRecord = logReader.new LogRecord(LogReader.buf_log_record, (logRecord == null ? null : logRecord.getRecordHeader()));
+					try {
+						logRecord = logReader.new LogRecord(LogReader.buf_log_record, (logRecord == null ? null : logRecord.getRecordHeader()));
+					}
+					catch (DataInconsitsentException e) {
+						log.log(Level.SEVERE, e.getMessage());
+					}
 					GDE.getUiNotification().setProgress((int) (readByteCount * 100 / fileSize));
 					logRecordCount += 1;
 				}
@@ -1198,7 +1207,7 @@ public class LogReader {
 				LogReader.recordSet.setRecordSetDescription(LogReader.device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129)
 						+ new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(LogReader.startTimeStamp_ms));
 
-				if (LogReader.log.isLoggable(java.util.logging.Level.FINEST)) {
+				if (LogReader.log.isLoggable(Level.FINEST)) {
 					System.out.println("logRecordCount = " + logRecordCount);
 				}
 
@@ -1206,7 +1215,7 @@ public class LogReader {
 				for (Integer unknownId : LogReader.unknownIds) {
 					sb.append(String.format("0x%04x, ", unknownId));
 				}
-				LogReader.log.log(java.util.logging.Level.WARNING, sb.toString());
+				LogReader.log.log(Level.WARNING, sb.toString());
 
 				LogReader.log.logp(Level.TIME, LogReader.$CLASS_NAME, $METHOD_NAME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 
