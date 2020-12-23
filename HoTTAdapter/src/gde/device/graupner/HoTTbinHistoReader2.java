@@ -141,7 +141,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 			varBinParser = Sensor.VARIO.createBinParser2(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
 		}
 		if (detectedSensors.contains(Sensor.GPS)) {
-			gpsBinParser = Sensor.GPS.createBinParser2(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+			gpsBinParser = Sensor.GPS.createBinParser2(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		}
 		if (detectedSensors.contains(Sensor.GAM)) {
 			gamBinParser = Sensor.GAM.createBinParser2(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
@@ -397,7 +397,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 			varBinParser = Sensor.VARIO.createBinParser2(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
 		} else varBinParser = null;
 		if (detectedSensors.contains(Sensor.GPS)) {
-			gpsBinParser = Sensor.GPS.createBinParser2(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+			gpsBinParser = Sensor.GPS.createBinParser2(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		} else gpsBinParser = null;
 		if (detectedSensors.contains(Sensor.GAM)) {
 			gamBinParser = Sensor.GAM.createBinParser2(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });

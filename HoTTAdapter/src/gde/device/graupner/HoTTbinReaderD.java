@@ -965,7 +965,6 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsGPS[26] = DataParser.parse2Short(_buf4, 3) * 1000;
 			//27=Vibration 28=Version			
 			HoTTbinReader.pointsGPS[27] = (_buf4[5] & 0xFF) * 1000;
-			//6,7,8 ASCII
 			HoTTbinReader.pointsGPS[28] = _buf4[9] * 1000;
 		}
 		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E

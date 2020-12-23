@@ -376,7 +376,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 	 * @param evt
 	 */
 	private void drawAreaPaintControl(PaintEvent evt) {
-		log.off(() -> "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
+		log.fine(() -> "drawAreaPaintControl.paintControl, event=" + evt); //$NON-NLS-1$
 		long nanoTime = System.nanoTime();
 		abstractDrawAreaPaintControl(evt.gc);
 		log.time(() -> "drawTime=" + StringHelper.getFormatedTime("ss:SSS", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - nanoTime)));

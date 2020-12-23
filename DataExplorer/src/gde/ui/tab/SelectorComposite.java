@@ -320,7 +320,7 @@ public class SelectorComposite extends Composite {
 			this.oldSelectorColumnWidth = this.selectorColumnWidth;
 			this.application.setGraphicsSashFormWeights(this.selectorColumnWidth, this.graphicsType);
 		}
-
+		this.curveSelectorTable.redraw();
 		if (SelectorComposite.log.isLoggable(Level.FINER)) SelectorComposite.log.log(Level.FINER, "curveSelectorTable width = " + this.selectorColumnWidth); //$NON-NLS-1$
 	}
 

@@ -6,6 +6,7 @@ Generic changes/fixes
 	
 Device specific changes/fixes
 	* Weatronic-Telemetry - add error handling for cases buffer offset zero
+	* HoTTAdapter* - add missing GPS values home direction - version
 
 Version 3.4.5 - 17 Dec 2020
 Generic changes/fixes

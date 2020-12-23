@@ -958,7 +958,7 @@ public class GraphicsComposite extends Composite {
 	synchronized void doRedrawGraphics() {
 		this.graphicsHeader.notifyListeners(SWT.Paint, new Event());
 
-		if (log.isLoggable(Level.OFF)) log.log(Level.OFF, "this.graphicCanvas.redraw(); // do full update where required");
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "this.graphicCanvas.redraw(); // do full update where required");
 		
 		// Get the canvas and its dimensions
 		this.canvasBounds = GraphicsComposite.this.graphicCanvas.getClientArea();

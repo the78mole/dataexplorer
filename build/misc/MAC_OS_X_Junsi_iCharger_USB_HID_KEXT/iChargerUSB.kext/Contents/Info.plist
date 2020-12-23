@@ -4,7 +4,7 @@
     <!-- contains no actual code; its only purpose is to     -->
     <!-- prevent Apple's USB-HID driver from exclusively     -->
     <!-- opening the device.                                 -->
-    <plist version="1.1">
+    <plist version="1.0">
     <dict>
         <key>CFBundleDevelopmentRegion</key>
         <string>English</string>

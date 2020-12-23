@@ -307,7 +307,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 							}
 							break;
 						}
-						//18=Satellites 19=Fix 20=HomeDirection 21=Roll 22=Pitch 23=Yaw 24=GyroX 25=GyroY 26=GyroZ 27=Vibration 28=Version
+						//20=HomeDirection 21=Roll 22=Pitch 23=Yaw 24=GyroX 25=GyroY 26=GyroZ 27=Vibration 28=Version
 						points[20] = (dataBuffer[38] & 0xFF) * 1000; //Home direction
 						points[21] = dataBuffer[39] * 1000; //Roll
 						points[22] = dataBuffer[40] * 1000; //Pitch
@@ -316,6 +316,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 						points[25] = DataParser.parse2Short(dataBuffer, 44) * 1000;; //Gyro y or GPS time minutes
 						points[26] = DataParser.parse2Short(dataBuffer, 46) * 1000;; //Gyro z or GPS time seconds
 						points[27] = (dataBuffer[48] & 0xFF) * 1000; //ENL
+						//three char
 						points[28] = (dataBuffer[52] & 0xFF) * 1000; //Version
 					}
 				}
@@ -485,7 +486,7 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 				break;
 
 			case HoTTAdapterD.SENSOR_TYPE_GPS_115200:
-				if (dataBuffer.length >= 34) {
+				if (dataBuffer.length >= 46) {
 					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
 					//8=Altitude, 9=Climb 1, 10=Climb 3
 					//12=Latitude, 13=Longitude, 14=Velocity, 15=Distance, 16=Direction, 17=TripDistance
@@ -508,8 +509,8 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 						points[17] = 0;
 					}
 					//18=Satellites 19=Fix
-					points[18] = (dataBuffer[33] & 0xFF) * 1000;
-					switch (dataBuffer[34]) { //sat-fix
+					points[18] = (dataBuffer[32] & 0xFF) * 1000;
+					switch (dataBuffer[33]) { //sat-fix
 					case '-':
 						points[19] = 0;
 						break;
@@ -524,21 +525,21 @@ public class HoTTAdapterD extends HoTTAdapter implements IDevice {
 						break;
 					default:
 						try {
-							points[19] = Integer.valueOf(String.format("%c",dataBuffer[34])) * 1000;
+							points[19] = Integer.valueOf(String.format("%c",dataBuffer[33])) * 1000;
 						}
 						catch (NumberFormatException e1) {
 							points[19] = 1000;
 						}
 						break;
 					}
-					points[20] = (dataBuffer[35] & 0xFF) * 1000; //Home direction
+					points[20] = DataParser.parse2Short(dataBuffer, 34) * 1000; //Home direction
 					//18=Satellites 19=Fix 20=HomeDirection 21=Roll 22=Pitch 23=Yaw 24=GyroX 25=GyroY 26=GyroZ 27=Vibration 28=Version
 					points[21] = dataBuffer[36] * 1000; //Roll
 					points[22] = dataBuffer[37] * 1000; //Pitch
 					points[23] = dataBuffer[38] * 1000; //Yaw
-					points[24] = DataParser.parse2Short(dataBuffer, 39) * 1000;; //Gyro x or GPS time hours
-					points[25] = DataParser.parse2Short(dataBuffer, 41) * 1000;; //Gyro y or GPS time minutes
-					points[26] = DataParser.parse2Short(dataBuffer, 43) * 1000;; //Gyro z or GPS time seconds
+					points[24] = DataParser.parse2Short(dataBuffer, 39) * 1000; //Gyro x or GPS time hours
+					points[25] = DataParser.parse2Short(dataBuffer, 41) * 1000; //Gyro y or GPS time minutes
+					points[26] = DataParser.parse2Short(dataBuffer, 43) * 1000; //Gyro z or GPS time seconds
 					points[27] = (dataBuffer[46] & 0xFF) * 1000; //ENL
 					points[28] = 0; //Version
 				}

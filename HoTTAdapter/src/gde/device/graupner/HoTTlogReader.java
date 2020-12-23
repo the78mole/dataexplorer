@@ -27,7 +27,7 @@ import gde.utils.StringHelper;
  * @author brueg
  */
 public class HoTTlogReader extends HoTTbinReader {
-	final static Logger	log					= Logger.getLogger(HoTTlogReader2.class.getName());
+	final static Logger	log					= Logger.getLogger(HoTTlogReader.class.getName());
 	static int[]				points;
 
 
@@ -58,12 +58,12 @@ public class HoTTlogReader extends HoTTbinReader {
 		HoTTbinReader.recordSetGAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetEAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Altitude, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
 		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 		HoTTbinReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperaure
 		HoTTbinReader.pointsReceiver = new int[10];
 		HoTTbinReader.pointsVario = new int[8];
 		HoTTbinReader.pointsVario[2] = 100000;
-		HoTTbinReader.pointsGPS = new int[15];
+		HoTTbinReader.pointsGPS = new int[24];
 		HoTTbinReader.pointsGAM = new int[26];
 		HoTTbinReader.pointsEAM = new int[31];
 		HoTTbinReader.pointsChannel = new int[23];
@@ -461,13 +461,15 @@ public class HoTTlogReader extends HoTTbinReader {
 	 * @param _buf
 	 */
 	protected static boolean parseGPS(byte[] _buf, int[] values, boolean isHoTTAdapter2) {
-		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS
+	  //0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 
+		//15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 		//10=Altitude, 11=Climb 1, 12=Climb 3
 		//15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		//24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
 		//sensor byte: 26=sensor byte
 		//27,28=InverseBits 29=moveDirection 30,31=speed 32,33,34,35,36=latitude 37,38,39,40,41=longitude 42,43=distanceStart 44,45=altitude
-		//46,47=climb1 48=climb3 49=#satellites 50=GPS-Fix 51=homeDirection 52,53=northVelocity 54=hAcc 55-58=GPStime 59,60=eastVelocity
-		//61=hAcc 62-65=freeChars 66=version
+		//46,47=climb1 48=climb3 49=#satellites 50=GPS-Fix 51=homeDirection 52=Roll 53=Pitch 54=Yaw 55,56=GyroX 57,58=GyroY 59,60=GyroZ
+		//61=Vibration 62-65=freeChars 66=Version
 		values[0] = (_buf[16] & 0xFF) * 1000;
 		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 44) - 500 : DataParser.parse2Short(_buf, 44);
 		HoTTbinReader.tmpClimb1 = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 46) - 30000) : DataParser.parse2UnsignedShort(_buf, 46);
@@ -479,7 +481,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		HoTTbinReader.tmpLongitude = DataParser.parse2Short(_buf, 38) * 10000 + DataParser.parse2Short(_buf, 40);
 		values[2] = HoTTbinReader.tmpLongitude;
 		values[3] = HoTTbinReader.tmpHeight * 1000;		//altitude
-		values[4] = HoTTbinReader.tmpClimb1 * 10;			//climb1
+		values[4] = isHoTTAdapter2 ? HoTTbinReader.tmpClimb1 * 10 : HoTTbinReader.tmpClimb1 * 1000;			//climb1
 		values[5] = HoTTbinReader.tmpClimb3 * 1000;		//climb3
 		values[7] = DataParser.parse2Short(_buf, 42) * 1000;
 		values[8] = (_buf[51] & 0xFF) * 1000;
@@ -509,7 +511,24 @@ public class HoTTlogReader extends HoTTbinReader {
 			}
 			break;
 		}
-		values[14] = (_buf[27] & 0x0F) * 1000; //inverse event
+		//values[14] = DataParser.parse2Short(_buf, 27) * 1000; //inverse event including byte 2 valid GPS data
+		values[14] = (_buf[28] & 0xFF) * 1000; //inverse event
+		//51=homeDirection 52=Roll 53=Pitch 54=Yaw
+		values[15] = (_buf[51] & 0xFF) * 1000; //15=HomeDirection
+		//16=Roll 17=Pitch 18=Yaw
+		values[16] = _buf[52] * 1000;
+		values[17] = _buf[53] * 1000;
+		values[18] = _buf[54] * 1000; 
+		//19=GyroX 20=GyroY 21=GyroZ 	
+		//55,56=GyroX 57,58=GyroY 59,60=GyroZ
+		values[19] = DataParser.parse2Short(_buf, 55) * 1000;
+		values[20] = DataParser.parse2Short(_buf, 57) * 1000;
+		values[21] = DataParser.parse2Short(_buf, 59) * 1000;
+		//22=Vibration 23=Version			
+		//61=Vibration 62-65=freeChars 66=Version
+		values[22] = (_buf[61] & 0xFF) * 1000;
+		//three char
+		values[23] = _buf[65] * 1000;
 
 		if (log.isLoggable(Level.FINER)) {
 			printSensorValues(_buf, values, 14);

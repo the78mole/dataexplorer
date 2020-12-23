@@ -478,7 +478,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		boolean									isFilterEnabled								= true;
 		boolean									isFilterTextModus							= true;
 		boolean									isChannelPercentEnabled				= true;
-		int											altitudeClimbSensorSelection						= 0;
+		int											altitudeClimbSensorSelection	= 0;
 		
 		boolean									isTolerateSignChangeLatitude	= false;
 		boolean									isTolerateSignChangeLongitude	= false;
@@ -723,7 +723,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 			case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 				if (dataBuffer.length == 40) {
-					// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+					// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 
+					//12=satellites 13=GPS-fix 14=EventGPS 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 					points[0] = (dataBuffer[15] & 0xFF) * 1000;
 					points[1] = DataParser.parse2Short(dataBuffer, 20) * 10000 + DataParser.parse2Short(dataBuffer, 22);
 					points[1] = dataBuffer[19] == 1 ? -1 * points[1] : points[1];
@@ -738,7 +739,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					points[9] = 0;
 					points[10] = (dataBuffer[8] & 0xFF) * 1000;
 					points[11] = (dataBuffer[5] & 0xFF) * 1000;
-				}
+			}
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_GENERAL_19200:
@@ -865,6 +866,42 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						points[9] = 0;
 						points[10] = (dataBuffer[6] & 0xFF) * 1000;
 						points[11] = (dataBuffer[7] & 0xFF) * 1000;
+						//12=satellites 13=GPS-fix 14=EventGPS 
+						points[12] = (dataBuffer[36] & 0xFF) * 1000;
+						switch (dataBuffer[37]) { //sat-fix
+						case '-':
+							points[13] = 0;
+							break;
+						case '2':
+							points[13] = 2000;
+							break;
+						case '3':
+							points[13] = 3000;
+							break;
+						case 'D':
+							points[13] = 4000;
+							break;
+						default:
+							try {
+								points[13] = Integer.valueOf(String.format("%c",dataBuffer[37])) * 1000;
+							}
+							catch (NumberFormatException e1) {
+								points[13] = 1000;
+							}
+							break;
+						}
+						points[14] = (dataBuffer[14] & 0xFF) * 1000; //14=EventGPS
+						//15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
+						points[15] = (dataBuffer[38] & 0xFF) * 1000; //Home direction
+						points[16] = dataBuffer[39] * 1000; //Roll
+						points[17] = dataBuffer[40] * 1000; //Pitch
+						points[18] = dataBuffer[41] * 1000; //Yaw
+						points[19] = DataParser.parse2Short(dataBuffer, 42) * 1000;; //Gyro x or GPS time hours
+						points[20] = DataParser.parse2Short(dataBuffer, 44) * 1000;; //Gyro y or GPS time minutes
+						points[21] = DataParser.parse2Short(dataBuffer, 46) * 1000;; //Gyro z or GPS time seconds
+						points[22] = (dataBuffer[48] & 0xFF) * 1000; //ENL
+						//three char
+						points[23] = (dataBuffer[52] & 0xFF) * 1000; //Version
 					}
 				}
 				break;
@@ -1012,8 +1049,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				break;
 
 			case HoTTAdapter.SENSOR_TYPE_GPS_115200:
-				if (dataBuffer.length >= 34) {
-					// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+				if (dataBuffer.length >= 46) {
+					//0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS
+					//15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 					tmpLatitude = DataParser.parse2Short(dataBuffer, 16);
 					tmpLongitude = DataParser.parse2Short(dataBuffer, 20);
 					tmpHeight = DataParser.parse2Short(dataBuffer, 14) + 500;
@@ -1033,28 +1071,41 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						points[9] = 0;
 						points[10] = dataBuffer[4] * 1000;
 						points[11] = (dataBuffer[5] + 20) * 1000;
-						points[12] = dataBuffer[32];
-						try {
-							points[13] = Integer.valueOf(String.format("%c", dataBuffer[33])) * 1000;
-						} catch (NumberFormatException e1) {
-							// ignore;
+						//18=Satellites 19=Fix
+						points[12] = (dataBuffer[32] & 0xFF) * 1000;
+						switch (dataBuffer[33]) { //sat-fix
+						case '-':
+							points[13] = 0;
+							break;
+						case '2':
+							points[13] = 2000;
+							break;
+						case '3':
+							points[13] = 3000;
+							break;
+						case 'D':
+							points[13] = 4000;
+							break;
+						default:
+							try {
+								points[13] = Integer.valueOf(String.format("%c",dataBuffer[33])) * 1000;
+							}
+							catch (NumberFormatException e1) {
+								points[13] = 1000;
+							}
+							break;
 						}
-						/*
-						 * dataBuffer[34] * 2 = HomeDirection
-						 * dataBuffer[35] = acceleration x-direction
-						 * dataBuffer[36] = acceleration y-direction
-						 * dataBuffer[37] = acceleration z-direction
-						 * dataBuffer[38,39] = gyro x //39 SM GPS-Logger ENL
-						 * dataBuffer[40,41] = gyro y
-						 * dataBuffer[42,43] = gyro z
-						 * dataBuffer[44] = vibration
-						 * dataBuffer[45] = free
-						 * dataBuffer[46] = free
-						 * dataBuffer[47] = free
-						 * dataBuffer[48] = version
-						 * dataBuffer[49,50] = CRC
-						 */
-						points[14] = (dataBuffer[1] & 0x0F) * 1000; // inverse event
+						points[14] = (dataBuffer[1] & 0xFF) * 1000; //GPS inverse Event
+						//15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
+						points[15] = DataParser.parse2Short(dataBuffer, 34) * 1000; //Home direction
+						points[16] = dataBuffer[36] * 1000; //Roll
+						points[17] = dataBuffer[37] * 1000; //Pitch
+						points[18] = dataBuffer[38] * 1000; //Yaw
+						points[19] = DataParser.parse2Short(dataBuffer, 39) * 1000; //Gyro x or GPS time hours
+						points[20] = DataParser.parse2Short(dataBuffer, 41) * 1000; //Gyro y or GPS time minutes
+						points[21] = DataParser.parse2Short(dataBuffer, 43) * 1000; //Gyro z or GPS time seconds
+						points[22] = (dataBuffer[46] & 0xFF) * 1000; //ENL
+						points[23] = 0; //Version
 					}
 				}
 				break;

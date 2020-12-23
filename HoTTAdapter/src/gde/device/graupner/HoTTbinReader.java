@@ -676,7 +676,7 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetGAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetEAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Altitude, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
 		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx 7=Event Vario
-		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 		HoTTbinReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		HoTTbinReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
 		HoTTbinReader.dataBlockSize = 64;
@@ -691,7 +691,7 @@ public class HoTTbinReader {
 		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, new int[10], timeSteps_ms, new byte[][] { buf });
 		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, new int[23], timeSteps_ms, new byte[][] { buf });
 		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, new int[8], timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
-		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, new int[15], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, new int[24], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, new int[26], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, new int[31], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser(HoTTbinReader.pickerParameters, new int[14], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
@@ -840,7 +840,7 @@ public class HoTTbinReader {
 									// recordSetGPS initialized and ready to add data
 									bufCopier.copyToFreeBuffer();
 									if (bufCopier.is3BuffersFull()) {
-										parseAddGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3);
+										parseAddGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 										bufCopier.clearBuffers();
 									}
 								}
@@ -1058,7 +1058,7 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetGAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetEAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Altitude, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
 		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
-		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
+		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 		HoTTbinReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16 19=PowerOff 20=BattLow 21=Reset 22=Warning
 		HoTTbinReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperaure
 		HoTTbinReader.dataBlockSize = 64;
@@ -1073,7 +1073,7 @@ public class HoTTbinReader {
 		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, new int[10], timeSteps_ms, new byte[][] { buf });
 		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, new int[23], timeSteps_ms, new byte[][] { buf });
 		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, new int[8], timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
-		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, new int[15], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
+		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, new int[24], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, new int[26], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, new int[31], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.escBinParser = Sensor.ESC.createBinParser(HoTTbinReader.pickerParameters, new int[14], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3 });
@@ -1215,7 +1215,7 @@ public class HoTTbinReader {
 											}
 										}
 										// recordSetGPS initialized and ready to add data
-										parseAddGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3);
+										parseAddGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 									}
 									break;
 
@@ -1631,7 +1631,7 @@ public class HoTTbinReader {
 	 * @param _buf3
 	 * @throws DataInconsitsentException
 	 */
-	protected static void parseAddGPS(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3) throws DataInconsitsentException {
+	protected static void parseAddGPS(byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
 		if (HoTTbinReader.gpsBinParser.parse()) {
 			HoTTbinReader.recordSetGPS.addPoints(HoTTbinReader.gpsBinParser.getPoints(), HoTTbinReader.gpsBinParser.getTimeStep_ms());
 		}
@@ -1654,7 +1654,7 @@ public class HoTTbinReader {
 
 		protected GpsBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
 			super(pickerParameters, points, timeSteps_ms, buffers, Sensor.GPS);
-			if (buffers.length != 4) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
+			if (buffers.length != 5) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 		}
 
 		@Override
@@ -1665,7 +1665,8 @@ public class HoTTbinReader {
 			this.tmpVelocity = DataParser.parse2Short(_buf1, 4) * 1000;
 			this.points[0] = (_buf0[4] & 0xFF) * 1000;
 			if (isPointsValid()) {
-				// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS
+				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS
+				//15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 				this.points[6] = this.pickerParameters.isFilterEnabled && this.tmpVelocity > 2000000 ? this.points[6] : this.tmpVelocity;
 
 				this.tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
@@ -1732,7 +1733,20 @@ public class HoTTbinReader {
 					}
 					break;
 				}
-				this.points[14] = (_buf1[1] & 0x0F) * 1000; // inverse event
+				this.points[14] = (_buf1[1] & 0x0F) * 1000; //14=inverse event
+				this.points[15] = (_buf3[5] & 0xFF) * 1000; //15=HomeDirection
+				//16=Roll 17=Pitch 18=Yaw
+				this.points[16] = _buf3[6] * 1000;
+				this.points[17] = _buf3[7] * 1000;
+				this.points[18] = _buf3[8] * 1000; 
+				//19=GyroX 20=GyroY 21=GyroZ 			
+				this.points[19] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
+				this.points[20] = DataParser.parse2Short(_buf4, 1) * 1000;
+				this.points[21] = DataParser.parse2Short(_buf4, 3) * 1000;
+				//22=Vibration 23=Version			
+				this.points[22] = (_buf4[5] & 0xFF) * 1000;
+				//three char
+				this.points[23] = _buf4[9] * 1000;
 				return true;
 			}
 			this.points[14] = (_buf1[1] & 0x0F) * 1000; // inverse event

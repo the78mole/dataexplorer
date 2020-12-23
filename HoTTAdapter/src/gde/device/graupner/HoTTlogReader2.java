@@ -80,15 +80,21 @@ public class HoTTlogReader2 extends HoTTlogReader {
 		boolean isMotorDriverData = false;
 		HoTTlogReader2.recordSet = null;
 		HoTTlogReader2.isJustMigrated = false;
-		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-		//10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-		//15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
-		//24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6, 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G
-		//46=Voltage E, 47=Current E, 48=Capacity E, 49=Power E, 50=Balance E, 51=CellVoltage E1, 52=CellVoltage E2 .... 64=CellVoltage E14, 65=Voltage E1, 66=Voltage E2, 67=Temperature E1, 68=Temperature E2 69=Revolution E 70=MotorTime 71=Speed 72=Event E
-		//73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max, 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
+		// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
+		// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+		// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
+		// 33=Voltage G, 34=Current G, 35=Capacity G, 36=Power G, 37=Balance G, 38=CellVoltage G1, 39=CellVoltage G2 .... 43=CellVoltage G6,
+		// 44=Revolution G, 45=FuelLevel, 46=Voltage G1, 47=Voltage G2, 48=Temperature G1, 49=Temperature G2 50=Speed G, 51=LowestCellVoltage,
+		// 52=LowestCellNumber, 53=Pressure, 54=Event G
+		// 55=Voltage E, 56=Current E, 57=Capacity E, 58=Power E, 59=Balance E, 60=CellVoltage E1, 61=CellVoltage E2 .... 73=CellVoltage E14,
+		// 74=Voltage E1, 75=Voltage E2, 76=Temperature E1, 77=Temperature E2 78=Revolution E 79=MotorTime 80=Speed 81=Event E
+		// 82=VoltageM, 83=CurrentM, 84=CapacityM, 85=PowerM, 86=RevolutionM, 87=TemperatureM 1, 88=TemperatureM 2 89=Voltage_min, 90=Current_max,
+		// 91=Revolution_max, 92=Temperature1_max, 93=Temperature2_max 94=Event M
 
-		//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-		//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+		// 82=Ch 1, 83=Ch 2, 84=Ch 3 .. 97=Ch 16, 98=PowerOff, 99=BatterieLow, 100=Reset, 101=reserve
+		// 102=VoltageM, 103=CurrentM, 104=CapacityM, 105=PowerM, 106=RevolutionM, 107=TemperatureM 1, 108=TemperatureM 2 109=Voltage_min, 110=Current_max,
+		// 111=Revolution_max, 112=Temperature1_max, 113=Temperature2_max 114=Event M
 		HoTTlogReader2.points = new int[device.getNumberOfMeasurements(channelNumber)];
 		HoTTbinReader.timeStep_ms = 0;
 		int numberLogChannels = Integer.valueOf(fileInfoHeader.get("LOG NOB CHANNEL"));
@@ -97,7 +103,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 		int[] valuesChannel = new int[23];
 		int[] valuesVario = new int[8];
 		valuesVario[2] = 100000;
-		int[] valuesGPS = new int[15];
+		int[] valuesGPS = new int[24];
 		int[] valuesGAM = new int[26];
 		int[] valuesEAM = new int[31];
 		int[] valuesESC = new int[14];
@@ -161,8 +167,8 @@ public class HoTTlogReader2 extends HoTTlogReader {
 					if (channelNumber == 4) {
 						parseChannel(HoTTbinReader.buf, valuesChannel, numberLogChannels);
 						//in 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16 19=PowerOff 20=BattLow 21=Reset 22=Warning
-						//out 73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-						System.arraycopy(valuesChannel, 3, HoTTlogReader2.points, 73, 20); //copy channel data and events, warning
+						//out 82=Ch 1, 83=Ch 2, 84=Ch 3 .. 97=Ch 16, 98=PowerOff, 99=BatterieLow, 100=Reset, 101=reserve
+						System.arraycopy(valuesChannel, 3, HoTTlogReader2.points, 82, 20); //copy channel data and events, warning
 					}
 
 					switch ((byte) (HoTTbinReader.buf[26] & 0xFF)) { //actual sensor
@@ -234,8 +240,8 @@ public class HoTTlogReader2 extends HoTTlogReader {
 						if (channelNumber == 4) {
 							parseChannel(HoTTbinReader.buf, valuesChannel, numberLogChannels);
 							//in 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16 19=PowerOff 20=BattLow 21=Reset 22=Warning
-							//out 73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-							System.arraycopy(valuesChannel, 3, HoTTlogReader2.points, 73, 20); //copy channel data and events, warning
+							//out 82=Ch 1, 83=Ch 2, 84=Ch 3 .. 97=Ch 16, 98=PowerOff, 99=BatterieLow, 100=Reset, 101=reserve
+							System.arraycopy(valuesChannel, 3, HoTTlogReader2.points, 82, 20); //copy channel data and events, warning
 							HoTTlogReader2.recordSet.addPoints(HoTTlogReader2.points, HoTTbinReader.timeStep_ms);
 						}
 						HoTTbinReader.timeStep_ms += logTimeStep;
@@ -289,31 +295,36 @@ public class HoTTlogReader2 extends HoTTlogReader {
 			int[] valuesVario, int[] valuesGPS, int[] valuesGAM, int[] valuesEAM, int[] valuesESC)
 			throws DataInconsitsentException {
 		//receiver data gets integrated each cycle
-		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-		//10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-		//15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
-		//24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6, 35=Revolution G, 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G
-		//46=Voltage E, 47=Current E, 48=Capacity E, 49=Power E, 50=Balance E, 51=CellVoltage E1, 52=CellVoltage E2 .... 64=CellVoltage E14, 65=Voltage E1, 66=Voltage E2, 67=Temperature E1, 68=Temperature E2 69=Revolution E 70=MotorTime 71=Speed 72=Event E
-		//73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max, 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
-		//Channels
-		//73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
-		//93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+		// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
+		// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+		// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
+		// 33=Voltage G, 34=Current G, 35=Capacity G, 36=Power G, 37=Balance G, 38=CellVoltage G1, 39=CellVoltage G2 .... 43=CellVoltage G6,
+		// 44=Revolution G, 45=FuelLevel, 46=Voltage G1, 47=Voltage G2, 48=Temperature G1, 49=Temperature G2 50=Speed G, 51=LowestCellVoltage,
+		// 52=LowestCellNumber, 53=Pressure, 54=Event G
+		// 55=Voltage E, 56=Current E, 57=Capacity E, 58=Power E, 59=Balance E, 60=CellVoltage E1, 61=CellVoltage E2 .... 73=CellVoltage E14,
+		// 74=Voltage E1, 75=Voltage E2, 76=Temperature E1, 77=Temperature E2 78=Revolution E 79=MotorTime 80=Speed 81=Event E
+		// 82=VoltageM, 83=CurrentM, 84=CapacityM, 85=PowerM, 86=RevolutionM, 87=TemperatureM 1, 88=TemperatureM 2 89=Voltage_min, 90=Current_max,
+		// 91=Revolution_max, 92=Temperature1_max, 93=Temperature2_max 94=Event M
+
+		// 82=Ch 1, 83=Ch 2, 84=Ch 3 .. 97=Ch 16, 98=PowerOff, 99=BatterieLow, 100=Reset, 101=reserve
+		// 102=VoltageM, 103=CurrentM, 104=CapacityM, 105=PowerM, 106=RevolutionM, 107=TemperatureM 1, 108=TemperatureM 2 109=Voltage_min, 110=Current_max,
+		// 111=Revolution_max, 112=Temperature1_max, 113=Temperature2_max 114=Event M
 
 		//in 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14,
 		//in 20=Altitude, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2 27=RPM 28=MotorTime 29=Speed 30=Event
-		//out 46=Voltage E, 47=Current E, 48=Capacity E, 49=Power E, 50=Balance E, 51=CellVoltage E1, 52=CellVoltage E2 .... 64=CellVoltage E14, 65=Voltage E1, 66=Voltage E2, 67=Temperature E1, 68=Temperature E2 69=Revolution E 70=MotorTime 71=Speed 72=Event E
 		if (isElectricData) {
 			//out 10=Altitude, 11=Climb 1, 12=Climb 3
 			for (int j = 0; !isVarioData && !isGPSData && !isGeneralData && j < 3; j++) { //0=altitude 1=climb1 2=climb3
 				HoTTlogReader2.points[j+10] = valuesEAM[j+20];
 			}
-			//out 46=Voltage E, 47=Current E, 48=Capacity E, 49=Power E, 50=Balance E, 51=CellVoltage E1, 52=CellVoltage E2 .... 64=CellVoltage E14
+			//out 55=Voltage E, 56=Current E, 57=Capacity E, 58=Power E, 59=Balance E, 60=CellVoltage E1, 61=CellVoltage E2 .... 73=CellVoltage E14,
 			for (int k = 0; k < 19; k++) { //3=voltage 4=current 5=capacity...
-				HoTTlogReader2.points[k+46] = valuesEAM[k+1];
+				HoTTlogReader2.points[k+55] = valuesEAM[k+1];
 			}
-			//out 65=Voltage E1, 66=Voltage E2, 67=Temperature E1, 68=Temperature E2 69=Revolution E 70=MotorTime 71=Speed 72=Event E
+			//out 74=Voltage E1, 75=Voltage E2, 76=Temperature E1, 77=Temperature E2 78=Revolution E 79=MotorTime 80=Speed 81=Event E
 			for (int k = 0; k < 8; k++) { //3=voltage 4=current 5=capacity...
-				HoTTlogReader2.points[k+65] = valuesEAM[k+23];
+				HoTTlogReader2.points[k+74] = valuesEAM[k+23];
 			}
 		}
 		//in 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6,
@@ -324,13 +335,13 @@ public class HoTTlogReader2 extends HoTTlogReader {
 			for (int k = 0; !isVarioData && !isGPSData && k < 3; k++) {
 				HoTTlogReader2.points[k+10] = valuesGAM[k+13];
 			}
-			//out 24=Voltage G, 25=Current G, 26=Capacity G, 27=Power G, 28=Balance G, 29=CellVoltage G1, 30=CellVoltage G2 .... 34=CellVoltage G6, 35=Revolution G
+			//out 33=Voltage G, 34=Current G, 35=Capacity G, 36=Power G, 37=Balance G, 38=CellVoltage G1, 39=CellVoltage G2 .... 43=CellVoltage G6, 44=Revolution G
 			for (int j = 0; j < 12; j++) {
-				HoTTlogReader2.points[j+24] = valuesGAM[j+1];
+				HoTTlogReader2.points[j+33] = valuesGAM[j+1];
 			}
-			//out 36=FuelLevel, 37=Voltage G1, 38=Voltage G2, 39=Temperature G1, 40=Temperature G2 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G
+			//out 45=FuelLevel, 46=Voltage G1, 47=Voltage G2, 48=Temperature G1, 49=Temperature G2 50=Speed G, 51=LowestCellVoltage, 52=LowestCellNumber, 53=Pressure, 54=Event G
 			for (int j = 0; !isVarioData && !isGPSData && j < 10; j++) {
-				HoTTlogReader2.points[j+36] = valuesGAM[j+16];
+				HoTTlogReader2.points[j+45] = valuesGAM[j+16];
 			}
 		}
 		//in 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS
@@ -339,14 +350,19 @@ public class HoTTlogReader2 extends HoTTlogReader {
 			for (int j = 0; !isVarioData && j < 3; j++) { //0=altitude 1=climb1 2=climb3
 				HoTTlogReader2.points[j+10] = valuesGPS[j+3];
 			}
-			//out 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+			//out 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance
 			HoTTlogReader2.points[15] = valuesGPS[1];
 			HoTTlogReader2.points[16] = valuesGPS[2];
 			for (int k = 0; k < 4; k++) {
 				HoTTlogReader2.points[k+17] = valuesGPS[k+6];
 			}
+			//out 21=NumSatellites 22=GPS-Fix 23=EventGPS
 			for (int k = 0; k < 3; k++) {
 				HoTTlogReader2.points[k+21] = valuesGPS[k+12];
+			}
+			// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
+			for (int k = 0; k < 9; k++) {
+				HoTTlogReader2.points[k+24] = valuesGPS[k+15];
 			}
 		}
 		//in 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx	7=EventVario
@@ -361,14 +377,14 @@ public class HoTTlogReader2 extends HoTTlogReader {
 		//in 8=Voltage_min, 9=Current_max, 10=Revolution_max, 11=Temperature1_max, 12=Temperature2_max 13=Event
 		if (isMotorDriverData) {
 			if (channelNumber == 4)
-				//out 93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max, 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
+				//out 102=VoltageM, 103=CurrentM, 104=CapacityM, 105=PowerM, 106=RevolutionM, 107=TemperatureM 1, 108=TemperatureM 2 109=Voltage_min, 110=Current_max, 111=Revolution_max, 112=Temperature1_max, 113=Temperature2_max 114=Event M
 				for (int j = 0; j < 13; j++) {
-					HoTTlogReader2.points[j+93] = valuesESC[j+1];
+					HoTTlogReader2.points[j+102] = valuesESC[j+1];
 				}
 			else
-				//out 73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max, 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
+				//out 82=VoltageM, 83=CurrentM, 84=CapacityM, 85=PowerM, 86=RevolutionM, 87=TemperatureM 1, 88=TemperatureM 2 89=Voltage_min, 90=Current_max, 91=Revolution_max, 92=Temperature1_max, 93=Temperature2_max 94=Event M
 				for (int j = 0; j < 13; j++) {
-					HoTTlogReader2.points[j+73] = valuesESC[j+1];
+					HoTTlogReader2.points[j+82] = valuesESC[j+1];
 				}
 		}
 		
