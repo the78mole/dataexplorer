@@ -1,14 +1,19 @@
-GNU DataExplorer - News - comes with Version 3.4.5 - 17 Dec 2020
+GNU DataExplorer - News - comes with Version 3.4.6 - 26 Dec 2020
 
 Generic changes/fixes
-	* fix graphics update problem initiated by MAC OS update to 11.*
-
+	* update XSD version to force device properties replacement
+	* reduce flicker while measuring on Windows
+	* fix error in history analyze while defined month outside existing file dates
+	
 Device specific changes/fixes
-	* 
+	* Weatronic-Telemetry - add error handling for cases buffer offset zero
+	* HoTTAdapter* - add missing GPS values home direction - version
 	
 Generelle Änderungen/Verbesserungen
-    * Korrektur des Grafik-Update-Problems hervorgerufen durch MAC OS Update 11.*
-   
+    * neu XML Schema-Version, führt zum Austausch der Geräte Beschreibungsdateien (XML)
+    * Flackern beim Messen reduziert (Windows)
+    * Fehler in Hisorienanalyse behoben wenn spezefizierter Zeitraum ausserhalb der Dateidaten
 
 Geräte spezifische Änderungen/Verbesserungen
-    * 
+	* Weatronic-Telemetry - Fehlerbehandlung bei Buffer-Offset Null
+	* HoTTAdapter* - fehlende GPS Werte nachgerüstet
