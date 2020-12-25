@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 3.4.6 - xx yyy 2021
 Generic changes/fixes
 	* update XSD version to force device properties replacement
+	* reduce flicker while measuring on Windows
 	
 Device specific changes/fixes
 	* Weatronic-Telemetry - add error handling for cases buffer offset zero

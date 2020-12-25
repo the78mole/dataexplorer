@@ -1413,18 +1413,18 @@ public class GraphicsComposite extends Composite {
 
 							this.xLast = evt.x;
 							this.yLast = evt.y;
-							this.graphicCanvas.redraw();
+							this.graphicCanvas.redraw(this.offSetX, this.offSetY, this.curveAreaBounds.width, this.curveAreaBounds.height, false);
 						}
 						else if (this.isLeftMouseMeasure) {
 
 							// all obsolete lines are cleaned up now draw new position marker
 							this.xPosMeasure = evt.x; // evt.x is already relative to curve area
-							this.graphicCanvas.redraw();
+							this.graphicCanvas.redraw(this.offSetX, this.offSetY, this.curveAreaBounds.width, this.curveAreaBounds.height, false);
 						}
 						else if (this.isRightMouseMeasure) {
 							// update the new delta position
 							this.xPosDelta = evt.x; // evt.x is already relative to curve area
-							this.graphicCanvas.redraw();
+							this.graphicCanvas.redraw(this.offSetX, this.offSetY, this.curveAreaBounds.width, this.curveAreaBounds.height, false);
 						}
 						else if (this.isPanMouse) {
 							this.xDeltaPan = (this.xLast != 0 && this.xLast != evt.x) ? (this.xDeltaPan + (this.xLast < evt.x ? -1 : 1)) : 0;
@@ -1441,12 +1441,12 @@ public class GraphicsComposite extends Composite {
 						else if (this.isLeftCutMode) {
 							//define new cut position black/left
 							this.xPosCut = evt.x;
-							this.graphicCanvas.redraw();
+							this.graphicCanvas.redraw(this.offSetX, this.offSetY, this.curveAreaBounds.width, this.curveAreaBounds.height, false);
 						}
 						else if (this.isRightCutMode) {
 							//define new cut position blue/right
 							this.xPosCut = evt.x;
-							this.graphicCanvas.redraw();
+							this.graphicCanvas.redraw(this.offSetX, this.offSetY, this.curveAreaBounds.width, this.curveAreaBounds.height, false);
 						}
 					}
 					catch (RuntimeException e) {

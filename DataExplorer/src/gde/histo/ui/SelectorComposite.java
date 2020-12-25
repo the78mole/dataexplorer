@@ -357,6 +357,7 @@ public final class SelectorComposite extends Composite {
 		windowActor.setChartSashFormWeights(this);
 
 		log.fine(() -> "curveSelectorTable width = " + this.selectorColumnWidth);
+		this.curveSelectorTable.redraw();
 	}
 
 	/**
