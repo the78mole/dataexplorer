@@ -736,11 +736,21 @@ public final class TrailRecordSet extends AbstractRecordSet {
 	}
 
 	public long getTopTimeStamp_ms() {
-		return this.timeStep_ms.firstElement() / 10;
+		try {
+			return this.timeStep_ms.firstElement() / 10;
+		}
+		catch (Exception e) {
+			return 0;
+		}
 	}
 
 	public long getLowestTimeStamp_ms() {
-		return this.timeStep_ms.lastElement() / 10;
+		try {
+			return this.timeStep_ms.lastElement() / 10;
+		}
+		catch (Exception e) {
+			return 0;
+		}
 	}
 
 	public long getDisplayTimeStamp_ms(int index) {
