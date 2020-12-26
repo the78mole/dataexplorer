@@ -606,7 +606,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		HistoCurveUtils.drawCurveAreaBorders(canvasImageGC, curveAreaBounds, curveAreaBorderColor);
 
 		long startTime = new Date().getTime();
-		if (fixedCanvasHeight > AbstractChartComposite.ZERO_CANVAS_HEIGHT) drawTrailRecordSet(dataScaleWidth);
+		drawTrailRecordSet(dataScaleWidth);
 		log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startTime)));
 	}
 
