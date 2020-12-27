@@ -332,6 +332,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			trailRecord.setSelectedTrail();
 			trailRecord.initializeFromVaults(pickedVaults.initialVaults);
 		}
+		log.finer(() -> "refilled trailRecord size = " + get(0).size());
 		collector.setGpsLocationsTags();
 	}
 
@@ -356,6 +357,7 @@ public final class TrailRecordSet extends AbstractRecordSet {
 			trailRecord.setSelectedTrail(trailTextOrdinal);
 			trailRecord.initializeFromVaults(pickedVaults.initialVaults);
 		}
+		log.finer(() -> "initial trailRecord size = " + get(0).size());
 		collector.setGpsLocationsTags();
 	}
 

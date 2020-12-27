@@ -566,9 +566,9 @@ public final class VaultPicker {
 		List<ExtendedVault> timeStampHistoVaults = pickedVaults.get(histoVault.getLogStartTimestamp_ms());
 		if (timeStampHistoVaults == null) {
 			pickedVaults.put(histoVault.getLogStartTimestamp_ms(), timeStampHistoVaults = new ArrayList<ExtendedVault>());
+			timeStampHistoVaults.add(histoVault);
+			log.finer(() -> format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLoadFilePath()));
 		}
-		timeStampHistoVaults.add(histoVault);
-		log.finer(() -> format("added   startTimeStamp=%s  %s  logRecordSetOrdinal=%d  logChannelNumber=%d  %s", histoVault.getStartTimeStampFormatted(), histoVault.getVaultFileName(), histoVault.getLogRecordSetOrdinal(), histoVault.getLogChannelNumber(), histoVault.getLoadFilePath()));
 	}
 
 	/**

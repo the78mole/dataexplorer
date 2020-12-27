@@ -606,7 +606,8 @@ public final class SummaryComposite extends AbstractChartComposite {
 		HistoCurveUtils.drawCurveAreaBorders(canvasImageGC, curveAreaBounds, curveAreaBorderColor);
 
 		long startTime = new Date().getTime();
-		drawTrailRecordSet(dataScaleWidth);
+		if (fixedCanvasHeight > AbstractChartComposite.ZERO_CANVAS_HEIGHT) 
+			drawTrailRecordSet(dataScaleWidth);
 		log.fine(() -> "draw records time = " + StringHelper.getFormatedDuration("ss.SSS", (new Date().getTime() - startTime)));
 	}
 
@@ -643,6 +644,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 	 * Support multiple plots for one single item.
 	 */
 	private void drawTrailRecordSet(int dataScaleWidth) {
+		log.finer(() -> "trail record set summary");
 		boolean isDrawScaleInRecordColor = settings.isDrawScaleInRecordColor();
 		boolean isDrawNameInRecordColor = settings.isDrawNameInRecordColor();
 		boolean isDrawNumbersInRecordColor = settings.isDrawNumbersInRecordColor();

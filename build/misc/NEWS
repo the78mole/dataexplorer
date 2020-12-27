@@ -4,7 +4,7 @@ Generic changes/fixes
 	* update XSD version to force device properties replacement
 	* reduce flicker while measuring on Windows
 	* fix error in history analyze while defined time outside existing file dates
-	* fix missing update while hiding unwanted trail point in simple mode
+	* fix adding wrong histoVault while picking vaults
 	
 Device specific changes/fixes
 	* Weatronic-Telemetry - add error handling for cases buffer offset zero
@@ -14,7 +14,7 @@ Generelle Änderungen/Verbesserungen
     * neu XML Schema-Version, führt zum Austausch der Geräte Beschreibungsdateien (XML)
     * Flackern beim Messen reduziert (Windows)
     * Fehler in Hisorienanalyse behoben wenn spezefizierter Zeitraum ausserhalb der Dateidaten
-    * fehlende Update beim Ausblenden eines unerwünschten Trail-Punktes behoben    
+    * Hinzufügen eines falschen HistoVault beim Auswählen von Tresoren wurde behoben   
 
 Geräte spezifische Änderungen/Verbesserungen
 	* Weatronic-Telemetry - Fehlerbehandlung bei Buffer-Offset Null

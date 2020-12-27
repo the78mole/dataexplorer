@@ -82,7 +82,7 @@ public final class TrailDataTags extends EnumMap<DataTag, List<String>> {
 	}
 
 	public void add(ExtendedVault histoVault) {
-		log.log(Level.FINER, histoVault.getLoadLinkPath().toString(), "   " + histoVault.getLoadFilePath().toString());
+		if (log.isLoggable(Level.FINER)) log.log(Level.FINER, histoVault.getLoadLinkPath().toString(), "   " + histoVault.getLoadFilePath().toString());
 		this.dataLinkPaths.add(histoVault.getLoadLinkPath().toString());
 		this.dataFilePaths.add(histoVault.getLoadFilePath().toString());
 		this.dataChannelNumbers.add(String.valueOf(histoVault.getLogChannelNumber()).intern());

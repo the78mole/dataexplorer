@@ -513,6 +513,7 @@ public final class GraphicsComposite extends AbstractChartComposite {
 	 * Support multiple curves for one single item.
 	 */
 	private void drawTrailRecordSet(int dataScaleWidth) {
+		log.finer(() -> "trail record set graphics");
 		TrailRecordSet trailRecordSet = retrieveTrailRecordSet();
 		if (trailRecordSet == null) return;
 
