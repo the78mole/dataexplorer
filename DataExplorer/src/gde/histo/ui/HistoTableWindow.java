@@ -303,7 +303,7 @@ public class HistoTableWindow extends CTabItem {
 					TrailRecordSet trailRecordSet = presentHistoExplorer.getTrailRecordSet();
 					TableItem item = (TableItem) event.item;
 					Vector<TrailRecord> currentRecords = trailRecordSet.getVisibleAndDisplayableRecordsForTable();
-					if (HistoTableWindow.this.dataTable.indexOf(item) < currentRecords.size()) {
+					if (HistoTableWindow.this.dataTable.indexOf(item) > 0 && HistoTableWindow.this.dataTable.indexOf(item) < currentRecords.size()) {
 						int index = HistoTableWindow.this.dataTable.indexOf(item);
 						TrailRecord trailRecord = currentRecords.get(index);
 						item.setText(HistoTableMapper.getTableRow(trailRecord));
