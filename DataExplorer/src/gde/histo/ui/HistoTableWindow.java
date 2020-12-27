@@ -303,15 +303,20 @@ public class HistoTableWindow extends CTabItem {
 					TrailRecordSet trailRecordSet = presentHistoExplorer.getTrailRecordSet();
 					TableItem item = (TableItem) event.item;
 					Vector<TrailRecord> currentRecords = trailRecordSet.getVisibleAndDisplayableRecordsForTable();
-					if (HistoTableWindow.this.dataTable.indexOf(item) > 0 && HistoTableWindow.this.dataTable.indexOf(item) < currentRecords.size()) {
-						int index = HistoTableWindow.this.dataTable.indexOf(item);
-						TrailRecord trailRecord = currentRecords.get(index);
-						item.setText(HistoTableMapper.getTableRow(trailRecord));
-					} else if (HistoTableWindow.this.settings.isDisplayTags()) {
-						int index = HistoTableWindow.this.dataTable.indexOf(item) - currentRecords.size();
-						int channelNumber = Analyzer.getInstance().getActiveChannel().getNumber();
-						DisplayTag[] activeDisplayTags = trailRecordSet.getDataTags().getActiveDisplayTags(channelNumber).toArray(new DisplayTag[] {});
-						item.setText(HistoTableMapper.getTableTagRow(trailRecordSet, activeDisplayTags[index]));
+					try {
+						if (HistoTableWindow.this.dataTable.indexOf(item) < currentRecords.size()) {
+							int index = HistoTableWindow.this.dataTable.indexOf(item);
+							TrailRecord trailRecord = currentRecords.get(index);
+							item.setText(HistoTableMapper.getTableRow(trailRecord));
+						} else if (HistoTableWindow.this.settings.isDisplayTags()) {
+							int index = HistoTableWindow.this.dataTable.indexOf(item) - currentRecords.size();
+							int channelNumber = Analyzer.getInstance().getActiveChannel().getNumber();
+							DisplayTag[] activeDisplayTags = trailRecordSet.getDataTags().getActiveDisplayTags(channelNumber).toArray(new DisplayTag[] {});
+							item.setText(HistoTableMapper.getTableTagRow(trailRecordSet, activeDisplayTags[index]));
+						}
+					}
+					catch (Exception e) {
+						log.warning(() -> "index of item outside data table array bounds");
 					}
 				}
 			}
