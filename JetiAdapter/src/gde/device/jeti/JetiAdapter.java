@@ -549,7 +549,7 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		Channel activeChannel = this.channels.getActiveChannel();
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
-			if (activeRecordSet != null && activeRecordSet.containsGPSdata()) {
+			if (activeRecordSet != null && isActualRecordSetWithGpsData()) {
 				new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2903), 
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE),
 						activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE), 
@@ -575,8 +575,6 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 
-				containsGPSdata = activeRecordSet.containsGPSdata();
 				if (!containsGPSdata) {
 					containsGPSdata = (activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LONGITUDE) >= 0) && (activeRecordSet.getRecordOrdinalOfType(Record.DataType.GPS_LATITUDE) >= 0);
 				}
