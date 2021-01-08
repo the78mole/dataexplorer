@@ -16,7 +16,7 @@
     
     Copyright (c) 2020 Winfried Bruegmann
 ****************************************************************************************/
-package gde.device.olc;
+package gde.device.onlinecommander;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -64,7 +64,7 @@ public class OnLineCommander extends DeviceConfiguration implements IDevice {
 	public OnLineCommander(String deviceProperties) throws FileNotFoundException, JAXBException {
 		super(deviceProperties);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.olc.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.onlinecommander.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
@@ -82,7 +82,7 @@ public class OnLineCommander extends DeviceConfiguration implements IDevice {
 	public OnLineCommander(DeviceConfiguration deviceConfig) {
 		super(deviceConfig);
 		// initializing the resource bundle for this device
-		Messages.setDeviceResourceBundle("gde.device.olc.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
+		Messages.setDeviceResourceBundle("gde.device.onlinecommander.messages", Settings.getInstance().getLocale(), this.getClass().getClassLoader()); //$NON-NLS-1$
 
 		this.application = DataExplorer.getInstance();
 		this.channels = Channels.getInstance();
@@ -97,8 +97,8 @@ public class OnLineCommander extends DeviceConfiguration implements IDevice {
 	 * @return the tool tip text for the import menu bar button
 	 */
 	public static String getImportToolTip() {
-		DeviceConfiguration olcConfiguration = Analyzer.getInstance().getDeviceConfigurations().get("OnLineCommander");
-		String fileExtentions = olcConfiguration != null ? olcConfiguration.getDataBlockPreferredFileExtention() : GDE.STRING_QUESTION_MARK;
+		DeviceConfiguration onlinecommanderConfiguration = Analyzer.getInstance().getDeviceConfigurations().get("OnLineCommander");
+		String fileExtentions = onlinecommanderConfiguration != null ? onlinecommanderConfiguration.getDataBlockPreferredFileExtention() : GDE.STRING_QUESTION_MARK;
 		return Messages.getString(MessageIds.GDE_MSGT2754, new Object[] { fileExtentions });
 	}
 
