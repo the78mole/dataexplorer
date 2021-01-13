@@ -136,7 +136,7 @@ public class GoogleEarthCustomizingDialog extends org.eclipse.swt.widgets.Dialog
 			dialogShell.setLayout( new FormLayout());
 			dialogShell.layout();
 			dialogShell.pack();
-			dialogShell.setSize(360, 255);
+			dialogShell.setSize(360, 265);
 			this.dialogShell.addListener(SWT.Traverse, new Listener() {
 	      @Override
 				public void handleEvent(Event event) {
