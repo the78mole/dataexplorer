@@ -521,8 +521,11 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public Integer getGPS2KMZMeasurementOrdinal() {
-		//0=latitude 1=longitude  2=altitudeAbs 3=height
-		return -1;
+		//0=latitude 1=longitude  2=altitude 3=altitudeGPS 4=climb 5=speed
+		if (kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
+			return 5;
+
+		return kmzMeasurementOrdinal;
 	}
 		
 	/**
