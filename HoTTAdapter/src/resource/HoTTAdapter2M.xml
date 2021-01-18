@@ -329,7 +329,7 @@
             <Measurement>
                 <name>Vibration</name>
                 <symbol></symbol>
-                <unit>5</unit>
+                <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
@@ -1351,7 +1351,7 @@
             <Measurement>
                 <name>Vibration</name>
                 <symbol></symbol>
-                <unit>5</unit>
+                <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
@@ -2435,7 +2435,7 @@
             <Measurement>
                 <name>Vibration</name>
                 <symbol></symbol>
-                <unit>5</unit>
+                <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
@@ -3507,7 +3507,7 @@
             <Measurement>
                 <name>Vibration</name>
                 <symbol></symbol>
-                <unit>5</unit>
+                <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
@@ -4540,7 +4540,7 @@
             <Measurement>
                 <name>Vibration</name>
                 <symbol></symbol>
-                <unit>5</unit>
+                <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>

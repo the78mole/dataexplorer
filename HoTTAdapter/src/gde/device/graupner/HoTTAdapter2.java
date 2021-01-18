@@ -1509,6 +1509,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					}
 				}
 				break;
+				
 			case 74: //Channels (no ESC) prior to 3.0.4 added PowerOff, BatterieLow, Reset, reserve
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					switch (i) { //list of added measurements
@@ -1618,6 +1619,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					}
 				}
 				break;
+				
 			case 84: //Channels 3.0.4 added VoltageM, CurrentM, CapacityM, PowerM, RevolutionM, TemperatureM 1
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					switch (i) { //list of added measurements
@@ -1729,6 +1731,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					}
 				}
 				break;
+				
 			case 86:
 				if (recordSet.getChannelConfigNumber() == 4) { //Channels 3.1.9 added VoltageRx_min, Revolution EAM
 					for (int i = 0, j = 0; i < recordKeys.length; i++) {
@@ -1819,7 +1822,6 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						}
 					}
 				}
-
 				break;
 
 			case 72:	//3.2.7 General, GAM, EAM, ESC
@@ -1865,6 +1867,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					}
 				}
 				break;
+				
 			case 92:	//3.2.7 Channels
 				for (int i = 0, j = 0; i < recordKeys.length; i++) {
 					//3.3.1 extend this measurements: 9=EventRx, 14=EventVario, 21=NumSatellites 22=GPS-Fix 23=EventGPS, 41=Speed G, 42=LowestCellVoltage, 43=LowestCellNumber, 44=Pressure, 45=Event G, 70=MotorTime 71=Speed 72=Event E, 85/105=Event M
