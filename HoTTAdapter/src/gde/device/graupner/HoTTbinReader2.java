@@ -683,8 +683,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			HoTTbinReader2.gpsBinParser.migratePoints(HoTTbinReader2.points);
 			// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 			// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
-			// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
-			if (!isResetMinMax[3] && HoTTbinReader2.points[22] == 3000  && HoTTbinReader2.points[15] != 0 && HoTTbinReader2.points[16] != 0) {
+			if (!isResetMinMax[3] && HoTTbinReader2.points[22] >= 3000  && HoTTbinReader2.points[15] != 0 && HoTTbinReader2.points[16] != 0) {
 				for (int i=15; i<32; ++i) {
 					tmpRecordSet.get(i).setMinMax(HoTTbinReader2.points[i], HoTTbinReader2.points[i]);
 				}

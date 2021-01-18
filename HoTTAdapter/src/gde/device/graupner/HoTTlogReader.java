@@ -463,9 +463,6 @@ public class HoTTlogReader extends HoTTbinReader {
 	protected static boolean parseGPS(byte[] _buf, int[] values, boolean isHoTTAdapter2) {
 	  //0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 
 		//15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
-		//10=Altitude, 11=Climb 1, 12=Climb 3
-		//15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
-		//24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
 		//sensor byte: 26=sensor byte
 		//27,28=InverseBits 29=moveDirection 30,31=speed 32,33,34,35,36=latitude 37,38,39,40,41=longitude 42,43=distanceStart 44,45=altitude
 		//46,47=climb1 48=climb3 49=#satellites 50=GPS-Fix 51=homeDirection 52=Roll 53=Pitch 54=Yaw 55,56=GyroX 57,58=GyroY 59,60=GyroZ
@@ -525,13 +522,13 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[20] = DataParser.parse2Short(_buf, 57) * 1000;
 		values[21] = DataParser.parse2Short(_buf, 59) * 1000;
 		//22=Vibration 23=Version			
-		//61=Vibration 62-65=freeChars 66=Version
+		//61=Vibration 62-64=freeChars 65=Version
 		values[22] = (_buf[61] & 0xFF) * 1000;
 		//three char
 		values[23] = _buf[65] * 1000;
 
 		if (log.isLoggable(Level.FINER)) {
-			printSensorValues(_buf, values, 14);
+			printSensorValues(_buf, values, 23);
 		}
 		return true;
 	}
@@ -686,6 +683,10 @@ public class HoTTlogReader extends HoTTbinReader {
 		}
 		values[13] = ((_buf[27] & 0xFF) + ((_buf[28] & 0x7F) << 8)) * 1000; //inverse event
 
+		//enable binary output for enhanced ESC data
+		if (log.isLoggable(Level.INFO))
+			log.log(Level.INFO, StringHelper.byte2Hex2CharString(_buf, _buf.length));
+		
 		if (log.isLoggable(Level.FINER)) {
 			printSensorValues(_buf, values, 14);
 		}

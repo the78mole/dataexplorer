@@ -323,69 +323,14 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 	protected static boolean parseGPS(byte[] _buf, int[] values, boolean isHoTTAdapter2) {
 		//0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS
 		//10=Altitude, 11=Climb 1, 12=Climb 3
-		//15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
+		//12=Latitude, 13=Longitude, 14=Velocity, 15=Distance, 16=Direction, 17=TripDistance 18=Satellites 19=Fix
+		//20=HomeDirection 21=Roll 22=Pitch 23=Yaw 24=GyroX 25=GyroY 26=GyroZ 27=Vibration 28=Version	
+		//129=EventGPS
 		//sensor byte: 26=sensor byte
 		//27,28=InverseBits 29=moveDirection 30,31=speed 32,33,34,35,36=latitude 37,38,39,40,41=longitude 42,43=distanceStart 44,45=altitude
-		//46,47=climb1 48=climb3 49=#satellites 50=GPS-Fix 51=homeDirection 52,53=northVelocity 54=hAcc 55-58=GPStime 59,60=eastVelocity
-		//61=hAcc 62-65=freeChars 66=version
+		//46,47=climb1 48=climb3 49=#satellites 50=GPS-Fix 51=homeDirection 52=Roll 53=Pitch 54=Yaw 55,56=GyroX 57,58=GyroY 59,60=GyroZ
+		//61=Vibration 62-65=freeChars 66=Version
 		HoTTlogReader.parseGPS(_buf, values, isHoTTAdapter2);
-//		values[0] = (_buf[16] & 0xFF) * 1000;
-//		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 44) - 500 : DataParser.parse2Short(_buf, 44);
-//		HoTTbinReader.tmpClimb1 = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 46) - 30000) : DataParser.parse2UnsignedShort(_buf, 46);
-//		HoTTbinReader.tmpClimb3 = isHoTTAdapter2 ? (_buf[48] & 0xFF) - 120 : (_buf[48] & 0xFF);
-//		HoTTbinReader.tmpVelocity = DataParser.parse2Short(_buf, 30) * 1000;
-//		values[6] = HoTTbinReader.tmpVelocity;
-//		HoTTbinReader.tmpLatitude = DataParser.parse2Short(_buf, 33) * 10000 + DataParser.parse2Short(_buf, 35);
-//		values[1] = HoTTbinReader.tmpLatitude;
-//		HoTTbinReader.tmpLongitude = DataParser.parse2Short(_buf, 38) * 10000 + DataParser.parse2Short(_buf, 40);
-//		values[2] = HoTTbinReader.tmpLongitude;
-//		values[3] = HoTTbinReader.tmpHeight * 1000;		//altitude
-//		values[4] = HoTTbinReader.tmpClimb1 * 10;			//climb1
-//		values[5] = HoTTbinReader.tmpClimb3 * 1000;		//climb3
-//		values[7] = DataParser.parse2Short(_buf, 42) * 1000;
-//		values[8] = (_buf[51] & 0xFF) * 1000;
-//		values[9] = 0; 																//trip length
-//		values[10] = (_buf[13] & 0xFF) * 1000;				//voltageRx
-//		values[11] = ((_buf[14] & 0xFF) - 20) * 1000;	//temperaturRx
-//		values[12] = (_buf[49] & 0xFF) * 1000;
-//		try {
-//			values[13] = Integer.valueOf(String.format("%c", _buf[50])) * 1000;
-//		}
-//		catch (NumberFormatException e1) {
-//			//ignore;
-//		}
-//		values[14] = (_buf[27] & 0x0F) * 1000; //inverse event
-
-		//sensor byte: 26=sensor byte
-		//27,28=InverseBits 29=moveDirection 30,31=speed 32,33,34,35,36=latitude 37,38,39,40,41=longitude 42,43=distanceStart 44,45=altitude
-		//46,47=climb1 48=climb3 49=#satellites 50=GPS-Fix 51=homeDirection 52,53=northVelocity 54=hAcc 55-58=GPStime 59,60=eastVelocity
-		//61=hAcc 62-65=freeChars 66=version
-
-		//15=HomeDirection 16=NorthVelocity 17=SpeedAccuracy 18=Time 19=EastVelocity 20=HorizontalAccuracy 21=Altitude 22=Fix2 23=Version
-		values[15] = (_buf[51] & 0xFF) * 1000;
-		values[16] = DataParser.parse2Short(_buf, 52) * 1000;
-		values[17] = (_buf[54] & 0xFF) * 1000;
-		if (!HoTTbinReaderD.isGpsStartTimeSet) {
-			HoTTbinReaderD.gpsStartTime = getStartTime(_buf[55]&0xFF, _buf[56]&0xFF, _buf[57]&0xFF, _buf[58]&0xFF);
-			HoTTbinReader.log.log(Level.FINE, String.format("%02d:%02d:%02d.%03d", (_buf[55] & 0xFF), (_buf[56] & 0xFF), (_buf[57] & 0xFF), (_buf[58] & 0xFF)));
-			HoTTbinReaderD.isGpsStartTimeSet = true;
-			final RecordSet activeRecordSet = HoTTbinReader.application.getActiveRecordSet();
-			if (activeRecordSet != null) {
-				activeRecordSet.setRecordSetDescription(activeRecordSet.getRecordSetDescription() + GDE.STRING_MESSAGE_CONCAT + "GPS start time = "
-						+ String.format("%02d:%02d:%02d.%03d ", (_buf[55] & 0xFF), (_buf[56] & 0xFF), (_buf[57] & 0xFF), (_buf[58] & 0xFF)));
-			}
-		}
-		values[18] = getStartTime(_buf[55]&0xFF, _buf[56]&0xFF, _buf[57]&0xFF, _buf[58]&0xFF) - HoTTbinReaderD.gpsStartTime;
-		values[19] = DataParser.parse2Short(_buf, 59) * 1000;
-		values[20] = (_buf[61] & 0xFF) * 1000;
-		values[21] = DataParser.parse2Short(_buf, 62) * 1000;
-		try {
-			values[22] = Integer.valueOf(String.format("%c", _buf[64])) * 1000;
-		}
-		catch (NumberFormatException e) {
-			// ignore
-		}
-		values[23] = (_buf[65] & 0xFF) * 1000;
 
 		if (log.isLoggable(Level.FINER)) {
 			printSensorValues(_buf, values, 24);
@@ -468,7 +413,7 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 		}
 		//in 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 		//in 12=satellites 13=GPS-fix 14=EventGPS
-		//in 15=HomeDirection 16=NorthVelocity 17=SpeedAccuracy 18=Time 19=EastVelocity 20=HorizontalAccuracy 21=Altitude 22=Fix2 23=Version
+		//in 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 		if (isGPSData) {
 			//out 8=Altitude, 9=Climb 1, 10=Climb 3
 			for (int j = 0; !isVarioData && j < 3; j++) {
@@ -481,14 +426,15 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 			for (int k = 0; k < 4; k++) {
 				HoTTlogReaderD.points[k+14] = valuesGPS[k+6];
 			}
-			//18=GPS.Satelites, 19=GPS.Fix,
+			//out 18=GPS.Satelites, 19=GPS.Fix,
 			HoTTlogReaderD.points[18] = valuesGPS[12];
 			HoTTlogReaderD.points[19] = valuesGPS[13];
-			//20=HomeDirection, 21=NorthVelocity, 22=SpeedAccuracy, 23=GPS.Time, 24=EastVelocity, 25=HorizontalAccuracy, 26=Altitude, 27=GPS.Fix2, 28=Version
+			//out 20=HomeDirection, 21=Roll, 22=Pitch, 23=Yaw, 24=GyroX, 25=GyroY, 26=GyroZ, 27=Vibration, 28=Version
 			for (int k = 0; k < 9; k++) {
 				HoTTlogReaderD.points[k+20] = valuesGPS[k+15];
 			}
-			HoTTlogReaderD.points[129] = valuesGPS[14]; //129=EventGPS
+			//out 129=EventGPS
+			HoTTlogReaderD.points[129] = valuesGPS[14]; 
 		}
 		//in 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx	7=EventVario
 		if (isVarioData) {
@@ -558,14 +504,5 @@ public class HoTTlogReaderD extends HoTTlogReader2 {
 
 		HoTTlogReaderD.recordSet.addPoints(HoTTlogReaderD.points, HoTTbinReader.timeStep_ms);
 		HoTTlogReaderD.isJustMigrated = true;
-	}
-
-	private static int getStartTime(int HH, int mm, int ss, int SSS) {
-		try {
-			return Integer.valueOf(String.format("%02d%02.0f%02.0f%03d", HH, 100.0 / 60 * mm, 100.0 / 60 * ss, SSS));
-		}
-		catch (NumberFormatException e) {
-			return HoTTlogReaderD.pointsGPS[23] + HoTTbinReaderD.gpsStartTime; //keep time unchanged
-		}
 	}
 }
