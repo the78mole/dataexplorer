@@ -141,7 +141,8 @@ public class UltraDuoPlusType {
 	public void setChannelData1(UltraDuoPlusType.ChannelData1 value, boolean is24hour) {
 		if (is24hour) {
 			String tmp = value.getValue();
-			tmp = String.format("%s%02x%s", tmp.substring(0, 54), 12+Integer.valueOf(value.getValue().substring(54, 56)), tmp.substring(56, tmp.length()));
+			//System.out.println(tmp);
+			tmp = String.format("%s%02x%s", tmp.substring(0, 54), 12+Integer.valueOf(value.getValue().substring(54, 56),16), tmp.substring(56, tmp.length()));
 			//System.out.println(tmp);
 			this.channelData1.setValue(tmp);
 		}

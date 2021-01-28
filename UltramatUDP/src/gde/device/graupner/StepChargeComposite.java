@@ -249,24 +249,28 @@ public class StepChargeComposite extends ScrolledComposite {
 		this.valueA1 = currentStep1 / 10;
 		//this.stepSliderA1.setMaximum(2000 + 10);
 		this.stepSliderA1.setSelection(this.valueA1);
-		this.stepSliderA1.notifyListeners(SWT.Selection, new Event());
+		this.stepSliderA1.redraw();
+		this.stepTextA1.setText(String.format("%.2f", (StepChargeComposite.this.valueA1 / 100.0)));
 
 		this.valueA2 = currentStep2 / 10;
 		//this.stepSliderA2.setMaximum(2000 + 10);
 		this.stepSliderA2.setSelection(this.valueA2);
-		this.stepSliderA2.notifyListeners(SWT.Selection, new Event());
+		this.stepSliderA2.redraw();
+		this.stepTextA2.setText(String.format("%.2f", (StepChargeComposite.this.valueA2 / 100.0)));
 
 		this.valueA3 = currentStep3 / 10;
 		//this.stepSliderA3.setMaximum(2000 + 10);
 		this.stepSliderA3.setSelection(this.valueA3);
-		this.stepSliderA3.notifyListeners(SWT.Selection, new Event());
+		this.stepSliderA3.redraw();
+		this.stepTextA3.setText(String.format("%.2f", (StepChargeComposite.this.valueA3 / 100.0)));
 
 		this.valueA4 = currentStep4 / 10;
 		//this.stepSliderA4.setMaximum(2000 + 10);
 		this.stepSliderA4.setSelection(this.valueA4);
-		this.stepSliderA4.notifyListeners(SWT.Selection, new Event());
+		this.stepSliderA4.redraw();
+		this.stepTextA4.setText(String.format("%.2f", (StepChargeComposite.this.valueA4 / 100.0)));
 
-		this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
+		this.stepChargeCanvas.redraw();
 	}
 
 	public void initCapacity(final int initialCapacity, int capacityStep1, int capacityStep2, int capacityStep3, int capacityStep4) {
@@ -283,24 +287,28 @@ public class StepChargeComposite extends ScrolledComposite {
 		this.valueC1 = capacityStep1;
 		//this.stepSliderC1.setMaximum(maxCapacityValue / 10 + 10);
 		this.stepSliderC1.setSelection(this.valueC1);
-		this.stepSliderC1.notifyListeners(SWT.Selection, new Event());
+		this.stepSliderC1.redraw();
+		this.stepTextC1.setText(String.format("%d", StepChargeComposite.this.valueC1));
 
 		this.valueC2 = capacityStep2;
 		//this.stepSliderC2.setMaximum(maxCapacityValue / 10 + 10);
 		this.stepSliderC2.setSelection(this.valueC2);
-		this.stepSliderC2.notifyListeners(SWT.Selection, new Event());
+		this.stepSliderC2.redraw();
+		this.stepTextC2.setText(String.format("%d", StepChargeComposite.this.valueC2));
 
 		this.valueC3 = capacityStep3;
 		//this.stepSliderC3.setMaximum(maxCapacityValue / 10 + 10);
 		this.stepSliderC3.setSelection(this.valueC3);
-		this.stepSliderC3.notifyListeners(SWT.Selection, new Event());
+		this.stepSliderC3.redraw();
+		this.stepTextC3.setText(String.format("%d", StepChargeComposite.this.valueC3));
 
 		this.valueC4 = capacityStep4;
 		//this.stepSliderC4.setMaximum(maxCapacityValue / 10 + 10);
 		this.stepSliderC4.setSelection(this.valueC4);
-		this.stepSliderC4.notifyListeners(SWT.Selection, new Event());
+		this.stepSliderC4.redraw();
+		this.stepTextC4.setText(String.format("%d", StepChargeComposite.this.valueC4));
 
-		this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
+		this.stepChargeCanvas.redraw();
 	}
 
 	private void initGUI() {
@@ -347,7 +355,7 @@ public class StepChargeComposite extends ScrolledComposite {
 											|| StepChargeComposite.this.stepSliderA4.getSelection() > 1000 
 												? 2000 : 1000	: 500;
 
-								int rightEdge1 = canvasBounds.width * StepChargeComposite.this.stepSliderC1.getSelection()
+								int rightEdge1 = canvasBounds.width * (StepChargeComposite.this.stepSliderC1.getSelection() + 100)
 										/ (StepChargeComposite.this.stepSliderC4.getSelection() == 0 ? 1 : StepChargeComposite.this.stepSliderC4.getSelection());
 								int centerPos1x = rightEdge1 / 2;
 								int centerPos1Y = canvasBounds.height - (StepChargeComposite.this.valueA1 * canvasBounds.height / maxCurrent / 2);
@@ -381,8 +389,8 @@ public class StepChargeComposite extends ScrolledComposite {
 								canvasImageGC.fillRectangle(new Rectangle(rightEdge1 + rightEdge2 + rightEdge3, canvasBounds.height - StepChargeComposite.this.valueA4 * canvasBounds.height / maxCurrent, rightEdge4,
 										canvasBounds.height));
 								if (centerPos4x < rightEdge4 && centerPos4Y < canvasBounds.height - 4) canvasImageGC.drawString("4", centerPos4x - 4, centerPos4Y - 4);
-								evt.gc.drawImage(canvasImage, 0, 0);
 								canvasImageGC.dispose();
+								evt.gc.drawImage(canvasImage, 0, 0);
 								canvasImage.dispose();
 							}
 						}
@@ -415,25 +423,24 @@ public class StepChargeComposite extends ScrolledComposite {
 						}
 						{
 							this.stepSliderC1 = new Slider(this.stepGroup1, SWT.BORDER);
-							this.stepSliderC1.setMinimum(0);
-							this.stepSliderC1.setMaximum(9910);
-							this.stepSliderC1.setIncrement(1);
-							this.stepSliderC1.setSelection(150);
-							this.valueC1 = this.stepSliderC1.getSelection();
+							this.stepSliderC1.setMinimum(100);
+							this.stepSliderC1.setMaximum(9810);
+							this.stepSliderC1.setIncrement(10);
+							this.stepSliderC1.setSelection(250);
+							this.valueC1 = 100 + this.stepSliderC1.getSelection();
 							this.stepSliderC1.addSelectionListener(new SelectionAdapter() {
 								@Override
 								public void widgetSelected(SelectionEvent evt) {
 									StepChargeComposite.log.log(Level.FINEST, "stepSliderC1.widgetSelected, event=" + evt);
-									StepChargeComposite.this.valueC1 = StepChargeComposite.this.stepSliderC1.getSelection();
+									StepChargeComposite.this.valueC1 = 100 + StepChargeComposite.this.stepSliderC1.getSelection();
 									StepChargeComposite.this.stepTextC1.setText(String.format("%d", StepChargeComposite.this.valueC1)); //$NON-NLS-1$
 									if (StepChargeComposite.this.valueC1 > StepChargeComposite.this.valueC2) {
 										StepChargeComposite.this.valueC2 = StepChargeComposite.this.valueC1;
 										StepChargeComposite.this.stepSliderC2.setSelection(StepChargeComposite.this.valueC2);
-										StepChargeComposite.this.stepSliderC2.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepSliderC2.redraw();
 									}
 									if (evt.detail != 0) {
-										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
-										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepChargeCanvas.redraw();
 									}
 								}
 							});
@@ -462,8 +469,7 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.this.valueA1 = StepChargeComposite.this.stepSliderA1.getSelection();
 									StepChargeComposite.this.stepTextA1.setText(String.format("%.2f", (StepChargeComposite.this.valueA1 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
-										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
-										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepChargeCanvas.redraw();
 									}
 								}
 							});
@@ -478,7 +484,6 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.log.log(Level.FINEST, "impulsStep1.widgetSelected, event=" + evt);
 									StepChargeComposite.this.impulseValue1 = StepChargeComposite.this.impulsStep1.getSelection();
 									if (StepChargeComposite.this.impulseValue1) StepChargeComposite.this.reflexStep1.setSelection(false);
-									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
 								}
 							});
 						}
@@ -492,7 +497,6 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.log.log(Level.FINEST, "reflexStep1.widgetSelected, event=" + evt);
 									StepChargeComposite.this.reflexValue1 = StepChargeComposite.this.reflexStep1.getSelection();
 									if (StepChargeComposite.this.reflexValue1) StepChargeComposite.this.impulsStep1.setSelection(false);
-									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
 								}
 							});
 						}
@@ -517,7 +521,7 @@ public class StepChargeComposite extends ScrolledComposite {
 							this.stepSliderC2 = new Slider(this.stepGroup2, SWT.BORDER);
 							this.stepSliderC2.setMinimum(0);
 							this.stepSliderC2.setMaximum(9910);
-							this.stepSliderC2.setIncrement(1);
+							this.stepSliderC2.setIncrement(10);
 							this.stepSliderC2.setSelection(150);
 							this.valueC2 = this.stepSliderC2.getSelection();
 							this.stepSliderC2.addSelectionListener(new SelectionAdapter() {
@@ -529,16 +533,15 @@ public class StepChargeComposite extends ScrolledComposite {
 									if (StepChargeComposite.this.valueC2 < StepChargeComposite.this.valueC1) {
 										StepChargeComposite.this.valueC1 = StepChargeComposite.this.valueC2;
 										StepChargeComposite.this.stepSliderC1.setSelection(StepChargeComposite.this.valueC1);
-										StepChargeComposite.this.stepSliderC1.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepSliderC1.redraw();
 									}
 									if (StepChargeComposite.this.valueC2 > StepChargeComposite.this.valueC3) {
 										StepChargeComposite.this.valueC3 = StepChargeComposite.this.valueC2;
 										StepChargeComposite.this.stepSliderC3.setSelection(StepChargeComposite.this.valueC3);
-										StepChargeComposite.this.stepSliderC3.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepSliderC3.redraw();
 									}
 									if (evt.detail != 0) {
-										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
-										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepChargeCanvas.redraw();
 									}
 								}
 							});
@@ -567,8 +570,7 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.this.valueA2 = StepChargeComposite.this.stepSliderA2.getSelection();
 									StepChargeComposite.this.stepTextA2.setText(String.format("%.2f", (StepChargeComposite.this.valueA2 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
-										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
-										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepChargeCanvas.redraw();
 									}
 								}
 							});
@@ -583,7 +585,6 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.log.log(Level.FINEST, "impulsStep2.widgetSelected, event=" + evt);
 									StepChargeComposite.this.impulseValue2 = StepChargeComposite.this.impulsStep2.getSelection();
 									if (StepChargeComposite.this.impulseValue2) StepChargeComposite.this.reflexStep2.setSelection(false);
-									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
 								}
 							});
 						}
@@ -597,7 +598,6 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.log.log(Level.FINEST, "reflexStep2.widgetSelected, event=" + evt);
 									StepChargeComposite.this.reflexValue2 = StepChargeComposite.this.reflexStep2.getSelection();
 									if (StepChargeComposite.this.reflexValue2) StepChargeComposite.this.impulsStep2.setSelection(false);
-									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
 								}
 							});
 						}
@@ -622,7 +622,7 @@ public class StepChargeComposite extends ScrolledComposite {
 							this.stepSliderC3 = new Slider(this.stepGroup3, SWT.BORDER);
 							this.stepSliderC3.setMinimum(0);
 							this.stepSliderC3.setMaximum(9910);
-							this.stepSliderC3.setIncrement(1);
+							this.stepSliderC3.setIncrement(10);
 							this.stepSliderC3.setSelection(150);
 							this.valueC3 = this.stepSliderC3.getSelection();
 							this.stepSliderC3.addSelectionListener(new SelectionAdapter() {
@@ -634,11 +634,10 @@ public class StepChargeComposite extends ScrolledComposite {
 									if (StepChargeComposite.this.valueC3 < StepChargeComposite.this.valueC2) {
 										StepChargeComposite.this.valueC2 = StepChargeComposite.this.valueC3;
 										StepChargeComposite.this.stepSliderC2.setSelection(StepChargeComposite.this.valueC2);
-										StepChargeComposite.this.stepSliderC2.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepSliderC2.redraw();
 									}
 									if (evt.detail != 0) {
-										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
-										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepChargeCanvas.redraw();
 									}
 								}
 							});
@@ -667,8 +666,7 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.this.valueA3 = StepChargeComposite.this.stepSliderA3.getSelection();
 									StepChargeComposite.this.stepTextA3.setText(String.format("%.2f", (StepChargeComposite.this.valueA3 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
-										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
-										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepChargeCanvas.redraw();
 									}
 								}
 							});
@@ -683,7 +681,6 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.log.log(Level.FINEST, "impulsStep3.widgetSelected, event=" + evt);
 									StepChargeComposite.this.impulseValue3 = StepChargeComposite.this.impulsStep3.getSelection();
 									if (StepChargeComposite.this.impulseValue3) StepChargeComposite.this.reflexStep3.setSelection(false);
-									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
 								}
 							});
 						}
@@ -697,7 +694,6 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.log.log(Level.FINEST, "reflexStep3.widgetSelected, event=" + evt);
 									StepChargeComposite.this.reflexValue3 = StepChargeComposite.this.reflexStep3.getSelection();
 									if (StepChargeComposite.this.reflexValue3) StepChargeComposite.this.impulsStep3.setSelection(false);
-									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
 								}
 							});
 						}
@@ -722,7 +718,7 @@ public class StepChargeComposite extends ScrolledComposite {
 							this.stepSliderC4 = new Slider(this.stepGroup4, SWT.BORDER);
 							this.stepSliderC4.setMinimum(0);
 							this.stepSliderC4.setMaximum(9910);
-							this.stepSliderC4.setIncrement(1);
+							this.stepSliderC4.setIncrement(10);
 							this.stepSliderC4.setSelection(900 - 450);
 							this.valueC4 = this.stepSliderC4.getSelection();
 							this.stepSliderC4.addSelectionListener(new SelectionAdapter() {
@@ -734,11 +730,10 @@ public class StepChargeComposite extends ScrolledComposite {
 									if (StepChargeComposite.this.valueC4 < StepChargeComposite.this.valueC3) {
 										StepChargeComposite.this.valueC3 = StepChargeComposite.this.valueC4;
 										StepChargeComposite.this.stepSliderC3.setSelection(StepChargeComposite.this.valueC3);
-										StepChargeComposite.this.stepSliderC3.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepSliderC3.redraw();
 									}
 									if (evt.detail != 0) {
-										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
-										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepChargeCanvas.redraw();
 									}
 								}
 							});
@@ -767,8 +762,7 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.this.valueA4 = StepChargeComposite.this.stepSliderA4.getSelection();
 									StepChargeComposite.this.stepTextA4.setText(String.format("%.2f", (StepChargeComposite.this.valueA4 / 100.0))); //$NON-NLS-1$
 									if (evt.detail != 0) {
-										StepChargeComposite.this.stepChargeCanvas.notifyListeners(SWT.Paint, new Event());
-										StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
+										StepChargeComposite.this.stepChargeCanvas.redraw();
 									}
 								}
 							});
@@ -783,7 +777,6 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.log.log(Level.FINEST, "impulsStep4.widgetSelected, event=" + evt);
 									StepChargeComposite.this.impulseValue4 = StepChargeComposite.this.impulsStep4.getSelection();
 									if (StepChargeComposite.this.impulseValue4) StepChargeComposite.this.reflexStep4.setSelection(false);
-									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
 								}
 							});
 						}
@@ -797,7 +790,6 @@ public class StepChargeComposite extends ScrolledComposite {
 									StepChargeComposite.log.log(Level.FINEST, "reflexStep4.widgetSelected, event=" + evt);
 									StepChargeComposite.this.reflexValue4 = StepChargeComposite.this.reflexStep4.getSelection();
 									if (StepChargeComposite.this.reflexValue4) StepChargeComposite.this.impulsStep4.setSelection(false);
-									StepChargeComposite.this.parent.notifyListeners(SWT.Selection, new Event());
 								}
 							});
 						}
