@@ -896,9 +896,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						points[16] = dataBuffer[39] * 1000; //Roll
 						points[17] = dataBuffer[40] * 1000; //Pitch
 						points[18] = dataBuffer[41] * 1000; //Yaw
-						points[19] = DataParser.parse2Short(dataBuffer, 42) * 1000;; //Gyro x or GPS time hours
-						points[20] = DataParser.parse2Short(dataBuffer, 44) * 1000;; //Gyro y or GPS time minutes
-						points[21] = DataParser.parse2Short(dataBuffer, 46) * 1000;; //Gyro z or GPS time seconds
+						points[19] = DataParser.parse2Short(dataBuffer, 42) * 1000;; //Gyro x or GPS time hours and minutes
+						points[20] = DataParser.parse2Short(dataBuffer, 44) * 1000;; //Gyro y or GPS time seconds and .sss
+						points[21] = DataParser.parse2Short(dataBuffer, 46) * 1000;; //Gyro z or MSLAltitude
 						points[22] = (dataBuffer[48] & 0xFF) * 1000; //ENL
 						//three char
 						points[23] = (dataBuffer[52] & 0xFF) * 1000; //Version
@@ -1101,9 +1101,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 						points[16] = dataBuffer[36] * 1000; //Roll
 						points[17] = dataBuffer[37] * 1000; //Pitch
 						points[18] = dataBuffer[38] * 1000; //Yaw
-						points[19] = DataParser.parse2Short(dataBuffer, 39) * 1000; //Gyro x or GPS time hours
-						points[20] = DataParser.parse2Short(dataBuffer, 41) * 1000; //Gyro y or GPS time minutes
-						points[21] = DataParser.parse2Short(dataBuffer, 43) * 1000; //Gyro z or GPS time seconds
+						points[19] = DataParser.parse2Short(dataBuffer, 39) * 1000; //Gyro x or GPS time hours and minutes
+						points[20] = DataParser.parse2Short(dataBuffer, 41) * 1000; //Gyro y or GPS time seconds and .sss
+						points[21] = DataParser.parse2Short(dataBuffer, 43) * 1000; //Gyro z or MSLAltitude
 						points[22] = (dataBuffer[46] & 0xFF) * 1000; //ENL
 						points[23] = 0; //Version
 					}
