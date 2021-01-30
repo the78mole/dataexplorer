@@ -10,6 +10,7 @@ Device specific changes/fixes
 	* IGCAdapter - fix support configuring speed or others in KML/KMZ export
 	* HoTTAdapter* - fix unit of GPS vibration
 	* GraupnerUDP* - fix update step charge tabulator
+	* GraupnerUDP* - fix update step charge min capacity/current
 
 Version 3.4.6 - 26 Dec 2020
 Generic changes/fixes
