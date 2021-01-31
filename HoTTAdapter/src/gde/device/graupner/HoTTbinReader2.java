@@ -992,9 +992,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				this.points[23] = (this._buf1[1] & 0x0F) * 1000; // inverse event
 				// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
 				this.points[24] = (_buf3[5] & 0xFF) * 1000;
-				this.points[25] = _buf3[6] * 1000;
-				this.points[26] = _buf3[7] * 1000;
-				this.points[27] = _buf3[8] * 1000; 
+				this.points[25] = _buf3[6] * 1000; //(DataParser.parse2Short(_buf3, 6) -500) * 1000; //Sparrow GPS altitude
+				this.points[26] = _buf3[7] * 1000; //_buf4[3] * 1000; //Sparrow ENL
+				this.points[27] = _buf3[8] * 1000; //_buf4[4] * 1000; //Sparrow servo pulse
 				this.points[28] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
 				this.points[29] = DataParser.parse2Short(_buf4, 1) * 1000;
 				this.points[30] = DataParser.parse2Short(_buf4, 3) * 1000;
