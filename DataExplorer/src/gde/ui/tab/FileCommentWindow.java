@@ -20,6 +20,7 @@ package gde.ui.tab;
 
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.swt.SWT;
@@ -335,9 +336,14 @@ public class FileCommentWindow extends CTabItem {
 						text.addFocusListener(new FocusAdapter() {
 							@Override
 							public void focusLost(FocusEvent evt) {
-								cursor.getRow().setText(1, text.getText());
-								if (application.getActiveChannel() != null && application.getActiveChannel().get(row.getText(0)) != null)
-									application.getActiveChannel().get(row.getText(0)).setRecordSetDescription(text.getText());
+									try {
+										cursor.getRow().setText(1, text.getText());
+										if (application.getActiveChannel() != null && application.getActiveChannel().get(row.getText(0)) != null)
+											application.getActiveChannel().get(row.getText(0)).setRecordSetDescription(text.getText());
+									}
+									catch (Exception e) {
+										log.log(Level.WARNING, e.getMessage());
+									}
 								text.dispose();
 							}
 						});
@@ -387,7 +393,12 @@ public class FileCommentWindow extends CTabItem {
 						text.addFocusListener(new FocusAdapter() {
 							@Override
 							public void focusLost(FocusEvent evt) {
-								cursor.getRow().setText(1, text.getText());
+									try {
+										cursor.getRow().setText(1, text.getText());
+									}
+									catch (Exception e2) {
+										log.log(Level.WARNING, e2.getMessage());
+									}
 								text.dispose();
 							}
 						});
