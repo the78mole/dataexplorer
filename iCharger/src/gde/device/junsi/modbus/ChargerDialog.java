@@ -1474,6 +1474,8 @@ public class ChargerDialog extends DeviceDialog {
 				}
 				if (ChargerDialog.this.combo.getText().contains("BUILD IN")) { //$NON-NLS-1$
 					ChargerDialog.this.btnCopy.setEnabled(true);
+					if (log.isLoggable(Level.FINEST)) 
+						ChargerDialog.this.btnDelete.setEnabled(true); //enable deletion of memory created by error
 				}
 				else {
 					ChargerDialog.this.btnCopy.setEnabled(false);
@@ -1585,7 +1587,7 @@ public class ChargerDialog extends DeviceDialog {
 					WaitTimer.delay(400);
 				}
 				if (ChargerDialog.this.selectedProgramMemory != null)
-					writeProgramMemory(ChargerDialog.this.lastSelectedProgramMemoryIndex, ChargerDialog.this.selectedProgramMemory, ChargerDialog.this.selectedProgramMemory.getUseFlag());
+					writeProgramMemory(ChargerDialog.this.lastSelectedProgramMemoryIndex, ChargerDialog.this.selectedProgramMemory, (short) 0x55aa);
 				ChargerDialog.this.combo.setForeground(ChargerDialog.this.application.COLOR_BLACK);
 				String updatedItemText = getFormatedListEntry(ChargerDialog.this.lastSelectedComboIndex, ChargerDialog.this.selectedProgramMemory);
 				String[] items = ChargerDialog.this.combo.getItems();
