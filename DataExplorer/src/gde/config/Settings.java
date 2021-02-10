@@ -1118,7 +1118,7 @@ public final class Settings extends Properties {
 	 * @return the decimal separator, default value is '.'
 	 */
 	public char getDecimalSeparator() {
-		if (this.getProperty(Settings.DECIMAL_SEPARATOR) == null) this.setProperty(Settings.DECIMAL_SEPARATOR, GDE.STRING_SEMICOLON);
+		if (this.getProperty(Settings.DECIMAL_SEPARATOR) == null) this.setProperty(Settings.DECIMAL_SEPARATOR, GDE.STRING_DOT);
 		return this.getProperty(Settings.DECIMAL_SEPARATOR).trim().charAt(0);
 	}
 

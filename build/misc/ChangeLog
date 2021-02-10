@@ -5,6 +5,7 @@ Generic changes/fixes
 	* update copyright 2021
 	* update dialog sizes to support uneven Windows scaling 
 	* fix error while editing FileComment tab while focus lost
+	* fix error in setting returning initial wrong decimal separator
 	
 Device specific changes/fixes
 	* JetiAdapter - fix check GPS data to enable Google Earth export
