@@ -78,7 +78,7 @@ public class DeviceConfiguration {
 	private final static Logger								log												= Logger.getLogger(DeviceConfiguration.class.getName());
 
 	private final Settings										settings;
-	final DeviceXmlResource										xmlResource								= DeviceXmlResource.getInstance();
+	final protected DeviceXmlResource					xmlResource								= DeviceXmlResource.getInstance();
 
 	private Path															xmlFile;
 	private String														fileSha1Hash							= GDE.STRING_EMPTY;
@@ -2854,4 +2854,9 @@ public class DeviceConfiguration {
 	 */
 	public int[] getAtlitudeTripSpeedOrdinals() { return new int[0]; }  
 
+	/**
+	 * @param key string of key to be replaced
+	 * @return the replacement
+	 */
+	public String getMeasurementReplacement(String key) { return xmlResource.getReplacement(key); }
 }

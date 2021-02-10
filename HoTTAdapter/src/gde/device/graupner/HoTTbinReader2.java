@@ -92,6 +92,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		device.getMeasurementFactor(channelNumber, 12);
 		boolean isReceiverData = false;
 		boolean isSensorData = false;
+		boolean isGPSdetected = false;
 		boolean[] isResetMinMax = new boolean[] {false, false, false, false, false}; //ESC, EAM, GAM, GPS, Vario
 		HoTTbinReader2.recordSet = null;
 		// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
@@ -213,6 +214,31 @@ public class HoTTbinReader2 extends HoTTbinReader {
 									HoTTbinReader2.gpsBinParser.parse();
 									bufCopier.clearBuffers();
 									isSensorData = true;
+									if (!isGPSdetected) {
+										if ((buf4[9] & 0xFF) > 100) { //SM GPS-Logger
+											// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
+											tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
+											tmpRecordSet.get(28).setName("Gyro X");
+											tmpRecordSet.get(29).setName("Gyro Y");
+											tmpRecordSet.get(30).setName("Gyro Z");
+											tmpRecordSet.get(31).setName("ENL");
+										}
+										else if ((buf4[9] & 0xFF) == 4 || (buf4[5] & 0xFF) == 0xDF) { //RC Electronics Sparrow
+											tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
+											tmpRecordSet.get(26).setName("0xDF");
+											tmpRecordSet.get(27).setName("Voltage MP");
+											tmpRecordSet.get(28).setName("GPS hh:mm");
+											tmpRecordSet.get(29).setName("GPS ss.SSS");
+											tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");
+											tmpRecordSet.get(31).setName("ENL");
+										}
+										else { //Graupner GPS
+											tmpRecordSet.get(28).setName("GPS hh:mm");
+											tmpRecordSet.get(29).setName("GPS ss.SSS");
+											tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");
+										}
+										isGPSdetected = true;
+									}
 									// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 									// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
 									if (!isResetMinMax[3] && HoTTbinReader2.points[22] == 3000 && HoTTbinReader2.points[15] != 0 && HoTTbinReader2.points[16] != 0) {
@@ -378,6 +404,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		boolean isReceiverData = false;
 		HoTTbinReader2.recordSet = null;
 		boolean isJustMigrated = false;
+		boolean isGPSdetected = false;
 		boolean[] isResetMinMax = new boolean[] {false, false, false, false, false}; //ESC, EAM, GAM, GPS, Vario
 		// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
 		// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
@@ -503,6 +530,31 @@ public class HoTTbinReader2 extends HoTTbinReader {
 										}
 										HoTTbinReader2.gpsBinParser.parse();
 										migrationJobs.add(Sensor.GPS);
+										if (!isGPSdetected) {
+											if ((buf4[9] & 0xFF) > 100) { //SM GPS-Logger
+												// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
+												tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
+												tmpRecordSet.get(28).setName("Gyro X");
+												tmpRecordSet.get(29).setName("Gyro Y");
+												tmpRecordSet.get(30).setName("Gyro Z");
+												tmpRecordSet.get(31).setName("ENL");
+											}
+											else if ((buf4[9] & 0xFF) == 4 || (buf4[5] & 0xFF) == 0xDF) { //RC Electronics Sparrow
+												tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
+												tmpRecordSet.get(26).setName("0xDF");
+												tmpRecordSet.get(27).setName("Voltage MP");
+												tmpRecordSet.get(28).setName("GPS hh:mm");
+												tmpRecordSet.get(29).setName("GPS ss.SSS");
+												tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");
+												tmpRecordSet.get(31).setName("ENL");
+											}
+											else { //Graupner GPS
+												tmpRecordSet.get(28).setName("GPS hh:mm");
+												tmpRecordSet.get(29).setName("GPS ss.SSS");
+												tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");
+											}
+											isGPSdetected = true;
+										}
 									}
 									break;
 
@@ -623,7 +675,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					+ Sensor.getSetAsSignature(HoTTbinReader.detectedSensors));
 			HoTTbinReader2.log.log(Level.WARNING, "skipped number receiver data due to package loss = " + ((RcvBinParser) HoTTbinReader.rcvBinParser).getCountPackageLoss()); //$NON-NLS-1$
 			HoTTbinReader2.log.log(Level.TIME, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
-
+			
 			if (menuToolBar != null) {
 				GDE.getUiNotification().setProgress(99);
 				device.makeInActiveDisplayable(tmpRecordSet);
@@ -990,15 +1042,38 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					break;
 				}
 				this.points[23] = (this._buf1[1] & 0x0F) * 1000; // inverse event
-				// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
+				// 24=HomeDirection 
 				this.points[24] = (_buf3[5] & 0xFF) * 1000;
-				this.points[25] = _buf3[6] * 1000; //(DataParser.parse2Short(_buf3, 6) -500) * 1000; //Sparrow GPS altitude
-				this.points[26] = _buf3[7] * 1000; //_buf4[3] * 1000; //Sparrow ENL
-				this.points[27] = _buf3[8] * 1000; //_buf4[4] * 1000; //Sparrow servo pulse
-				this.points[28] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
-				this.points[29] = DataParser.parse2Short(_buf4, 1) * 1000;
-				this.points[30] = DataParser.parse2Short(_buf4, 3) * 1000;
-				this.points[31] = (_buf4[5] & 0xFF) * 1000;
+				if ((_buf4[9] & 0xFF) > 100) { //SM GPS-Logger
+					//25=servoPulse 26=n/a 27=n/a 28=GyroX 29=GyroY 30=GyroZ 31=ENL 32=Version	
+					this.points[25] = _buf3[6] * 1000; //(DataParser.parse2Short(_buf3, 6) -500) * 1000; //Sparrow GPS altitude
+					this.points[26] = _buf3[7] * 1000; //_buf4[3] * 1000; //Sparrow ENL
+					this.points[27] = _buf3[8] * 1000; //_buf4[4] * 1000; //Sparrow servo pulse
+					this.points[28] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
+					this.points[29] = DataParser.parse2Short(_buf4, 1) * 1000;
+					this.points[30] = DataParser.parse2Short(_buf4, 3) * 1000;
+					this.points[31] = (_buf4[5] & 0xFF) * 1000;
+				}
+				else if ((_buf4[9] & 0xFF) == 4 || (_buf4[5] & 0xFF) == 0xDF) { //RCE Electronics Sparrow
+					//25=servoPulse 26=fixed 27=Voltage 28=GPS hh:mm 29=GPS sss.SSS 30=MSL Altitude 31=ENL 32=Version	
+					this.points[25] = _buf4[4] * 1000; 
+					this.points[26] = (_buf4[5] & 0xFF) * 1000; 
+					this.points[27] = _buf3[8] * 100; 
+					this.points[28] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
+					this.points[29] = DataParser.parse2Short(_buf4, 1) * 1000;
+					this.points[30] = (DataParser.parse2Short(_buf3, 6) -500) * 1000;
+					this.points[31] = (_buf4[3] & 0xFF) * 1000;
+				}
+				else { //Graupner GPS
+					//25=Roll 26=Pitch 27=Yaw 28=GPS hh:mm 29=GPS sss.SSS 30=MSL Altitude 31=Vibration 32=Version	
+					this.points[25] = _buf3[6] * 1000; //(DataParser.parse2Short(_buf3, 6) -500) * 1000; //Sparrow GPS altitude
+					this.points[26] = _buf3[7] * 1000; //_buf4[3] * 1000; //Sparrow ENL
+					this.points[27] = _buf3[8] * 1000; //_buf4[4] * 1000; //Sparrow servo pulse
+					this.points[28] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
+					this.points[29] = DataParser.parse2Short(_buf4, 1) * 1000;
+					this.points[30] = DataParser.parse2Short(_buf4, 3) * 1000;
+					this.points[31] = (_buf4[5] & 0xFF) * 1000;
+				}
 				this.points[32] = _buf4[9] * 1000;
 				return true;
 			}

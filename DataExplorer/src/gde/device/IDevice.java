@@ -1125,4 +1125,10 @@ public interface IDevice {
 	 */
 	public int[] getAtlitudeTripSpeedOrdinals();
 
+	/**
+	 * @param key string of key to be replaced
+	 * @return the replacement
+	 */
+	public String getMeasurementReplacement(String key);
+
 }
