@@ -492,7 +492,7 @@ public class OsdReaderWriter {
 				MeasurementType gdeMeasurement = device.getMeasurement(channelNumber, i);
 				gdeMeasurement.setName(recordNames[i] = recordProperties.get(Record.NAME));
 				gdeMeasurement.setUnit(recordUnits[i] = recordProperties.get(Record.UNIT));
-				gdeMeasurement.setSymbol(recordSymbols[i] = recordProperties.get(Record.SYMBOL));
+				gdeMeasurement.setSymbol(recordSymbols[i] = recordProperties.getOrDefault(Record.SYMBOL, GDE.STRING_EMPTY));
 				gdeMeasurement.setActive(Boolean.valueOf(recordProperties.get(Record.IS_ACTIVE)));
 			}
 			recordSet = RecordSet.createRecordSet(recordSetName, analyzer, channelNumber, recordNames, recordSymbols, recordUnits, true, true, true);
