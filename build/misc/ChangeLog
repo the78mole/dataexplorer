@@ -15,6 +15,8 @@ Device specific changes/fixes
 	* HoTTAdapter* - detecting GPS type to sort and name values
 	* GraupnerUDP* - fix update step charge tabulator
 	* GraupnerUDP* - fix update step charge min capacity/current
+	* IGCAdapter - fix loading older OSD file
+	* iCharger* - fix energy calculation
 
 Version 3.4.6 - 26 Dec 2020
 Generic changes/fixes

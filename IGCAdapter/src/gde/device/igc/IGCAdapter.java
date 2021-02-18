@@ -19,7 +19,10 @@
 package gde.device.igc;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -53,6 +56,7 @@ import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
 import gde.utils.LinearRegression;
 import gde.utils.QuasiLinearRegression;
+import gde.utils.StringHelper;
 
 /**
  * IGC adapter class to read and verify ICG files
@@ -352,7 +356,7 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 		if (recordSet.isRaw() && recordSet.isRecalculation()) {
 			// 0=Longitude, 1=Latitude, 2=Altitude(baro), 3=Altitude(GPS), 4=Climb, 5=Speed
 			// calculate the values required		
-			Record slopeRecord = recordSet.get(4);//2=Steigrate
+			Record slopeRecord = recordSet.get(4);//4=Climb
 			slopeRecord.setDisplayable(false);
 			PropertyType property = slopeRecord.getProperty(CalculationThread.REGRESSION_INTERVAL_SEC);
 			int regressionInterval = property != null ? Integer.valueOf(property.getValue()) : 10;
@@ -368,11 +372,8 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 			catch (RuntimeException e) {
 				log.log(Level.WARNING, e.getMessage(), e);
 			}
-			//GPSHelper.calculateSpeed2D(this, recordSet, 1, 0, 5);
-			//recordSet.get(5).setName("Speed");
-			//recordSet.get(5).setUnit("km/h");
-			//recordSet.setNoneCalculationRecordNames(this.getNoneCalculationMeasurementNames(1, recordSet.getActiveRecordNames()));
-			GPSHelper.calculateSpeed3D(this, recordSet, 1, 0, 2, 5);
+			if (recordSet.realSize() >= 6)
+				GPSHelper.calculateSpeed3D(this, recordSet, 1, 0, 2, 5);
 		}
 		this.updateVisibilityStatus(recordSet, true);
 		this.application.updateStatisticsData();
@@ -575,6 +576,43 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 	@Override
 	public String[] getUsedPropertyKeys() {
 		return new String[0];
+	}
+
+	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	@Override
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		ArrayList<String> recordKeys = new ArrayList<String>(Arrays.asList(recordSet.getRecordNames()));
+		//check if measurement Speed is already contained
+		boolean containsSpeed = false;
+		for (String recordProperty : fileRecordsProperties) {
+			String[] tmp = StringHelper.splitString(recordProperty, Record.DELIMITER, "_name=");
+			containsSpeed = tmp[0].equals("Speed");
+			if (containsSpeed)
+				break;
+		}
+		if (!containsSpeed) {
+			recordKeys.remove(5);
+		}
+		final Vector<String> cleanedRecordNames = new Vector<>();
+		if ((recordKeys.size() - fileRecordsProperties.length) > 0) {
+			int i = 0;
+			for (; i < fileRecordsProperties.length; ++i) {
+				cleanedRecordNames.add(recordKeys.get(i));
+			}
+			//cleanup recordSet
+			for (; i < recordKeys.size(); ++i) {
+				recordSet.remove(recordKeys.get(i));
+			}
+			return cleanedRecordNames.toArray(new String[1]);
+		}
+		return recordKeys.toArray(new String[1]);
 	}
 }
 
