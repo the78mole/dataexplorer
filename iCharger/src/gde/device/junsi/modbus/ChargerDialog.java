@@ -917,6 +917,7 @@ public class ChargerDialog extends DeviceDialog {
 						ChargerDialog.log.log(Level.INFO, programMemories.get(programMemories.size() - 1));
 				}
 				initProgramMemory(0);
+				return programMemories.size() == 0 ? new String[0] : programMemories.toArray(new String[1]);
 			}
 		}
 		catch (IllegalStateException | TimeOutException e) {
@@ -925,7 +926,7 @@ public class ChargerDialog extends DeviceDialog {
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
 		}
-		return programMemories.size() == 0 ? new String[0] : programMemories.toArray(new String[1]);
+		return new String[0];
 	}
 
 	/**
