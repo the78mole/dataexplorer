@@ -111,6 +111,7 @@ public class iCharger208B extends iCharger {
 		DataParser data = new  DataParser(this.getDataBlockTimeUnitFactor(), this.getDataBlockLeader(), this.getDataBlockSeparator().value(), null, null, Math.abs(this.getDataBlockSize(InputTypes.FILE_IO)), this.getDataBlockFormat(InputTypes.SERIAL_IO), false);
 		int[] startLength = new int[] {0,0};
 		byte[] lineBuffer = null;
+		double timeStep_h = 2.0 / 3600.0;
 				
 		try {
 			setDataLineStartAndLength(dataBuffer, startLength);
@@ -132,7 +133,13 @@ public class iCharger208B extends iCharger {
 			//3=Ladung 4=Leistung 5=Energie
 			points[3] = values[cellOffset + 3] * 1000;
 			points[4] = Double.valueOf(points[1] * points[2] / 100.0).intValue(); 							// power U*I [W]
-			points[5] = Double.valueOf(points[1]/1000.0 * points[3]/1000.0).intValue();					// energy U*C [mWh]
+			if (points[3] != 0) {
+				energySum += points[4] * timeStep_h; //energy = energy + (timeDelta * power)
+				points[5] = Double.valueOf(energySum).intValue();
+			} else {
+				points[5] = 0;
+				energySum = 0.0;
+			}
 			//6=Temp.intern 7=Temp.extern 
 			points[6] = values[cellOffset + 1];
 			points[7] = values[cellOffset + 2];
@@ -171,6 +178,8 @@ public class iCharger208B extends iCharger {
 		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
+		double energy = 0.0;
+		double timeStep_h = 2.0 / 3600.0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		
 		for (int i = 0; i < recordDataSize; i++) {
@@ -184,7 +193,10 @@ public class iCharger208B extends iCharger {
 			//3=Ladung 4=Leistung 5=Energie
 			points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff) << 0));
 			points[4] = Double.valueOf((points[1] / 1000.0) * (points[2] / 1000.0) * 10000).intValue(); 						// power U*I [W]
-			points[5] = Double.valueOf((points[1] / 1000.0) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
+			if (i != 0) {
+				energy += points[4] * timeStep_h; //energy = energy + (timeDelta * power)
+			}
+			points[5] = Double.valueOf(energy).intValue();
 			//6=Temp.intern 7=Temp.extern 
 			points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff) << 0));
 			points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff) << 0));

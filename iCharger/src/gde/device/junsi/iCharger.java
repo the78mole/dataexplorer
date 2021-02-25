@@ -61,6 +61,8 @@ public abstract class iCharger extends DeviceConfiguration implements IDevice {
 	protected final Channels											channels;
 	protected       GathererThread								gathererThread;
 	protected String[]														BATTERIE_TYPES;
+	
+	protected static double energySum = 0.0; 
 
 	/**
 	 * @param batTypeName LiPo, LiIo, LiFe,...

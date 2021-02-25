@@ -71,6 +71,11 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	protected String 								batteryType_1 = GDE.STRING_QUESTION_MARK;
 	protected String 								batteryType_2 = GDE.STRING_QUESTION_MARK;
 
+	protected static int lastTime1_ms = 0;
+	protected static int lastTime2_ms = 0;
+	protected static double energySum1 = 0.0;
+	protected static double energySum2 = 0.0;
+
 		
 	public enum BatteryTypesDuo {
 		BT_UNKNOWN("?"), BT_LIPO("LiPo"), BT_LIIO("LiIo"), BT_LIFE("LiFe"), BT_NIMH("NiMH"), BT_NICD("NiCd"), BT_PB("PB"), BT_NIZN("NiZn"), BT_LIHV("LiHV"), BT_UNKNOWN_("?");
@@ -195,7 +200,8 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		for (int i = 0; i < recordDataSize; i++) {
 			//prepare convert buffer for conversion
 			System.arraycopy(dataBuffer, offset+5, convertBuffer, 0, deviceDataBufferSize);
-			recordSet.addPoints(convertDataBytes(points, convertBuffer));
+			int actualTime_ms = DataParser.parse2Int(convertBuffer, 3);
+			recordSet.addPoints(convertDataBytes(points, convertBuffer), actualTime_ms);
 			offset += lovDataSize;
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
@@ -369,6 +375,19 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	public int[] convertDataBytes(int[] points, byte[] dataBuffer) {
 		int maxVotage = Integer.MIN_VALUE;
 		int minVotage = Integer.MAX_VALUE;
+		int actualTime_ms = DataParser.parse2Int(dataBuffer, 3);
+		double timeStep_h = 1.0 / 3600.0; //default time step
+		if (dataBuffer[2] == 0x01) { //channel 1
+			if (actualTime_ms < lastTime1_ms)
+				lastTime1_ms = 0;
+			timeStep_h = (actualTime_ms - lastTime1_ms) / 1000.0 / 3600.0;
+			lastTime1_ms = actualTime_ms;
+		} else { //channel 2
+			if (actualTime_ms < lastTime2_ms)
+				lastTime2_ms = 0;
+			timeStep_h = (actualTime_ms - lastTime2_ms) / 1000.0 / 3600.0;
+			lastTime2_ms = actualTime_ms;
+		}
 
 		//2C 10 01 F8 7D 07 00 02 01 00 E5 FF 04 87 2B 3C CF FF FF FF 64 01 00 00 02 0F 0B 0F 0E 0F 00 0F 00 00 00 00 00 00 00 00 00 00 00
 	  //                                    34564 15403             35,6        3842  3851  3854  3840
@@ -379,7 +398,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			//short current, ushort Vin, ushort Vbat, int capacity, short tempInt, short tempExt, int Vcell1, int Vcell2, ....
 			switch (dataBuffer[2]) {
 			default:
-			case 1:
+			case 1: //channel 1
 				try {
 					batteryType_1 = this.getBatteryType(dataBuffer);
 				}
@@ -387,7 +406,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 					batteryType_1 = GDE.STRING_QUESTION_MARK;
 				}
 				break;
-			case 2:
+			case 2: //channel 2
 				try {
 					batteryType_2 = this.getBatteryType(dataBuffer);
 				}
@@ -402,8 +421,24 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 			points[2] = DataParser.parse2UnsignedShort(dataBuffer, 14);
 			//3=Capacity 4=Power 5=Energy
 			points[3] = DataParser.parse2Int(dataBuffer, 16);
-			points[4] = points[0] * points[2] / 100; 																	// power U*I [W]
-			points[5] = Double.valueOf(points[2] * points[3]/1000.0).intValue();	// energy U*C [mWh]
+			points[4] = Math.abs(points[0] * points[2] / 100); 	// power U*I [W]
+			if (dataBuffer[2] == 0x01) { //channel 1
+				if (points[3] != 0) {
+					energySum1 += points[4] * timeStep_h; //energy = energy + (timeDelta * power)
+					points[5] = Double.valueOf(energySum1).intValue();
+				} else {
+					points[5] = 0; 		
+					energySum1 = 0.0;
+				}
+			} else { //channel 2
+				if (points[3] != 0) {
+					energySum2 += points[4] * timeStep_h; //energy = energy + (timeDelta * power)
+					points[5] = Double.valueOf(energySum2).intValue();
+				} else {
+					points[5] = 0; 		
+					energySum2 = 0.0;
+				}
+			}
 			//6=Temp.intern 7=Temp.extern
 			points[6] = DataParser.parse2Short(dataBuffer, 20);
 			points[7] = DataParser.parse2Short(dataBuffer, 22);
@@ -470,6 +505,9 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		byte[] convertBuffer = new byte[dataBufferSize];
 		int[] points = new int[recordSet.size()];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
+		double energy = 0.0;
+		double timeStep_h = 1.0 / 3600.0; //use default time step 1000 ms
+		double lastTime_ms = 0, actualTime_ms = 0;
 		int progressCycle = 0;
 		if (doUpdateProgressBar) this.application.setProgress(progressCycle, sThreadId);
 		int riRecordOffset = 9 + this.getNumberOfLithiumCells();
@@ -490,8 +528,7 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 				points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff)));
 				points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff)));
 				//4=Power 5=Energy
-				points[4] = Double.valueOf((points[0] / 100.0) * (points[2])).intValue(); 											// power U*I [W]
-				points[5] = Double.valueOf((points[2]) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
+				points[4] = Math.abs(Double.valueOf((points[0] / 100.0) * (points[2])).intValue()); // power U*I [W]
 				//6=Temp.intern 7=Temp.extern
 				points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff)));
 				points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff)));
@@ -520,8 +557,13 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 					}
 				}
 	
-				recordSet.addPoints(points,
-						(((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff))) / 10.0);
+				actualTime_ms = (((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff))) / 10.0;
+				timeStep_h = (actualTime_ms - lastTime_ms) / 1000.0 / 3600.0;
+				if (i != 0)
+					energy += points[4] * timeStep_h;  //energy = energy + (timeDelta * power)
+				points[5] = Double.valueOf(energy).intValue();
+				recordSet.addPoints(points, actualTime_ms);
+				lastTime_ms = actualTime_ms;
 	
 				if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle*2500)/recordDataSize), sThreadId);				
 			}
@@ -537,8 +579,10 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 				points[2] = (((convertBuffer[8]&0xff) << 24) + ((convertBuffer[9]&0xff) << 16) + ((convertBuffer[10]&0xff) << 8) + ((convertBuffer[11]&0xff)));
 				points[3] = (((convertBuffer[12]&0xff) << 24) + ((convertBuffer[13]&0xff) << 16) + ((convertBuffer[14]&0xff) << 8) + ((convertBuffer[15]&0xff)));
 				//4=Power 5=Energy
-				points[4] = Double.valueOf((points[0] / 100.0) * (points[2])).intValue(); 											// power U*I [W]
-				points[5] = Double.valueOf((points[2]) * (points[3] / 1000.0)).intValue();											// energy U*C [mWh]
+				points[4] = Double.valueOf((points[0] / 100.0) * (points[2])).intValue(); // power U*I [W]
+				if (i != 0)
+					energy += points[4] * timeStep_h; 						//energy = energy + (timeDelta * power)
+				points[5] = Double.valueOf(energy).intValue(); 
 				//6=Temp.intern 7=Temp.extern
 				points[6] = (((convertBuffer[16]&0xff) << 24) + ((convertBuffer[17]&0xff) << 16) + ((convertBuffer[18]&0xff) << 8) + ((convertBuffer[19]&0xff)));
 				points[7] = (((convertBuffer[20]&0xff) << 24) + ((convertBuffer[21]&0xff) << 16) + ((convertBuffer[22]&0xff) << 8) + ((convertBuffer[23]&0xff)));
@@ -632,11 +676,21 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 				recordPower.clear();
 				recordEnergy.clear();
 				recordBalance.clear();
+				double energy = 0.0;
+				double lastTime_ms = 0.0;
 
 				for (int i = 0; i < recordCurrent.size(); i++) {
 					//4=Power 5=Energy
-					recordPower.add(Double.valueOf(recordVoltage.get(i) * recordCurrent.get(i) / 100.0).intValue()); // power U*I [W]
-					recordEnergy.add(Double.valueOf(recordVoltage.get(i) * recordCapacity.get(i) / 1000.0).intValue()); // energy U*C [mWh]
+					int power = Math.abs(Double.valueOf(recordVoltage.get(i) * recordCurrent.get(i) / 100.0).intValue());
+					recordPower.add(power); // power U*I [W]
+          if (recordCapacity.get(i) == 0)
+            energy = 0.0;
+					if (i != 0) {
+						double timeStep_h = (recordSet.getTime_ms(i) - lastTime_ms) / 1000.0 / 3600.0;
+						energy += power * timeStep_h;  //energy = energy + (timeDelta * power)
+					}
+					recordEnergy.add(Double.valueOf(energy).intValue());
+					lastTime_ms = recordSet.getTime_ms(i);
 
 					int maxVotage = Integer.MIN_VALUE;
 					int minVotage = Integer.MAX_VALUE;
@@ -722,6 +776,13 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 		//DataParser.parse2Int(buffer, 3)/1000/60 + " min " + (DataParser.parse2Int(buffer, 3)/1000)%60 + " sec run time");
 		log.finest(() -> StringHelper.byte2Hex2CharString(buffer, 3, 4));
 		return DataParser.getUInt32(buffer, 3);
+	}
+	
+	public void resetEnergySum(int channelnumber) {
+		if (channelnumber == 1)
+			energySum1 = 0.0;
+		else 
+			energySum2 = 0.0;
 	}
 	
 	/**

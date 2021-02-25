@@ -136,6 +136,7 @@ public class LogViewReader {
 		deviceMap.put("graupner ultra trio plus 16", "UltraTrioPlus16S"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("junsi icharger 106b", "iCharger106B"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("junsi icharger 1010b", "iCharger1010B"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("junsi icharger 206b", "iCharger206B"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("junsi icharger 208b", "iCharger208B"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("junsi icharger 306b", "iCharger306B"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("junsi icharger 3010b", "iCharger3010B"); //$NON-NLS-1$ //$NON-NLS-2$

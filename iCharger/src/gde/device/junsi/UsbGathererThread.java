@@ -371,6 +371,7 @@ public class UsbGathererThread extends Thread {
 						}
 					}
 				}
+				device.resetEnergySum(number); //reset integrated energy due to switch over capacity and energy 
 				processRecordSetKey = String.format("%d) %s - %s %s", outputChannel.getNextRecordSetNumber(), batteryType, processTypeName, extend.toString()).trim();
 				processRecordSetKey = processRecordSetKey.length() <= RecordSet.MAX_NAME_LENGTH ? processRecordSetKey : processRecordSetKey.substring(0, RecordSet.MAX_NAME_LENGTH);
 

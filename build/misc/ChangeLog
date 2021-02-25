@@ -17,6 +17,7 @@ Device specific changes/fixes
 	* GraupnerUDP* - fix update step charge min capacity/current
 	* IGCAdapter - fix loading older OSD file
 	* iCharger* - fix energy calculation
+	* iCharger206B - add support opening *.lov
 
 Version 3.4.6 - 26 Dec 2020
 Generic changes/fixes
