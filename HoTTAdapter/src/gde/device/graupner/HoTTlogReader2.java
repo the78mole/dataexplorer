@@ -78,6 +78,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 		boolean isGeneralData = false;
 		boolean isElectricData = false;
 		boolean isMotorDriverData = false;
+		boolean isGPSdetected = false;
 		HoTTlogReader2.recordSet = null;
 		HoTTlogReader2.isJustMigrated = false;
 		// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
@@ -181,6 +182,44 @@ public class HoTTlogReader2 extends HoTTlogReader {
 						break;
 					case HoTTAdapter.ANSWER_SENSOR_GPS_19200:
 						isGPSData = parseGPS(HoTTbinReader.buf, valuesGPS, true);
+						if (isGPSData && !isGPSdetected) {
+							if ((HoTTbinReader.buf[65] & 0xFF) > 100) { //SM GPS-Logger
+								// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
+								tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
+								tmpRecordSet.get(28).setName("Gyro X");
+								tmpRecordSet.get(29).setName("Gyro Y");
+								tmpRecordSet.get(30).setName("Gyro Z");
+								tmpRecordSet.get(31).setName("ENL");
+							}
+							else if ((HoTTbinReader.buf[65] & 0xFF) == 4 || (HoTTbinReader.buf[61] & 0xFF) == 0xDF) { //RC Electronics Sparrow
+								tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
+								tmpRecordSet.get(26).setName("0xDF");
+								tmpRecordSet.get(27).setName(device.getMeasurementReplacement("voltage") + " GU");
+								tmpRecordSet.get(28).setName("GPS hh:mm");
+								tmpRecordSet.get(29).setName("GPS ss.SSS");
+								tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");
+								tmpRecordSet.get(31).setName("ENL");
+							}
+							else if ((HoTTbinReader.buf[65] & 0xFF) == 1) { //Graupner GPS #1= 33602/S8437,
+								tmpRecordSet.get(25).setName("velNorth");
+								tmpRecordSet.get(25).setUnit("mm/s");
+								//26 not used
+								tmpRecordSet.get(27).setName("speedAcc");
+								tmpRecordSet.get(27).setUnit("cm/s");
+								tmpRecordSet.get(28).setName("GPS hh:mm");
+								tmpRecordSet.get(29).setName("GPS ss.SSS");
+								tmpRecordSet.get(30).setName("velEast");
+								tmpRecordSet.get(30).setUnit("mm/s");
+								tmpRecordSet.get(31).setName("HDOP");
+								tmpRecordSet.get(31).setUnit("dm");
+							}
+							else { //Graupner GPS #0=GPS #33600
+								tmpRecordSet.get(28).setName("GPS hh:mm");
+								tmpRecordSet.get(29).setName("GPS ss.SSS");
+								tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");
+							}
+							isGPSdetected = true;					
+						}
 						if (isGPSData && isReceiverData) {
 							migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber, valuesVario, valuesGPS, valuesGAM, valuesEAM, valuesESC);
 							isReceiverData = false;

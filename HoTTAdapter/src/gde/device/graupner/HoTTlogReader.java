@@ -76,6 +76,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		PackageLossDeque reverseChannelPackageLossCounter = new PackageLossDeque(logTimeStep);
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
+		boolean isGPSdetected = false;
 		int countPackageLoss = 0;
 		int logDataOffset = Integer.valueOf(fileInfoHeader.get("LOG DATA OFFSET"));
 		long numberDatablocks = (fileSize - logDataOffset) / HoTTbinReader.dataBlockSize;
@@ -208,6 +209,43 @@ public class HoTTlogReader extends HoTTbinReader {
 								// recordSetGPS initialized and ready to add data
 								parseGPS(HoTTbinReader.buf, HoTTbinReader.pointsGPS, false);
 								HoTTbinReader.recordSetGPS.addPoints(HoTTbinReader.pointsGPS, HoTTbinReader.timeStep_ms);
+								if (!isGPSdetected) {
+									if ((HoTTbinReader.buf[65] & 0xFF) > 100) { //SM GPS-Logger
+										// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
+										HoTTbinReader.recordSetGPS.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
+										HoTTbinReader.recordSetGPS.get(19).setName("Gyro X");
+										HoTTbinReader.recordSetGPS.get(20).setName("Gyro Y");
+										HoTTbinReader.recordSetGPS.get(21).setName("Gyro Z");
+										HoTTbinReader.recordSetGPS.get(22).setName("ENL");
+									}
+									else if ((HoTTbinReader.buf[65] & 0xFF) == 4 || (HoTTbinReader.buf[61] & 0xFF) == 0xDF) { //RC Electronics Sparrow
+										HoTTbinReader.recordSetGPS.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
+										HoTTbinReader.recordSetGPS.get(17).setName("0xDF");
+										HoTTbinReader.recordSetGPS.get(18).setName(device.getMeasurementReplacement("voltage") + " GU");
+										HoTTbinReader.recordSetGPS.get(19).setName("GPS hh:mm");
+										HoTTbinReader.recordSetGPS.get(20).setName("GPS ss.SSS");
+										HoTTbinReader.recordSetGPS.get(21).setName(device.getMeasurementReplacement("altitude") + " MSL");
+										HoTTbinReader.recordSetGPS.get(22).setName("ENL");
+									}
+									else if ((HoTTbinReader.buf[65] & 0xFF) == 1) { //Graupner GPS #1= 33602/S8437,
+										HoTTbinReader.recordSetGPS.get(16).setName("velNorth");
+										HoTTbinReader.recordSetGPS.get(16).setUnit("mm/s");
+										HoTTbinReader.recordSetGPS.get(18).setName("speedAcc");
+										HoTTbinReader.recordSetGPS.get(18).setUnit("cm/s");
+										HoTTbinReader.recordSetGPS.get(19).setName("GPS hh:mm");
+										HoTTbinReader.recordSetGPS.get(20).setName("GPS ss.SSS");
+										HoTTbinReader.recordSetGPS.get(21).setName("velEast");
+										HoTTbinReader.recordSetGPS.get(21).setUnit("mm/s");
+										HoTTbinReader.recordSetGPS.get(22).setName("HDOP");
+										HoTTbinReader.recordSetGPS.get(22).setUnit("dm");
+									}
+									else { //Graupner GPS #0=GPS #33600
+										HoTTbinReader.recordSetGPS.get(19).setName("GPS hh:mm");
+										HoTTbinReader.recordSetGPS.get(20).setName("GPS ss.SSS");
+										HoTTbinReader.recordSetGPS.get(21).setName(device.getMeasurementReplacement("altitude") + " MSL");
+									}
+									isGPSdetected = true;								
+								}
 								break;
 
 						case HoTTAdapter.ANSWER_SENSOR_GENERAL_19200:
@@ -511,20 +549,71 @@ public class HoTTlogReader extends HoTTbinReader {
 		//values[14] = DataParser.parse2Short(_buf, 27) * 1000; //inverse event including byte 2 valid GPS data
 		values[14] = (_buf[28] & 0xFF) * 1000; //inverse event
 		//51=homeDirection 52=Roll 53=Pitch 54=Yaw
-		values[15] = (_buf[51] & 0xFF) * 1000; //15=HomeDirection
-		//16=Roll 17=Pitch 18=Yaw
-		values[16] = _buf[52] * 1000;
-		values[17] = _buf[53] * 1000;
-		values[18] = _buf[54] * 1000; 
-		//19=GyroX 20=GyroY 21=GyroZ 	
-		//55,56=GyroX 57,58=GyroY 59,60=GyroZ
-		values[19] = DataParser.parse2Short(_buf, 55) * 1000;
-		values[20] = DataParser.parse2Short(_buf, 57) * 1000;
-		values[21] = DataParser.parse2Short(_buf, 59) * 1000;
-		//22=Vibration 23=Version			
-		//61=Vibration 62-64=freeChars 65=Version
-		values[22] = (_buf[61] & 0xFF) * 1000;
+		values[15] = (_buf[51] & 0xFF) * 1000; //15=HomeDirection		
+		if ((_buf[65] & 0xFF) > 100) { //SM GPS-Logger
+			//16=Roll 17=Pitch 18=Yaw
+			values[16] = _buf[52] * 1000;
+			values[17] = _buf[53] * 1000;
+			values[18] = _buf[54] * 1000; 
+			//19=GyroX 20=GyroY 21=GyroZ 	
+			//55,56=GyroX 57,58=GyroY 59,60=GyroZ
+			values[19] = DataParser.parse2Short(_buf, 55) * 1000;
+			values[20] = DataParser.parse2Short(_buf, 57) * 1000;
+			values[21] = DataParser.parse2Short(_buf, 59) * 1000;
+			//22=ENL 			
+			//61=Vibration 62-64=freeChars 65=Version
+			values[22] = (_buf[61] & 0xFF) * 1000;
+		}
+		else if ((_buf[65] & 0xFF) == 4 || (_buf[61] & 0xFF) == 0xDF) { //RCE Sparrow
+			//16=servoPulse 17=fixed 18=Voltage 19=GPS hh:mm 20=GPS sss.SSS 21=MSL Altitude 22=ENL 23=Version	
+			//16=Roll 17=Pitch 18=Yaw
+			values[16] = _buf[60] * 1000;
+			values[17] = _buf[61] * 1000;
+			values[18] = _buf[54] * 100; 
+			//19=GPS hh:mm 20=GPS sss.SSS 21=MSL Altitude 	
+			//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
+			values[19] = DataParser.parse2Short(_buf, 55) * 1000;
+			values[20] = DataParser.parse2Short(_buf, 57) * 1000;
+			values[21] = DataParser.parse2Short(_buf, 52) * 1000;
+			//22=Vibration 			
+			//61=Vibration 62-64=freeChars 65=Version
+			values[22] = (_buf[59] & 0xFF) * 1000;
+		}
+		else { //Graupner GPS need workaround to distinguish between different Graupner GPS with version #0
+			if (values[23] == 1000 || (_buf[52] != 0 && _buf[53] != 0 && _buf[54] != 0))
+				_buf[65] = 0x01;
+				
+			if (_buf[65] == 0) { //#0=GPS 33600
+				//16=Roll 17=Pitch 18=Yaw
+				values[16] = _buf[52] * 1000;
+				values[17] = _buf[53] * 1000;
+				values[18] = _buf[54] * 1000; 
+				//19=GPS hh:mm 20=GPS sss.SSS 21=MSL Altitude 	
+				//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
+				values[19] = DataParser.parse2Short(_buf, 55) * 1000;
+				values[20] = DataParser.parse2Short(_buf, 57) * 1000;
+				values[21] = DataParser.parse2Short(_buf, 59) * 1000;
+				//22=Vibration 			
+				//61=Vibration 62-64=freeChars 65=Version
+				values[22] = (_buf[61] & 0xFF) * 1000;
+			}
+			else { //#1= 33602/S8437
+				//16=velN NED north velocity mm/s 17=n/a 18=sAcc Speed accuracy estimate cm/s
+				values[16] = DataParser.parse2Short(_buf, 52) * 1000;
+				values[17] = 0;
+				values[18] = _buf[54] * 1000; 
+				//19=GPS hh:mm 20=GPS sss.SSS 21=velE NED east velocity mm/s
+				//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
+				values[19] = DataParser.parse2Short(_buf, 55) * 1000;
+				values[20] = DataParser.parse2Short(_buf, 57) * 1000;
+				values[21] = DataParser.parse2Short(_buf, 59) * 1000;
+				//22=hAcc Horizontal accuracy estimate HDOP 			
+				//61=Vibration 62-64=freeChars 65=Version
+				values[22] = (_buf[61] & 0xFF) * 1000;
+			}
+		}
 		//three char
+		//23=Version
 		values[23] = _buf[65] * 1000;
 
 		if (log.isLoggable(Level.FINER)) {

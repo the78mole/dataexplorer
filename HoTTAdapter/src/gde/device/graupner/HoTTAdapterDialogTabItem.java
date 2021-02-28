@@ -20,7 +20,9 @@ package gde.device.graupner;
 
 import gde.GDE;
 import gde.data.Channels;
+import gde.data.RecordSet;
 import gde.device.IDevice;
+import gde.device.MeasurementType;
 import gde.device.graupner.hott.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -140,10 +142,20 @@ public class HoTTAdapterDialogTabItem extends CTabItem {
 	 * @param channelConfigNumber
 	 */
 	public void createMeasurementsControls(final int channelConfigNumber) {
-		for (int i = 0; i < this.device.getChannelMeasuremtsReplacedNames(channelConfigNumber).size(); i++) {
-			this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, channelConfigNumber, i, this.device.getChannelMeasuremtsReplacedNames(channelConfigNumber).get(i),
-					this.device, 1));
-		}
+		RecordSet actualRecordSet = this.channels.getActiveChannel().getActiveRecordSet();
+		List<MeasurementType> channelMeasurements = this.device.getChannelMeasuremtsReplacedNames(channelConfigNumber);
+		if (actualRecordSet != null && actualRecordSet.realSize() == channelMeasurements.size()) 
+			for (int i = 0; i < channelMeasurements.size(); i++) {
+				MeasurementType measurement = channelMeasurements.get(i);
+				if (!measurement.getName().equals(actualRecordSet.get(i).getName()))
+					measurement.setName(actualRecordSet.get(i).getName());
+				this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, channelConfigNumber, i,measurement, this.device, 1));
+			}
+		else	
+			for (int i = 0; i < channelMeasurements.size(); i++) {
+				this.measurementTypes.add(new MeasurementControl(this.mainTabComposite, this.dialog, channelConfigNumber, i, channelMeasurements.get(i),
+						this.device, 1));
+			}
 		this.mainTabComposite.layout(true);
 	}
 	
