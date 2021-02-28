@@ -7,6 +7,7 @@ Generic changes/fixes
 	* fix error while editing FileComment tab while focus lost
 	* fix error in setting returning initial wrong decimal separator
 	* make tolerant missing symbols in OSD (variable measurement size written by Android app) 
+	* fix scroll problem file comment window record comment table
 	
 Device specific changes/fixes
 	* JetiAdapter - fix check GPS data to enable Google Earth export

@@ -82,6 +82,7 @@ public class FileCommentWindow extends CTabItem {
 	CLabel										infoLabel;
 	Text											fileCommentText;
 	boolean										isFileCommentChanged			= false;
+	boolean										isRecordCommentChanged		= false;
 	Table											recordCommentTable;
 	TableColumn								recordCommentTableColumn1;
 	TableColumn								recordCommentTableColumn2;
@@ -135,8 +136,8 @@ public class FileCommentWindow extends CTabItem {
 			@Override
 			public void paintControl(PaintEvent evt) {
 				if (FileCommentWindow.log.isLoggable(java.util.logging.Level.FINE)) FileCommentWindow.log.log(java.util.logging.Level.FINE, "commentMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
-				setFileComment();
-				updateRecordSetTable();
+				if (isFileCommentChanged) setFileComment();
+				if (isRecordCommentChanged) updateRecordSetTable();
 			}
 		});
 		this.commentMainComposite.addHelpListener(new HelpListener() {
@@ -239,7 +240,7 @@ public class FileCommentWindow extends CTabItem {
 			});
 		}
 		{
-			this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.V_SCROLL | SWT.FULL_SELECTION);
+			this.recordCommentTable = new Table(this.commentMainComposite, SWT.BORDER | SWT.FULL_SELECTION);
 
 			this.recordCommentTableColumn1 = new TableColumn(this.recordCommentTable, SWT.LEFT);
 			this.recordCommentTableColumn1.setWidth(250);
@@ -476,6 +477,8 @@ public class FileCommentWindow extends CTabItem {
 							}
 						}
 					}
+//					this.recordCommentTable.setItemCount(channel.getRecordSetNames().length);
+//					this.updateTopIndex();
 				}
 				else { //device switch detected
 					if (!isTableUptaded) {
@@ -484,6 +487,23 @@ public class FileCommentWindow extends CTabItem {
 					}
 				}
 			}
+		}
+		this.isRecordCommentChanged = false;
+	}
+
+
+	/**
+	 * reset the top index of the data table if required while updating or adding rows
+	 */
+	public void updateTopIndex() {
+		int height = this.recordCommentTable.getClientArea().height;
+		int visibleItemCount = height / this.recordCommentTable.getItemHeight() - 1;
+		int topIndex = this.recordCommentTable.getTopIndex();
+		int itemCount = this.recordCommentTable.getItemCount();
+		if (itemCount > visibleItemCount) {
+			int newTopIndex = itemCount - visibleItemCount;
+			if (topIndex != newTopIndex) 
+				this.recordCommentTable.setTopIndex(newTopIndex);
 		}
 	}
 
