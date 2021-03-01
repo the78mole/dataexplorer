@@ -127,6 +127,8 @@ public class IGCReaderWriter {
 		String recordSetNameExtend = device.getRecordSetStemNameReplacement();
 		long timeStamp = -1, actualTimeStamp = -1, startTimeStamp = -1;
 		StringBuilder header = new StringBuilder();
+		StringBuilder albatrossTask = new StringBuilder();
+		StringBuilder gpsTriangleRelated = new StringBuilder();
 		String date = "000000", time; //16 02 40
 		int hour, minute, second;
 		int latitude, longitude, altBaro, altGPS;
@@ -178,6 +180,14 @@ public class IGCReaderWriter {
 						//}
 						else if (line.startsWith("H")) {
 							header.append(line).append(GDE.LINE_SEPARATOR);
+						}
+						else if (line.startsWith("LTSK:T:")) { //Albatross task definition
+							albatrossTask.append(line.substring(7));
+						}
+						else if (line.startsWith("C")) {
+							if (line.startsWith("WP", 18)) 
+								albatrossTask.append(GDE.STRING_MESSAGE_CONCAT).append(line.substring(1));
+							gpsTriangleRelated.append(GDE.LINE_SEPARATOR).append(line);
 						}
 						else if (line.startsWith("A")) { // first line contains manufacturer identifier
 							dllID = line.substring(1, 4);
@@ -257,11 +267,13 @@ public class IGCReaderWriter {
 							recordSet = RecordSet.createRecordSet(recordSetName, device, activeChannel.getNumber(), true, true, true);
 							recordSetName = recordSet.getName(); // cut/correct length
 							String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(actualTimeStamp); //$NON-NLS-1$
-							String description = device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime + GDE.LINE_SEPARATOR + header.toString();
-							recordSet.setRecordSetDescription(description);
+							String recordDescription = device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + dateTime + GDE.LINE_SEPARATOR + albatrossTask.toString();
+							recordSet.setRecordSetDescription(recordDescription);
 							//write filename after import to record description
 							recordSet.descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1));
-							activeChannel.setFileDescription(dateTime.substring(0, 10) + (activeChannel.getFileDescription().length() < 11 ? "" : activeChannel.getFileDescription().substring(10)));
+							if (!activeChannel.getFileDescription().contains("HFGTYGLIDERTYPE"))
+								activeChannel.setFileDescription(dateTime.substring(0, 10) + (activeChannel.getFileDescription().length() < 11 ? "" : activeChannel.getFileDescription().substring(10)) 
+									+ GDE.LINE_SEPARATOR + header.toString());
 
 							activeChannel.put(recordSetName, recordSet);
 

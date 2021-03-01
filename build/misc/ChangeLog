@@ -17,6 +17,7 @@ Device specific changes/fixes
 	* GraupnerUDP* - fix update step charge tabulator
 	* GraupnerUDP* - fix update step charge min capacity/current
 	* IGCAdapter - fix loading older OSD file
+	* IGCAdapter - enable missing color and record dependency configuration
 	* iCharger* - fix energy calculation
 	* iCharger206B - add support opening *.lov
 

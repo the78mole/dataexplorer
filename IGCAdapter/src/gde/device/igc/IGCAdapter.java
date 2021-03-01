@@ -510,8 +510,9 @@ public class IGCAdapter extends DeviceConfiguration implements IDevice {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null && fileEndingType.contains(GDE.FILE_ENDING_KMZ)) {
-				//GPGGA	0=latitude 1=longitude  2=altitudeAbs 3=numSatelites
-				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, -1, -1, -1, -1, true, isExportTmpDir);
+				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
+				//0=latitude 1=longitude  2=altitude 3=altitudeGPS 4=climb 5=speed
+				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, additionalMeasurementOrdinal, 4, -1, -1, true, isExportTmpDir);
 			}
 		}
 		return exportFileName;
