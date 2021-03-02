@@ -1268,7 +1268,7 @@ public class HoTTbinReader {
 													tmpRecordSet.get(21).setName(device.getMeasurementReplacement("altitude") + " MSL");
 													tmpRecordSet.get(22).setName("ENL");
 												}
-												else if ((HoTTbinReader.buf[65] & 0xFF) == 1) { //Graupner GPS #1= 33602/S8437,
+												else if ((HoTTbinReader.buf4[9] & 0xFF) == 1) { //Graupner GPS #1= 33602/S8437,
 													tmpRecordSet.get(16).setName("velNorth");
 													tmpRecordSet.get(16).setUnit("mm/s");
 													tmpRecordSet.get(18).setName("speedAcc");
