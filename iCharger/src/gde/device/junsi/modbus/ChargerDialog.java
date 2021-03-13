@@ -2227,7 +2227,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.systemParameters[13] = new ParameterConfigControl(this.grpChargeDischargePower, this.systemValues, 13, GDE.STRING_EMPTY, 
 				Messages.getString(MessageIds.GDE_MSGI2640, new String[] {Messages.getString(MessageIds.GDE_MSGI2645).split(",")[2]}), 175, 
 				String.format("5W - %dW", device.getChargePowerMax()[1]), 280, //$NON-NLS-1$
-				true, 50, 200, 5, 1000, -5, false);
+				true, 50, 200, 5, device.getChargePowerMax()[1], -5, false);
 		//15 Discharge power channel 2
 		this.systemParameters[15] = new ParameterConfigControl(this.grpChargeDischargePower, this.systemValues, 15, GDE.STRING_EMPTY, 
 				Messages.getString(MessageIds.GDE_MSGI2642, new String[] {Messages.getString(MessageIds.GDE_MSGI2645).split(",")[2]}), 175, 

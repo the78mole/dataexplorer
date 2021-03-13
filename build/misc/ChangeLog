@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.x.y - xx yyy 2021
+Version 3.4.7 - xx yyy 2021
 Generic changes/fixes
 	* update copyright 2021
 	* update dialog sizes to support uneven Windows scaling 
@@ -19,6 +19,7 @@ Device specific changes/fixes
 	* IGCAdapter - fix loading older OSD file
 	* IGCAdapter - enable missing color and record dependency configuration
 	* iCharger* - fix energy calculation
+	* iChargerDuo* - fix max power setting channel 2
 	* iCharger206B - add support opening *.lov
 
 Version 3.4.6 - 26 Dec 2020
