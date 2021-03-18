@@ -194,7 +194,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 							else if ((HoTTbinReader.buf[65] & 0xFF) == 4 || (HoTTbinReader.buf[61] & 0xFF) == 0xDF) { //RC Electronics Sparrow
 								tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
 								tmpRecordSet.get(26).setName("0xDF");
-								tmpRecordSet.get(27).setName(device.getMeasurementReplacement("voltage") + " GU");
+								tmpRecordSet.get(27).setName(device.getMeasurementReplacement("voltage") + " GPS");
 								tmpRecordSet.get(28).setName("GPS hh:mm");
 								tmpRecordSet.get(29).setName("GPS ss.SSS");
 								tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");

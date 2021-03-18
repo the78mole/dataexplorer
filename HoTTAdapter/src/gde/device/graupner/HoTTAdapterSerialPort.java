@@ -175,9 +175,9 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				throw te;
 			}
 		}
-		if (HoTTAdapterSerialPort.log.isLoggable(Level.OFF)) {
+		if (HoTTAdapterSerialPort.log.isLoggable(Level.FINE)) {
 			//HoTTAdapterSerialPort.log.logp(Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data));
-			HoTTAdapterSerialPort.log.logp(Level.OFF, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
+			HoTTAdapterSerialPort.log.logp(Level.FINE, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
 		}
 		return data;
 	}
@@ -264,10 +264,10 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 			data[0] = this.QUERY_SENSOR_TYPE[1];
 			System.arraycopy(answer, 0, data, 1, answer.length);
 
-			if (answer.length == 51) {
-				//HoTTAdapterSerialPort.log.logp(Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data));
-				HoTTAdapterSerialPort.log.logp(Level.OFF, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answer, answer.length));
-			}
+//			if (answer.length == 51) {
+//				//HoTTAdapterSerialPort.log.logp(Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data));
+//				HoTTAdapterSerialPort.log.logp(Level.OFF, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answer, answer.length));
+//			}
 
 			if (!this.isInterruptedByUser && (answer[0] != 0x00 || answer[4] != 0x00 || answer[5] != 0x04 || answer[6] != 0x01 || (answer[answer.length - 3] < 0 && answer[answer.length - 3] > 100))) {
 				this.addXferError();

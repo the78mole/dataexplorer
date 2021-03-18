@@ -226,7 +226,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 										else if ((buf4[9] & 0xFF) == 4 || (buf4[5] & 0xFF) == 0xDF) { //RC Electronics Sparrow
 											tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
 											tmpRecordSet.get(26).setName("0xDF");
-											tmpRecordSet.get(27).setName(device.getMeasurementReplacement("altitude") + " GU");
+											tmpRecordSet.get(27).setName(device.getMeasurementReplacement("voltage") + " GPS");
 											tmpRecordSet.get(28).setName("GPS hh:mm");
 											tmpRecordSet.get(29).setName("GPS ss.SSS");
 											tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");
@@ -554,7 +554,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 											else if ((buf4[9] & 0xFF) == 4 || (buf4[5] & 0xFF) == 0xDF) { //RC Electronics Sparrow
 												tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
 												tmpRecordSet.get(26).setName("0xDF");
-												tmpRecordSet.get(27).setName(device.getMeasurementReplacement("altitude") + " GU");
+												tmpRecordSet.get(27).setName(device.getMeasurementReplacement("voltage") + " GPS");
 												tmpRecordSet.get(28).setName("GPS hh:mm");
 												tmpRecordSet.get(29).setName("GPS ss.SSS");
 												tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");
@@ -1070,9 +1070,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				this.points[24] = (_buf3[5] & 0xFF) * 1000;
 				if ((_buf4[9] & 0xFF) > 100) { //SM GPS-Logger
 					//25=servoPulse 26=n/a 27=n/a 28=GyroX 29=GyroY 30=GyroZ 31=ENL 32=Version	
-					this.points[25] = _buf3[6] * 1000; //(DataParser.parse2Short(_buf3, 6) -500) * 1000; //Sparrow GPS altitude
-					this.points[26] = _buf3[7] * 1000; //_buf4[3] * 1000; //Sparrow ENL
-					this.points[27] = _buf3[8] * 1000; //_buf4[4] * 1000; //Sparrow servo pulse
+					this.points[25] = _buf3[6] * 1000; 
+					this.points[26] = _buf3[7] * 1000; 
+					this.points[27] = _buf3[8] * 1000; 
 					this.points[28] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
 					this.points[29] = DataParser.parse2Short(_buf4, 1) * 1000;
 					this.points[30] = DataParser.parse2Short(_buf4, 3) * 1000;
@@ -1087,6 +1087,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					this.points[29] = DataParser.parse2Short(_buf4, 1) * 1000;
 					this.points[30] = (DataParser.parse2Short(_buf3, 6) -500) * 1000;
 					this.points[31] = (_buf4[3] & 0xFF) * 1000;
+					log.log(Level.OFF, StringHelper.byte2Hex2CharString(_buf4, 5, 5));
 				}
 				else { //Graupner GPS need workaround to distinguish between different Graupner GPS with version #0
 					if (this.points[32] == 1000 || (_buf3[6] != 0 && _buf3[7] != 0 && _buf3[8] != 0))

@@ -856,7 +856,7 @@ public class HoTTbinReader {
 										else if ((HoTTbinReader.buf4[9] & 0xFF) == 4 || (HoTTbinReader.buf4[5] & 0xFF) == 0xDF) { //RC Electronics Sparrow
 											tmpRecordSet.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
 											tmpRecordSet.get(17).setName("0xDF");
-											tmpRecordSet.get(18).setName(device.getMeasurementReplacement("voltage") + " GU");
+											tmpRecordSet.get(18).setName(device.getMeasurementReplacement("voltage") + " GPS");
 											tmpRecordSet.get(19).setName("GPS hh:mm");
 											tmpRecordSet.get(20).setName("GPS ss.SSS");
 											tmpRecordSet.get(21).setName(device.getMeasurementReplacement("altitude") + " MSL");
@@ -1262,7 +1262,7 @@ public class HoTTbinReader {
 												else if ((HoTTbinReader.buf4[9] & 0xFF) == 4 || (HoTTbinReader.buf4[5] & 0xFF) == 0xDF) { //RC Electronics Sparrow
 													tmpRecordSet.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
 													tmpRecordSet.get(17).setName("0xDF");
-													tmpRecordSet.get(18).setName(device.getMeasurementReplacement("voltage") + " GU");
+													tmpRecordSet.get(18).setName(device.getMeasurementReplacement("voltage") + " GPS");
 													tmpRecordSet.get(19).setName("GPS hh:mm");
 													tmpRecordSet.get(20).setName("GPS ss.SSS");
 													tmpRecordSet.get(21).setName(device.getMeasurementReplacement("altitude") + " MSL");
