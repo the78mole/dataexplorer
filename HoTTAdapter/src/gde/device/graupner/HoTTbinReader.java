@@ -845,6 +845,8 @@ public class HoTTbinReader {
 										bufCopier.clearBuffers();
 									}
 									if (!isGPSdetected) {
+										if (!isReasonableData(buf4))
+											continue;
 										if ((HoTTbinReader.buf4[9] & 0xFF) > 100) { //SM GPS-Logger
 											//16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version		
 											tmpRecordSet.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
@@ -855,7 +857,6 @@ public class HoTTbinReader {
 										}
 										else if ((HoTTbinReader.buf4[9] & 0xFF) == 4 || (HoTTbinReader.buf4[5] & 0xFF) == 0xDF) { //RC Electronics Sparrow
 											tmpRecordSet.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
-											tmpRecordSet.get(17).setName("0xDF");
 											tmpRecordSet.get(18).setName(device.getMeasurementReplacement("voltage") + " GPS");
 											tmpRecordSet.get(19).setName("GPS hh:mm");
 											tmpRecordSet.get(20).setName("GPS ss.SSS");
@@ -1251,6 +1252,8 @@ public class HoTTbinReader {
 											tmpRecordSet.setStartTimeStamp(startTimeStamp_ms);
 											
 											if (!isGPSdetected) {
+												if (!isReasonableData(buf4))
+													continue;
 												if ((HoTTbinReader.buf4[9] & 0xFF) > 100) { //SM GPS-Logger
 													//15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version		
 													tmpRecordSet.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
@@ -1261,7 +1264,6 @@ public class HoTTbinReader {
 												}
 												else if ((HoTTbinReader.buf4[9] & 0xFF) == 4 || (HoTTbinReader.buf4[5] & 0xFF) == 0xDF) { //RC Electronics Sparrow
 													tmpRecordSet.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
-													tmpRecordSet.get(17).setName("0xDF");
 													tmpRecordSet.get(18).setName(device.getMeasurementReplacement("voltage") + " GPS");
 													tmpRecordSet.get(19).setName("GPS hh:mm");
 													tmpRecordSet.get(20).setName("GPS ss.SSS");
@@ -1822,10 +1824,10 @@ public class HoTTbinReader {
 					this.points[21] = DataParser.parse2Short(_buf4, 3) * 1000;
 					this.points[22] = (_buf4[5] & 0xFF) * 1000;
 				}
-				else if ((_buf4[9] & 0xFF) == 4 || (_buf4[5] & 0xFF) == 0xDF) { //RCE Electronics Sparrow
+				else if ((_buf4[9] & 0xFF) == 4 || (_buf4[3] & 0xFF) == 0x01) { //RCE Electronics Sparrow
 					//16=servoPulse 17=fixed 18=Voltage 19=GPS hh:mm 20=GPS sss.SSS 21=MSL Altitude 22=ENL 23=Version	
 					this.points[16] = _buf4[4] * 1000; 
-					this.points[17] = (_buf4[5] & 0xFF) * 1000; 
+					//this.points[17] = (_buf4[5] & 0xFF) * 1000; 
 					this.points[18] = _buf3[8] * 100; 
 					this.points[19] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
 					this.points[20] = DataParser.parse2Short(_buf4, 1) * 1000;
@@ -2311,5 +2313,17 @@ public class HoTTbinReader {
 					? Arrays.toString(Arrays.copyOf(this.points, Math.min(this.points.length, maxLen)))
 					: null) + "]";
 		}
+	}
+	
+	/**
+	 * @param buffer
+	 * @return true if other data than 0 contained
+	 */
+	public static boolean isReasonableData(byte[] buffer) {
+		int sum = 0;
+		for (byte b : buffer) {
+			sum += (b & 0xFF);
+		}
+		return sum > 10;
 	}
 }

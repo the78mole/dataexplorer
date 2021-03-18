@@ -74,6 +74,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 	final static Logger			log											= Logger.getLogger(HoTTAdapter2.class.getName());
 
 	public static final int	CHANNELS_CHANNEL_NUMBER	= 4;
+	private static boolean isGPSdetected = false;
 
 	/**
 	 * constructor using properties file
@@ -334,7 +335,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						points[23] = (dataBuffer[14] & 0xFF) * 1000; //14=EventGPS
 						//24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version
 						points[24] = (dataBuffer[38] & 0xFF) * 1000; //Home direction
-						if ((dataBuffer[52] & 0xFF) == 3) { //RCE Sparrow
+						if (HoTTAdapter2.isGPSdetected || (dataBuffer[46] & 0xFF) == 0x01) { //RCE Sparrow
 							//25=servoPulse 26=fixed 27=Voltage 28=GPS hh:mm 29=GPS sss.SSS 30=MSL Altitude 31=ENL 32=Version	
 							points[25] = dataBuffer[47] * 1000; //servo pulse
 							points[26] = (dataBuffer[48] & 0xFF) * 1000; //0xDF
@@ -345,6 +346,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 							points[31] = (dataBuffer[46] & 0xFF) * 1000; //ENL
 							//three char
 							//log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, 49, dataBuffer.length));
+							HoTTAdapter2.isGPSdetected = true;
 						}
 						else { //SM GPS-Logger				
 							//25=servoPulse 26=n/a 27=n/a 28=GyroX 29=GyroY 30=GyroZ 31=ENL 32=Version	
