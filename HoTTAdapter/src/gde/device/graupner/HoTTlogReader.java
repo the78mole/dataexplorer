@@ -564,11 +564,11 @@ public class HoTTlogReader extends HoTTbinReader {
 			//61=Vibration 62-64=freeChars 65=Version
 			values[22] = (_buf[61] & 0xFF) * 1000;
 		}
-		else if ((_buf[65] & 0xFF) == 4 || (_buf[61] & 0xFF) == 0xDF) { //RCE Sparrow
+		else if ((_buf[65] & 0xFF) == 4 || (_buf[59] & 0xFF) == 0x01) { //RCE Sparrow
 			//16=servoPulse 17=fixed 18=Voltage 19=GPS hh:mm 20=GPS sss.SSS 21=MSL Altitude 22=ENL 23=Version	
 			//16=Roll 17=Pitch 18=Yaw
 			values[16] = _buf[60] * 1000;
-			values[17] = _buf[61] * 1000;
+			//values[17] = _buf[61] * 1000;
 			values[18] = _buf[54] * 100; 
 			//19=GPS hh:mm 20=GPS sss.SSS 21=MSL Altitude 	
 			//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
