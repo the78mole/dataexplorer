@@ -14,6 +14,7 @@ Device specific changes/fixes
 	* IGCAdapter - fix support configuring speed or others in KML/KMZ export
 	* HoTTAdapter* - fix unit of GPS vibration
 	* HoTTAdapter* - detecting GPS type to sort and re-name measurements
+	* HoTTAdapter* - fix missing ESC while importing *.log
 	* GraupnerUDP* - fix update step charge tabulator
 	* GraupnerUDP* - fix update step charge min capacity/current
 	* IGCAdapter - fix loading older OSD file

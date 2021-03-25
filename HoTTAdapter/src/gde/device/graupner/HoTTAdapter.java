@@ -216,7 +216,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				return new HoTTbinReader2.EamBinParser(pickerParameters, points, timeSteps_ms, buffers);
 			}
 		},
-		ESC(7, "ESC", "?") { //$NON-NLS-1$
+		ESC(7, "ESC", "AIR_ESC") { //$NON-NLS-1$
 			@Override
 			public BinParser createBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
 				return new HoTTbinReader.EscBinParser(pickerParameters, points, timeSteps_ms, buffers);
