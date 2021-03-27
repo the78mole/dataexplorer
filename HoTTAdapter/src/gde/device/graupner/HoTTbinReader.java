@@ -645,6 +645,8 @@ public class HoTTbinReader {
 		HoTTbinReader.pickerParameters = newPickerParameters;
 		HashMap<String, String> header = getFileInfo(new File(filePath), newPickerParameters);
 		HoTTbinReader2.detectedSensors = Sensor.getSetFromDetected(header.get(HoTTAdapter.DETECTED_SENSOR));
+		//set fix detected sensors if sensor detection fails!
+		//HoTTbinReader2.detectedSensors = Sensor.getSetFromDetected("RECEIVER,GPS,AIR_ESC");
 
 		if (HoTTbinReader2.detectedSensors.size() <= 2) {
 			HoTTbinReader.isReceiverOnly = HoTTbinReader2.detectedSensors.size() == 1;
