@@ -1368,6 +1368,20 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 							? GDE.STRING_EMPTY
 							: String.format("'%c'", ((record.realGet(rowIndex) / 1000) + 64));
 				}
+				else if (channel == 3) {
+					//GPS: 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version
+					if (ordinal == 19 && record.getUnit().endsWith(":mm")) { //hhmmOrdinal = 19, ssSSSOrdinal = 20;
+						int tmpValue = record.realGet(rowIndex) / 1000;
+						dataTableRow[index + 1] = String.format("%02d:%02d", tmpValue/100, tmpValue - (tmpValue/100)*100); //$NON-NLS-1$
+					}
+					else if (ordinal == 20 && record.getUnit().endsWith(".SSS")) { //hhmmOrdinal = 19, ssSSSOrdinal = 20;
+						int tmpValue = record.realGet(rowIndex) / 1000;
+						dataTableRow[index + 1] = String.format("%02d.%03d", tmpValue/100, 10 * (tmpValue - (tmpValue/100)*100)); //$NON-NLS-1$
+					}
+					else {
+						dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
+					}
+				}
 				else {
 					dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
 				}

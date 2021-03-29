@@ -1,5 +1,12 @@
 Development history / change log, please read from bottom up
 
+Version 3.4.8 - xx yyy 2021
+Generic changes/fixes
+	* 
+	
+Device specific changes/fixes
+	* HoTTAdapter* - fix unit and factor to support different GPS data
+
 Version 3.4.7 - 27 Mar 2021
 Generic changes/fixes
 	* update copyright 2021
