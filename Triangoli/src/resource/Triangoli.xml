@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DeviceProperties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DeviceProperties_V42.xsd">
     <Device>
-        <name implementation="gde.device.onlinecommander.OnLineCommander">OnLineCommander</name>
+        <name implementation="gde.device.wb.Triangoli">Triangoli</name>
         <manufacturer></manufacturer>
         <manufacturerURL>-</manufacturerURL>
         <group>logger</group>
-        <image>OnLineCommander.png</image>
+        <image>Triangoli.png</image>
         <usage>false</usage>
     </Device>
     <TimeBase>

@@ -2709,7 +2709,9 @@ public class Record extends AbstractRecord implements IRecord {
 	@Override
 	public int getSyncMasterRecordOrdinal() {
 		final PropertyType syncProperty = this.parent.isUtilitySet ? getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())
-				: this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
+				: this.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value()) != null 
+					? this.getProperty(MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value())
+					: this.device.getMeasruementProperty(this.parent.parent.number, this.ordinal, MeasurementPropertyTypes.SCALE_SYNC_REF_ORDINAL.value());
 		if (syncProperty != null && !syncProperty.getValue().equals(GDE.STRING_EMPTY)) {
 			return Integer.parseInt(syncProperty.getValue());
 		}

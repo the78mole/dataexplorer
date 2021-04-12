@@ -19,7 +19,7 @@
     Copyright (c) 2020 Winfried Bruegmann
 ************************************************************************************** 
 -->
-<project name="OnLineCommander" default="compile">
+<project name="Triangoli" default="compile">
 
 	<property name="build.properties" location="../build/build.properties" />
 	<property file="${build.properties}" />
@@ -72,7 +72,7 @@
 			<attribute name="Built-Date" value="${TODAY}"/> 
     		<attribute name="Bundle-Version" value="${version.num}"/>
     		<attribute name="Bundle-SymbolicName" value="${ant.project.name}"/>
-    		<attribute name="Bundle-Description" value="Implementation for OnLineCommander"/>
+    		<attribute name="Bundle-Description" value="Implementation for Triangoli"/>
     		<attribute name="Export-Service" value="${export.services}"/>
     	</manifest>
 	    <jar manifest="src/META-INF/MANIFEST.MF" jarfile="build/${ant.project.name}.jar" compress="true" index="true" >

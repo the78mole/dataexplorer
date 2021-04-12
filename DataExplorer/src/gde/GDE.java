@@ -442,6 +442,7 @@ public class GDE {
 		GDE.deviceMap.put("GPS-Logger (UL2)", "GPS-Logger"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("GPS-Logger2 (UL)", "GPS-Logger2"); //$NON-NLS-1$ //$NON-NLS-2$
 		GDE.deviceMap.put("GPS-Logger2 (UL2)", "GPS-Logger2"); //$NON-NLS-1$ //$NON-NLS-2$
+		GDE.deviceMap.put("OnLineCommander", "Triangoli"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		// Prepare for usage without main procedure, i.e. without integrated UI.
 		// Currently these DE UI objects are required during device instantiation.
