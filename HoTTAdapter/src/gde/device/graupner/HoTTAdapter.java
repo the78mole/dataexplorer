@@ -1370,13 +1370,11 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				}
 				else if (channel == 3) {
 					//GPS: 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version
-					if (ordinal == 19 && record.getUnit().endsWith(":mm")) { //hhmmOrdinal = 19, ssSSSOrdinal = 20;
-						int tmpValue = record.realGet(rowIndex) / 1000;
-						dataTableRow[index + 1] = String.format("%02d:%02d", tmpValue/100, tmpValue - (tmpValue/100)*100); //$NON-NLS-1$
+					if (ordinal == 19 && record.getUnit().endsWith("hh:mm:ss.SSS")) { //hhmmssSSSOrdinal = 19
+						dataTableRow[index + 1] = HoTTAdapter.getFormattedTime(record.realGet(rowIndex));
 					}
-					else if (ordinal == 20 && record.getUnit().endsWith(".SSS")) { //hhmmOrdinal = 19, ssSSSOrdinal = 20;
-						int tmpValue = record.realGet(rowIndex) / 1000;
-						dataTableRow[index + 1] = String.format("%02d.%03d", tmpValue/100, 10 * (tmpValue - (tmpValue/100)*100)); //$NON-NLS-1$
+					else if (ordinal == 20 && record.getUnit().endsWith("yy-mm-dd-yy")) { 
+						dataTableRow[index + 1] = HoTTAdapter.getFormattedDate(record.realGet(rowIndex)/10);
 					}
 					else {
 						dataTableRow[index + 1] = record.getFormattedTableValue(rowIndex);
@@ -1394,6 +1392,30 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 	}
 
 	/**
+	 * @param timeValue
+	 * @return formatted time HH:mm:ss.SSS
+	 */
+	public static String getFormattedTime(final int timeValue) {
+		int tmpHH = timeValue/10000000;
+		int tmpMM = timeValue/100000 - tmpHH*100;
+		int tmpSS = timeValue/1000 - tmpMM*100 - tmpHH*10000;
+		int tmpSSS = timeValue - tmpSS*1000 - tmpMM*100000 - tmpHH*10000000;
+		return String.format("%02d:%02d:%02d.%03d", tmpHH, tmpMM, tmpSS, tmpSSS); //$NON-NLS-1$;
+	}
+
+	/**
+	 * @param dateValue
+	 * @return formatted date yy-mm-dd-yy
+	 */
+	public static String getFormattedDate(int dateValue) {
+		int tmpYY = dateValue/1000000;
+		int tmpMM = dateValue/10000 - tmpYY*100;
+		int tmpDD = dateValue/100 - tmpMM*100 - tmpYY*10000;
+		int tmpYY2= dateValue - tmpDD*100 - tmpMM*10000 - tmpYY*1000000;
+		return String.format("%02d-%02d-%02d-%02d", tmpYY, tmpDD, tmpMM, tmpYY2); //$NON-NLS-1$
+	}
+
+	/**
 	 * function to translate measured values from a device to values represented
 	 * this function should be over written by device and measurement specific algorithm
 	 * @return double of device dependent value
@@ -1407,9 +1429,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 		if (record.getAbstractParent().getChannelConfigNumber() == 3 && (record.getOrdinal() == 1 || record.getOrdinal() == 2)) { // 1=GPS-longitude 2=GPS-latitude
 			// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-			int grad = ((int) (value / 1000));
-			double minuten = (value - (grad * 1000.0)) / 10.0;
-			newValue = grad + minuten / 60.0;
+				int grad = ((int) (value / 1000));
+				double minuten = (value - (grad * 1000.0)) / 10.0;
+				newValue = grad + minuten / 60.0;
 		}
 		else if (record.getAbstractParent().getChannelConfigNumber() == 6 && (record.getOrdinal() >= 3 && record.getOrdinal() <= 18)) {
 			if (this.pickerParameters.isChannelPercentEnabled) {
@@ -1446,9 +1468,9 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 		if ((record.getOrdinal() == 1 || record.getOrdinal() == 2) && record.getAbstractParent().getChannelConfigNumber() == 3) { // 1=GPS-longitude 2=GPS-latitude )
 			// 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripDistance, 10=VoltageRx, 11=TemperatureRx
-			int grad = (int) value;
-			double minuten = (value - grad * 1.0) * 60.0;
-			newValue = (grad + minuten / 100.0) * 1000.0;
+				int grad = (int) value;
+				double minuten = (value - grad * 1.0) * 60.0;
+				newValue = (grad + minuten / 100.0) * 1000.0;
 		} 
 		else if (record.getAbstractParent().getChannelConfigNumber() == 6 && (record.getOrdinal() >= 3 && record.getOrdinal() <= 18)) {
 			if (this.pickerParameters.isChannelPercentEnabled) {

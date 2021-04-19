@@ -216,64 +216,76 @@ public class HoTTlogReader extends HoTTbinReader {
 										//15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version		
 										HoTTbinReader.recordSetGPS.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
 										HoTTbinReader.recordSetGPS.get(16).setUnit("");
-										HoTTbinReader.recordSetGPS.get(19).setName("Gyro X");
+										HoTTbinReader.recordSetGPS.get(19).setName(device.getMeasurementReplacement("acceleration") + " X");
 										HoTTbinReader.recordSetGPS.get(19).setUnit("g");
 										HoTTbinReader.recordSetGPS.get(19).setFactor(0.01);
-										HoTTbinReader.recordSetGPS.get(20).setName("Gyro Y");
+										HoTTbinReader.recordSetGPS.get(20).setName(device.getMeasurementReplacement("acceleration") + " Y");
 										HoTTbinReader.recordSetGPS.get(20).setUnit("g");
 										HoTTbinReader.recordSetGPS.get(20).setFactor(0.01);
 										HoTTbinReader.recordSetGPS.get(20).createProperty(IDevice.SYNC_ORDINAL, DataTypes.INTEGER, 19); //$NON-NLS-1$
-										HoTTbinReader.recordSetGPS.get(21).setName("Gyro Z");
+										HoTTbinReader.recordSetGPS.get(21).setName(device.getMeasurementReplacement("acceleration") + " Z");
 										HoTTbinReader.recordSetGPS.get(21).setUnit("g");
 										HoTTbinReader.recordSetGPS.get(21).setFactor(0.01);
 										HoTTbinReader.recordSetGPS.get(21).createProperty(IDevice.SYNC_ORDINAL, DataTypes.INTEGER, 19); //$NON-NLS-1$
 										HoTTbinReader.recordSetGPS.get(22).setName("ENL");
 										HoTTbinReader.recordSetGPS.get(22).setUnit("");
 									}
-									else if ((HoTTbinReader.buf[65] & 0xFF) == 4 || (HoTTbinReader.buf[59] & 0xFF) == 0x01) { //RC Electronics Sparrow
+									else if ((HoTTbinReader.buf[65] & 0xFF) == 4) { //RC Electronics Sparrow
 										HoTTbinReader.recordSetGPS.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
 										HoTTbinReader.recordSetGPS.get(16).setUnit("%");
 										HoTTbinReader.recordSetGPS.get(18).setName(device.getMeasurementReplacement("voltage") + " GPS");
 										HoTTbinReader.recordSetGPS.get(18).setUnit("V");
-										HoTTbinReader.recordSetGPS.get(19).setName("GPS hh:mm");
-										HoTTbinReader.recordSetGPS.get(19).setUnit("hh:mm");
+										HoTTbinReader.recordSetGPS.get(19).setName(device.getMeasurementReplacement("time") + " GPS");
+										HoTTbinReader.recordSetGPS.get(19).setUnit("HH:mm:ss.SSS");
 										HoTTbinReader.recordSetGPS.get(19).setFactor(1.0);
-										HoTTbinReader.recordSetGPS.get(20).setName("GPS ss.SSS");
-										HoTTbinReader.recordSetGPS.get(20).setUnit("ss.SSS");
+										HoTTbinReader.recordSetGPS.get(20).setName(device.getMeasurementReplacement("date") + " GPS");
+										HoTTbinReader.recordSetGPS.get(20).setUnit("yy-mm-dd-yy");
 										HoTTbinReader.recordSetGPS.get(20).setFactor(1.0);
 										HoTTbinReader.recordSetGPS.get(21).setName(device.getMeasurementReplacement("altitude") + " MSL");
 										HoTTbinReader.recordSetGPS.get(21).setUnit("m");
 										HoTTbinReader.recordSetGPS.get(21).setFactor(1.0);
 										HoTTbinReader.recordSetGPS.get(22).setName("ENL");
 										HoTTbinReader.recordSetGPS.get(22).setUnit("%");
+										startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(tmpRecordSet.getStartTimeStamp(), tmpRecordSet.get(19).lastElement(), 0);
+										for (RecordSet recordSet : HoTTbinReader.recordSets.values()) {
+											recordSet.setStartTimeStamp(startTimeStamp_ms);
+										}
 									}
 									else if ((HoTTbinReader.buf[65] & 0xFF) == 1) { //Graupner GPS #1= 33602/S8437,
 										HoTTbinReader.recordSetGPS.get(16).setName("velNorth");
 										HoTTbinReader.recordSetGPS.get(16).setUnit("mm/s");
 										HoTTbinReader.recordSetGPS.get(18).setName("speedAcc");
 										HoTTbinReader.recordSetGPS.get(18).setUnit("cm/s");
-										HoTTbinReader.recordSetGPS.get(19).setName("GPS hh:mm");
-										HoTTbinReader.recordSetGPS.get(19).setUnit("hh:mm");
+										HoTTbinReader.recordSetGPS.get(19).setName(device.getMeasurementReplacement("time") + " GPS");
+										HoTTbinReader.recordSetGPS.get(19).setUnit("HH:mm:ss.SSS");
 										HoTTbinReader.recordSetGPS.get(19).setFactor(1.0);
-										HoTTbinReader.recordSetGPS.get(20).setName("GPS ss.SSS");
-										HoTTbinReader.recordSetGPS.get(20).setUnit("ss.SSS");
-										HoTTbinReader.recordSetGPS.get(20).setFactor(1.0);
+//										HoTTbinReader.recordSetGPS.get(20).setName("GPS ss.SSS");
+//										HoTTbinReader.recordSetGPS.get(20).setUnit("ss.SSS");
+//										HoTTbinReader.recordSetGPS.get(20).setFactor(1.0);
 										HoTTbinReader.recordSetGPS.get(21).setName("velEast");
 										HoTTbinReader.recordSetGPS.get(21).setUnit("mm/s");
 										HoTTbinReader.recordSetGPS.get(21).setFactor(1.0);
 										HoTTbinReader.recordSetGPS.get(22).setName("HDOP");
 										HoTTbinReader.recordSetGPS.get(22).setUnit("dm");
+										startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(tmpRecordSet.getStartTimeStamp(), tmpRecordSet.get(19).lastElement(), 0);
+										for (RecordSet recordSet : HoTTbinReader.recordSets.values()) {
+											recordSet.setStartTimeStamp(startTimeStamp_ms);
+										}
 									}
 									else { //Graupner GPS #0=GPS #33600
-										HoTTbinReader.recordSetGPS.get(19).setName("GPS hh:mm");
-										HoTTbinReader.recordSetGPS.get(19).setUnit("hh:mm");
+										HoTTbinReader.recordSetGPS.get(19).setName(device.getMeasurementReplacement("time") + " GPS");
+										HoTTbinReader.recordSetGPS.get(19).setUnit("HH:mm:ss.SSS");
 										HoTTbinReader.recordSetGPS.get(19).setFactor(1.0);
-										HoTTbinReader.recordSetGPS.get(20).setName("GPS ss.SSS");
-										HoTTbinReader.recordSetGPS.get(20).setUnit("ss.SSS");
-										HoTTbinReader.recordSetGPS.get(20).setFactor(1.0);
+//										HoTTbinReader.recordSetGPS.get(20).setName("GPS ss.SSS");
+//										HoTTbinReader.recordSetGPS.get(20).setUnit("ss.SSS");
+//										HoTTbinReader.recordSetGPS.get(20).setFactor(1.0);
 										HoTTbinReader.recordSetGPS.get(21).setName(device.getMeasurementReplacement("altitude") + " MSL");
 										HoTTbinReader.recordSetGPS.get(21).setUnit("m");
 										HoTTbinReader.recordSetGPS.get(21).setFactor(1.0);
+										startTimeStamp_ms = HoTTbinReader.getStartTimeStamp(tmpRecordSet.getStartTimeStamp(), tmpRecordSet.get(19).lastElement(), 0);
+										for (RecordSet recordSet : HoTTbinReader.recordSets.values()) {
+											recordSet.setStartTimeStamp(startTimeStamp_ms);
+										}
 									}
 									isGPSdetected = true;								
 								}
@@ -595,16 +607,16 @@ public class HoTTlogReader extends HoTTbinReader {
 			//61=Vibration 62-64=freeChars 65=Version
 			values[22] = (_buf[61] & 0xFF) * 1000;
 		}
-		else if ((_buf[65] & 0xFF) == 4 || (_buf[59] & 0xFF) == 0x01) { //RCE Sparrow
+		else if ((_buf[65] & 0xFF) == 4) { //RCE Sparrow
 			//16=servoPulse 17=fixed 18=Voltage 19=GPS hh:mm 20=GPS sss.SSS 21=MSL Altitude 22=ENL 23=Version	
 			//16=Roll 17=Pitch 18=Yaw
 			values[16] = _buf[60] * 1000;
 			values[17] = 0;
 			values[18] = _buf[54] * 100; 
-			//19=GPS hh:mm 20=GPS sss.SSS 21=MSL Altitude 	
+			//19=GPS hh:mm:sss.SSS 20=GPS sss.SSS 21=MSL Altitude 	
 			//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
-			values[19] = ((_buf[55] * 100) + _buf[56]) * 1000;
-			values[20] = ((_buf[57] * 100) + _buf[58]) * 1000;
+			values[19] = _buf[55] * 10000000 + _buf[56] * 100000 + _buf[57] * 1000 + _buf[58]*10;//HH:mm:ss.SSS
+			values[20] = ((_buf[61]-48) * 1000000 + (_buf[62]-48) * 10000 + (_buf[63]-48) * 100  +(_buf[64] - 48)) * 10;//yy-dd-mm-yy
 			values[21] = DataParser.parse2Short(_buf, 52) * 1000;
 			//22=Vibration 			
 			//61=Vibration 62-64=freeChars 65=Version
@@ -621,8 +633,8 @@ public class HoTTlogReader extends HoTTbinReader {
 				values[18] = _buf[54] * 1000; 
 				//19=GPS hh:mm 20=GPS sss.SSS 21=MSL Altitude 	
 				//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
-				values[19] = ((_buf[55] * 100) + _buf[56]) * 1000;
-				values[20] = ((_buf[57] * 100) + _buf[58]) * 1000;
+				values[19] = _buf[55] * 10000000 + _buf[56] * 100000 + _buf[57] * 1000 + _buf[58]*10;//HH:mm:ss.SSS
+				values[20] = 0;
 				values[21] = DataParser.parse2Short(_buf, 59) * 1000;
 				//22=Vibration 			
 				//61=Vibration 62-64=freeChars 65=Version
@@ -635,8 +647,8 @@ public class HoTTlogReader extends HoTTbinReader {
 				values[18] = _buf[54] * 1000; 
 				//19=GPS hh:mm 20=GPS sss.SSS 21=velE NED east velocity mm/s
 				//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
-				values[19] = ((_buf[55] * 100) + _buf[56]) * 1000;
-				values[20] = ((_buf[57] * 100) + _buf[58]) * 1000;
+				values[19] = _buf[55] * 10000000 + _buf[56] * 100000 + _buf[57] * 1000 + _buf[58]*10;//HH:mm:ss.SSS
+				values[20] = 0;
 				values[21] = DataParser.parse2Short(_buf, 59) * 1000;
 				//22=hAcc Horizontal accuracy estimate HDOP 			
 				//61=Vibration 62-64=freeChars 65=Version
