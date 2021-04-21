@@ -852,7 +852,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 							? GDE.STRING_EMPTY
 									: String.format("'%c'", ((record.realGet(rowIndex) / 1000)+64));
 				}
-				else if (ordinal == 28 && record.getUnit().endsWith("hh:mm:ss.SSS")) { //hhmmOrdinal = 28, ssSSSOrdinal = 29;
+				else if (ordinal == 28 && record.getUnit().endsWith("HH:mm:ss.SSS")) { //hhmmOrdinal = 28, ssSSSOrdinal = 29;
 					dataTableRow[index + 1] = HoTTAdapter.getFormattedTime(record.realGet(rowIndex));
 				}
 				else if (ordinal == 29 && record.getUnit().endsWith("yy-mm-dd-yy")) { //hhmmOrdinal = 28, ssSSSOrdinal = 29;

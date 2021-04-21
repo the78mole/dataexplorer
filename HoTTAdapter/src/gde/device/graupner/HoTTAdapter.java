@@ -1370,7 +1370,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				}
 				else if (channel == 3) {
 					//GPS: 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version
-					if (ordinal == 19 && record.getUnit().endsWith("hh:mm:ss.SSS")) { //hhmmssSSSOrdinal = 19
+					if (ordinal == 19 && record.getUnit().endsWith("HH:mm:ss.SSS")) { //hhmmssSSSOrdinal = 19
 						dataTableRow[index + 1] = HoTTAdapter.getFormattedTime(record.realGet(rowIndex));
 					}
 					else if (ordinal == 20 && record.getUnit().endsWith("yy-mm-dd-yy")) { 

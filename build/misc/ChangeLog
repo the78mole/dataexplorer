@@ -8,6 +8,8 @@ Device specific changes/fixes
 	* HoTTAdapter* - fix scale synchronization, formatting, unit and factor to support different GPS data source
 	* HoTTAdapter* - change SM GPS-Logger names from gyro to acceleration
 	* HoTTAdapter* - change GPS time and year to more readable format
+	* HoTTAdapter2 - fix parsing altitude,climb values while EAM is configured as primary
+	* HoTTAdapter2 - fix missing GAM, EAM, ESC parsing while no known GPS is connected
 	* Triangoli - add initial support
 
 Version 3.4.7 - 27 Mar 2021

@@ -215,10 +215,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 								bufCopier.copyToFreeBuffer();
 								if (bufCopier.is4BuffersFull()) {
 									HoTTbinReader2.gpsBinParser.parse();
-									isSensorData = true;
+									
 									if (!isGPSdetected) {
 										if (!isReasonableData(buf4) || tmpRecordSet.get(28).size() == 0)
-											continue;
+											break;
 										if ((buf4[9] & 0xFF) > 100) { //SM GPS-Logger
 											// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
 											tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
@@ -287,6 +287,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 										}
 										isGPSdetected = true;
 									}
+									
+									bufCopier.clearBuffers();
+									isSensorData = true;
 									// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 									// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
 									if (!isResetMinMax[3] && HoTTbinReader2.points[22] == 3000 && HoTTbinReader2.points[15] != 0 && HoTTbinReader2.points[16] != 0) {
@@ -295,7 +298,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 										}
 										isResetMinMax[3] = true;
 									}
-									bufCopier.clearBuffers();
 								}
 							}
 							break;
@@ -579,9 +581,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 										}
 										HoTTbinReader2.gpsBinParser.parse();
 										migrationJobs.add(Sensor.GPS);
+										
 										if (!isGPSdetected) {
 											if (!isReasonableData(buf4) || tmpRecordSet.get(28).size() == 0 || tmpRecordSet.get(28).get(tmpRecordSet.get(28).size()-1) == 0)
-												continue;
+												break;
 											if ((buf4[9] & 0xFF) > 100) { //SM GPS-Logger
 												// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
 												tmpRecordSet.get(25).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
@@ -1201,9 +1204,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 		@Override
 		public void migratePoints(int[] targetPoints) {
-			// 10=Altitude, 11=Climb 1, 12=Climb 3
-			for (int j = 10; j < 13; j++) {
-				targetPoints[j] = this.points[j];
+			if ((targetPoints[10] != 0 && this.points[10] != 0) || this.points[10] != 0) {
+				// 10=Altitude, 11=Climb 1, 12=Climb 3
+				for (int j = 10; j < 13; j++) {
+					targetPoints[j] = this.points[j];
+				}
 			}
 			// 15=Latitude, 16=Longitude, 17=Velocity, 18=Distance, 19=Direction, 20=TripDistance 21=NumSatellites 22=GPS-Fix 23=EventGPS
 			// 24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version	
@@ -1301,10 +1306,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 		@Override
 		public void migratePoints(int[] targetPoints) {
-			if ((targetPoints[10] != 0 && this.points[10] != 0) || this.points[10] != 0) targetPoints[10] = this.points[10];
-			// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-			for (int j = 10; j < 13; j++) {
-				targetPoints[j] = this.points[j];
+			if ((targetPoints[10] != 0 && this.points[10] != 0) || this.points[10] != 0) { 
+				// 10=Altitude, 11=Climb 1, 12=Climb 3
+				for (int j = 10; j < 13; j++) {
+					targetPoints[j] = this.points[j];
+				}
 			}
 			// 33=Voltage G, 34=Current G, 35=Capacity G, 36=Power G, 37=Balance G, 38=CellVoltage G1, 39=CellVoltage G2 .... 43=CellVoltage G6,
 			// 44=Revolution G, 45=FuelLevel, 46=Voltage G1, 47=Voltage G2, 48=Temperature G1, 49=Temperature G2 50=Speed G, 51=LowestCellVoltage,
@@ -1408,10 +1414,11 @@ public class HoTTbinReader2 extends HoTTbinReader {
 
 		@Override
 		public void migratePoints(int[] targetPoints) {
-			if ((targetPoints[10] != 0 && this.points[10] != 0) || this.points[10] != 0) targetPoints[10] = this.points[10];
-			// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
-			for (int j = 10; j < 13; j++) {
-				targetPoints[j] = this.points[j];
+			if ((targetPoints[10] != 0 && this.points[10] != 0) || this.points[10] != 0) {
+				// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario
+				for (int j = 10; j < 13; j++) {
+					targetPoints[j] = this.points[j];
+				}
 			}
 			// 55=Voltage E, 56=Current E, 57=Capacity E, 58=Power E, 59=Balance E, 60=CellVoltage E1, 61=CellVoltage E2 .... 73=CellVoltage E14,
 			// 74=Voltage E1, 75=Voltage E2, 76=Temperature E1, 77=Temperature E2 78=Revolution E 79=MotorTime 80=Speed 81=Event E
