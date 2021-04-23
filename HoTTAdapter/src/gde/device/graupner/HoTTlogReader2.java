@@ -216,7 +216,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 								tmpRecordSet.get(28).setUnit("HH:mm:ss.SSS");
 								tmpRecordSet.get(28).setFactor(1.0);
 								tmpRecordSet.get(29).setName(device.getMeasurementReplacement("date") + " GPS");
-								tmpRecordSet.get(29).setUnit("yy-mm-dd-yy");
+								tmpRecordSet.get(29).setUnit("yy-MM-dd");
 								tmpRecordSet.get(29).setFactor(1.0);
 								tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");
 								tmpRecordSet.get(30).setUnit("m");

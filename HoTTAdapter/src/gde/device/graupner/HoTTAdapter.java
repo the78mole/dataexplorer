@@ -1373,7 +1373,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					if (ordinal == 19 && record.getUnit().endsWith("HH:mm:ss.SSS")) { //hhmmssSSSOrdinal = 19
 						dataTableRow[index + 1] = HoTTAdapter.getFormattedTime(record.realGet(rowIndex));
 					}
-					else if (ordinal == 20 && record.getUnit().endsWith("yy-mm-dd-yy")) { 
+					else if (ordinal == 20 && record.getUnit().endsWith("yy-MM-dd")) { 
 						dataTableRow[index + 1] = HoTTAdapter.getFormattedDate(record.realGet(rowIndex)/10);
 					}
 					else {
@@ -1405,14 +1405,13 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 
 	/**
 	 * @param dateValue
-	 * @return formatted date yy-mm-dd-yy
+	 * @return formatted date yy-MM-dd
 	 */
 	public static String getFormattedDate(int dateValue) {
 		int tmpYY = dateValue/1000000;
 		int tmpMM = dateValue/10000 - tmpYY*100;
 		int tmpDD = dateValue/100 - tmpMM*100 - tmpYY*10000;
-		int tmpYY2= dateValue - tmpDD*100 - tmpMM*10000 - tmpYY*1000000;
-		return String.format("%02d-%02d-%02d-%02d", tmpYY, tmpDD, tmpMM, tmpYY2); //$NON-NLS-1$
+		return String.format("%02d-%02d-%02d", tmpYY, tmpMM, tmpDD); //$NON-NLS-1$
 	}
 
 	/**

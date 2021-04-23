@@ -239,7 +239,7 @@ public class HoTTlogReader extends HoTTbinReader {
 										HoTTbinReader.recordSetGPS.get(19).setUnit("HH:mm:ss.SSS");
 										HoTTbinReader.recordSetGPS.get(19).setFactor(1.0);
 										HoTTbinReader.recordSetGPS.get(20).setName(device.getMeasurementReplacement("date") + " GPS");
-										HoTTbinReader.recordSetGPS.get(20).setUnit("yy-mm-dd-yy");
+										HoTTbinReader.recordSetGPS.get(20).setUnit("yy-MM-dd");
 										HoTTbinReader.recordSetGPS.get(20).setFactor(1.0);
 										HoTTbinReader.recordSetGPS.get(21).setName(device.getMeasurementReplacement("altitude") + " MSL");
 										HoTTbinReader.recordSetGPS.get(21).setUnit("m");
@@ -616,7 +616,7 @@ public class HoTTlogReader extends HoTTbinReader {
 			//19=GPS hh:mm:sss.SSS 20=GPS sss.SSS 21=MSL Altitude 	
 			//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
 			values[19] = _buf[55] * 10000000 + _buf[56] * 100000 + _buf[57] * 1000 + _buf[58]*10;//HH:mm:ss.SSS
-			values[20] = ((_buf[61]-48) * 1000000 + (_buf[62]-48) * 10000 + (_buf[63]-48) * 100  +(_buf[64] - 48)) * 10;//yy-dd-mm-yy
+			values[20] = ((_buf[61]-48) * 1000000 + (_buf[63]-48) * 10000 + (_buf[62]-48) * 100) * 10;//yy-MM-dd
 			values[21] = DataParser.parse2Short(_buf, 52) * 1000;
 			//22=Vibration 			
 			//61=Vibration 62-64=freeChars 65=Version

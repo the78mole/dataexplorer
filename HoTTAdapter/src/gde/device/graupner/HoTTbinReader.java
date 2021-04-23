@@ -878,7 +878,7 @@ public class HoTTbinReader {
 											tmpRecordSet.get(19).setUnit("HH:mm:ss.SSS");
 											tmpRecordSet.get(19).setFactor(1.0);
 											tmpRecordSet.get(20).setName(device.getMeasurementReplacement("date") + " GPS");
-											tmpRecordSet.get(20).setUnit("yy-mm-dd-yy");
+											tmpRecordSet.get(20).setUnit("yy-MM-dd");
 											tmpRecordSet.get(20).setFactor(1.0);
 											tmpRecordSet.get(21).setName(device.getMeasurementReplacement("altitude") + " MSL");
 											tmpRecordSet.get(21).setUnit("m");
@@ -1334,7 +1334,7 @@ public class HoTTbinReader {
 												tmpRecordSet.get(19).setUnit("HH:mm:ss.SSS");
 												tmpRecordSet.get(19).setFactor(1.0);
 												tmpRecordSet.get(20).setName(device.getMeasurementReplacement("date") + " GPS");
-												tmpRecordSet.get(20).setUnit("yy-mm-dd-yy");
+												tmpRecordSet.get(20).setUnit("yy-MM-dd");
 												tmpRecordSet.get(20).setFactor(1.0);
 												tmpRecordSet.get(21).setName(device.getMeasurementReplacement("altitude") + " MSL");
 												tmpRecordSet.get(21).setUnit("m");
@@ -1919,7 +1919,7 @@ public class HoTTbinReader {
 					this.points[17] = 0; 
 					this.points[18] = _buf3[8] * 100; 
 					this.points[19] = _buf3[9] * 10000000 + _buf4[0] * 100000 + _buf4[1] * 1000 + _buf4[2]*10;
-					this.points[20] = ((_buf4[5]-48) * 1000000 + (_buf4[6]-48) * 10000 + (_buf4[7]-48) * 100  +(_buf4[8] - 48)) * 10;
+					this.points[20] = ((_buf4[5]-48) * 1000000 + (_buf4[7]-48) * 10000 + (_buf4[6]-48) * 100) * 10;
 					this.points[21] = (DataParser.parse2Short(_buf3, 6) -500) * 1000;
 					this.points[22] = (_buf4[3] & 0xFF) * 1000;
 				}

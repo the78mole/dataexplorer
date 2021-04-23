@@ -335,17 +335,18 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						points[23] = (dataBuffer[14] & 0xFF) * 1000; //14=EventGPS
 						//24=HomeDirection 25=Roll 26=Pitch 27=Yaw 28=GyroX 29=GyroY 30=GyroZ 31=Vibration 32=Version
 						points[24] = (dataBuffer[38] & 0xFF) * 1000; //Home direction
+						//log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, 37, dataBuffer.length));
 						if (HoTTAdapter2.isGPSdetected || (dataBuffer[46] & 0xFF) == 0x01) { //RCE Sparrow
-							//25=servoPulse 26=fixed 27=Voltage 28=GPS hh:mm 29=GPS sss.SSS 30=MSL Altitude 31=ENL 32=Version	
+							//25=servoPulse 26=fixed 27=Voltage 28=GPS time 29=GPD date 30=MSL Altitude 31=ENL 32=Version	
 							points[25] = dataBuffer[47] * 1000; //servo pulse
-							points[26] = (dataBuffer[48] & 0xFF) * 1000; //0xDF
+							points[26] = 0;
 							points[27] = dataBuffer[41] * 100; //voltage GU
-							points[28] = DataParser.parse2Short(dataBuffer, 42) * 1000;; //Gyro x or GPS hh:mm
-							points[29] = DataParser.parse2Short(dataBuffer, 44) * 1000;; //Gyro y or GPS ss:SSS
+							points[28] = dataBuffer[42] * 10000000 + dataBuffer[43] * 100000 + dataBuffer[44] * 1000 + dataBuffer[45]*10;//HH:mm:ss.SSS
+							points[29] = ((dataBuffer[48]-48) * 1000000 + (dataBuffer[49]-48) * 10000 + (dataBuffer[50]-48) * 100) * 10;//yy-dd-mm
 							points[30] = DataParser.parse2Short(dataBuffer, 39) * 1000;; //Altitude MSL
 							points[31] = (dataBuffer[46] & 0xFF) * 1000; //ENL
 							//three char
-							//log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, 49, dataBuffer.length));
+							points[32] = 4 * 1000; //Version
 							HoTTAdapter2.isGPSdetected = true;
 						}
 						else { //SM GPS-Logger				
@@ -353,13 +354,13 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 							points[25] = dataBuffer[39] * 1000; //Roll
 							points[26] = dataBuffer[40] * 1000; //Pitch
 							points[27] = dataBuffer[41] * 1000; //Yaw
-							points[28] = DataParser.parse2Short(dataBuffer, 42) * 1000;; //Gyro x or GPS hh:mm
-							points[29] = DataParser.parse2Short(dataBuffer, 44) * 1000;; //Gyro y or GPS ss:SSS
-							points[30] = DataParser.parse2Short(dataBuffer, 46) * 1000;; //Gyro z or Altitude MSL
+							points[28] = DataParser.parse2Short(dataBuffer, 42) * 1000;; //Acc x
+							points[29] = DataParser.parse2Short(dataBuffer, 44) * 1000;; //Acc y
+							points[30] = DataParser.parse2Short(dataBuffer, 46) * 1000;; //Acc z
 							points[31] = (dataBuffer[48] & 0xFF) * 1000; //ENL
 							//three char
+							points[32] = 125 * 1000; //Version
 						}
-						points[32] = (dataBuffer[52] & 0xFF) * 1000; //Version
 					}
 				}
 				break;
@@ -855,7 +856,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				else if (ordinal == 28 && record.getUnit().endsWith("HH:mm:ss.SSS")) { //hhmmOrdinal = 28, ssSSSOrdinal = 29;
 					dataTableRow[index + 1] = HoTTAdapter.getFormattedTime(record.realGet(rowIndex));
 				}
-				else if (ordinal == 29 && record.getUnit().endsWith("yy-mm-dd-yy")) { //hhmmOrdinal = 28, ssSSSOrdinal = 29;
+				else if (ordinal == 29 && record.getUnit().endsWith("yy-MM-dd")) { //hhmmOrdinal = 28, ssSSSOrdinal = 29;
 					dataTableRow[index + 1] = HoTTAdapter.getFormattedDate(record.realGet(rowIndex)/10);
 				}
 				else {

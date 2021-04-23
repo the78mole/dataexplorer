@@ -10,6 +10,7 @@ Device specific changes/fixes
 	* HoTTAdapter* - change GPS time and year to more readable format
 	* HoTTAdapter2 - fix parsing altitude,climb values while EAM is configured as primary
 	* HoTTAdapter2 - fix missing GAM, EAM, ESC parsing while no known GPS is connected
+	* HoTTAdapter2 - enable simple GPS type detection while reading through 19200 Baud protocol
 	* Triangoli - add initial support
 
 Version 3.4.7 - 27 Mar 2021
