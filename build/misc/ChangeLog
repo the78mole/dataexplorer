@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.4.8 - xx yyy 2021
+Version 3.4.8 - 24 Apr 2021
 Generic changes/fixes
 	* enable record based scale sync property updates (outside device XML)
 	

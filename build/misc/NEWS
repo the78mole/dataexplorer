@@ -1,47 +1,27 @@
-GNU DataExplorer - News - comes with Version 3.4.7 - 27 Mar 2021
+GNU DataExplorer - News - comes with Version 3.4.8 - 24 Apr 2021
 
 Generic changes/fixes
-	* update copyright 2021
-	* update dialog sizes to support uneven Windows scaling 
-	* fix error while editing FileComment tab while focus lost
-	* fix error in setting returning initial wrong decimal separator
-	* make tolerant missing symbols in OSD (variable measurement size written by Android app) 
-	* fix scroll problem file comment window record comment table
+	* enable record based scale sync property updates (outside device XML)
 	
 Device specific changes/fixes
-	* JetiAdapter - fix check GPS data to enable Google Earth export
-	* IGCAdapter - fix support configuring speed or others in KML/KMZ export
-	* HoTTAdapter* - fix unit of GPS vibration
-	* HoTTAdapter* - detecting GPS type to sort and re-name measurements
-	* HoTTAdapter* - fix missing ESC while importing *.log
-	* GraupnerUDP* - fix update step charge tabulator
-	* GraupnerUDP* - fix update step charge min capacity/current
-	* IGCAdapter - fix loading older OSD file
-	* IGCAdapter - enable missing color and record dependency configuration
-	* iCharger* - fix energy calculation
-	* iChargerDuo* - fix max power setting channel 2
-	* iCharger206B - add support opening *.lov
+	* HoTTAdapter* - fix scale synchronization, formatting, unit and factor to support different GPS data source
+	* HoTTAdapter* - change SM GPS-Logger names from gyro to acceleration
+	* HoTTAdapter* - change GPS time and year to more readable format
+	* HoTTAdapter2 - fix parsing altitude,climb values while EAM is configured as primary
+	* HoTTAdapter2 - fix missing GAM, EAM, ESC parsing while no known GPS is connected
+	* HoTTAdapter2 - enable simple GPS type detection while reading through 19200 Baud protocol
+	* Triangoli - add initial support
 	
 Generelle Änderungen/Verbesserungen
-    * update Copyright 2021
-    * update Dialog-Größe zur Unterstützung von ungeradem Windows-Skalierung
-    * Fehlerkorrektur beim Ändern des Dateikommentars, (focus lost)
-    * Fehlerkorrektur Einstellungen, gab initial falschen Dezimal-Separator zurück
-    * Toleriere fehlende Symbole in der OSD-Datei (variable Messwertanzahl geschrieben von Android App)
-    * Fehlerkorrektur Dateikommentarfenster-Komentartabelle rollen
+	* Skalen-Synchronisations Eigenschaften auf Record Basis ermöglicht (ausserhalb Geräte XML)
 
 Geräte spezifische Änderungen/Verbesserungen
-    * JetiAdapter - Korrektur der GPS-Daten-Prüfung, um Google Earth Export zu ermöglichen
-    * IGCAdapter - Korrektur der Konfiguration von Zusatzdaten beim KML/KMZ export
-    * HoTTAdapter* - Korrektur GPS-Vibration Einheit
-    * HoTTAdapter* - Erkennung des GPS-Types zur Sortierung und Benennung von Messwerten
-    * HoTTAdapter* - Korrektur fehlender Ausgabe eines erkannten ESC beim Import von *.log
-    * GraupnerUDP* - Korrektur beim Update Stufenladeparameter
-    * GraupnerUDP* - Korrektur beim Update Stufenladeparameter laden min Kapazität/Strom
-    * IGCAdapter - Korrektur des Ladefehlers bei älteren IGC-Adapter Dateien
-    * IGCAdapter - Ermögliche fehlende Farb und Messwert abhängiger Messwertkonfiguration
-    * iCharger* - Korrektur der Energieberechnung
-    * iChargerDuo* - Korrektur maximale Leistungseinstellung Kanal 2
-    * iCharger206B - Unterstützung zum öffen von *.lov eingebaut
+	* HoTTAdapter* - Synchronization, Formatierung, Einheit und Faktor zur Unterstützung unterschiedlicher GPS korrigiert
+	* HoTTAdapter* - SM GPS-Logger Namen von Gyro nach Beschleunigung geändert
+	* HoTTAdapter* - GPS Zeit und Datum zu besser lesbarem Format geändert
+	* HoTTAdapter2 - Parsingfehler bei eingestellten EAM als primärer Sensor für Höhe und Steigwerte korrigiert
+	* HoTTAdapter2 - Fehlendes parsen von GAM, EAM, ESC bei nicht erkanntem GPS Type gelöst
+	* HoTTAdapter2 - Simple GPS Type Erkennung implementiert bei Datenaufnahme mit 19200 Baud Protokoll
+	* Triangoli - add initial support
 
 	
