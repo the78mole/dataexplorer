@@ -480,8 +480,6 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		boolean									isChannelPercentEnabled				= true;
 		int											altitudeClimbSensorSelection	= 0;
 		
-		boolean									isTolerateSignChangeLatitude	= false;
-		boolean									isTolerateSignChangeLongitude	= false;
 		double									latitudeToleranceFactor				= 90.0;
 		double									longitudeToleranceFactor			= 25.0;
 
@@ -504,8 +502,8 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			this.isChannelPercentEnabled = that.isChannelPercentEnabled;
 			this.altitudeClimbSensorSelection = that.altitudeClimbSensorSelection;
 			
-			this.isTolerateSignChangeLatitude = that.isTolerateSignChangeLatitude;
-			this.isTolerateSignChangeLongitude = that.isTolerateSignChangeLongitude;
+//			this.isTolerateSignChangeLatitude = that.isTolerateSignChangeLatitude;
+//			this.isTolerateSignChangeLongitude = that.isTolerateSignChangeLongitude;
 			this.latitudeToleranceFactor = that.latitudeToleranceFactor;
 			this.longitudeToleranceFactor = that.longitudeToleranceFactor;
 		}
@@ -603,10 +601,10 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		}
 		
 		//TODO unused in future releases
-		this.pickerParameters.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
-				? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
-		this.pickerParameters.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
-				? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
+//		this.pickerParameters.isTolerateSignChangeLatitude = this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
+//				? Boolean.parseBoolean(this.getMeasruementProperty(3, 1, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
+//		this.pickerParameters.isTolerateSignChangeLongitude = this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()) != null
+//				? Boolean.parseBoolean(this.getMeasruementProperty(3, 2, MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value()).getValue()) : false;
 		this.pickerParameters.latitudeToleranceFactor = this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0
 				? Double.parseDouble(this.getMeasurementPropertyValue(3, 1, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString()) : 90.0;
 		this.pickerParameters.longitudeToleranceFactor = this.getMeasurementPropertyValue(3, 2, MeasurementPropertyTypes.FILTER_FACTOR.value()).toString().length() > 0

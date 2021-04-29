@@ -848,6 +848,20 @@ public class StringHelper {
 	}
 
 	/**
+	 * @return 8 bit binary representation
+	 */
+	public static String byte2bin_8(byte value) {
+		StringBuilder sb = new StringBuilder().append("binary : ");
+		for (int i = 0, j = 0x80; i < 8; i++, j /= 2) {
+			if ((value & j) > 0)
+				sb.append("1");
+			else
+				sb.append("0");
+		}
+		return sb.toString();
+	}
+
+	/**
 	 * @return 16 bit binary representation
 	 */
 	public static String int2bin_16(int value) {

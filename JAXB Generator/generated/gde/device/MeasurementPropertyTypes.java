@@ -45,7 +45,6 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="google_earth_is_extrude"/>
  *     &lt;enumeration value="google_earth_is_random_color"/>
  *     &lt;enumeration value="filter_factor"/>
- *     &lt;enumeration value="tolerate_sign_change"/>
  *     &lt;enumeration value="beyond_limit"/>
  *     &lt;enumeration value="below_limit"/>
  *     &lt;enumeration value="is_bits"/>
@@ -109,9 +108,7 @@ public enum MeasurementPropertyTypes {
     GOOGLE_EARTH_IS_RANDOM_COLOR("google_earth_is_random_color"),
     @XmlEnumValue("filter_factor")
     FILTER_FACTOR("filter_factor"),
-    @XmlEnumValue("tolerate_sign_change")
-    TOLERATE_SIGN_CHANGE("tolerate_sign_change"),
-    @XmlEnumValue("beyond_limit")
+     @XmlEnumValue("beyond_limit")
     BEYOND_LIMIT("beyond_limit"),
     @XmlEnumValue("below_limit")
     BELOW_LIMIT("below_limit"),

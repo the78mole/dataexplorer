@@ -1078,7 +1078,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				this.points[17] = this.pickerParameters.isFilterEnabled && this.tmpVelocity > 500000 ? this.points[17] : this.tmpVelocity;
 
 				this.tmpLatitude = DataParser.parse2Short(this._buf1, 7) * 10000 + DataParser.parse2Short(this._buf1[9], this._buf2[0]);
-				if (!this.pickerParameters.isTolerateSignChangeLatitude) this.tmpLatitude = this._buf1[6] == 1 ? -1 * this.tmpLatitude : this.tmpLatitude;
+				this.tmpLatitude = this._buf1[6] == 1 ? -1 * this.tmpLatitude : this.tmpLatitude;
 				this.tmpLatitudeDelta = Math.abs(this.tmpLatitude - this.points[15]);
 				this.tmpLatitudeDelta = this.tmpLatitudeDelta > 400000 ? this.tmpLatitudeDelta - 400000 : this.tmpLatitudeDelta;
 				this.latitudeTolerance = (this.points[17] / 1000.0) * (this.getTimeStep_ms() - this.lastLatitudeTimeStep) / this.pickerParameters.latitudeToleranceFactor;
@@ -1093,7 +1093,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				}
 
 				this.tmpLongitude = DataParser.parse2Short(this._buf2, 2) * 10000 + DataParser.parse2Short(this._buf2, 4);
-				if (!this.pickerParameters.isTolerateSignChangeLongitude) this.tmpLongitude = this._buf2[1] == 1 ? -1 * this.tmpLongitude : this.tmpLongitude;
+				this.tmpLongitude = this._buf2[1] == 1 ? -1 * this.tmpLongitude : this.tmpLongitude;
 				this.tmpLongitudeDelta = Math.abs(this.tmpLongitude - this.points[16]);
 				this.tmpLongitudeDelta = this.tmpLongitudeDelta > 400000 ? this.tmpLongitudeDelta - 400000 : this.tmpLongitudeDelta;
 				this.longitudeTolerance = (this.points[17] / 1000.0) * (this.getTimeStep_ms() - this.lastLongitudeTimeStep) / this.pickerParameters.longitudeToleranceFactor;
@@ -1448,7 +1448,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 		@Override
 		protected boolean parse() {
 			// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
-			// 82=Ch 1, 83=Ch 2, 84=Ch 3 .. 97=Ch 16, 98=PowerOff, 99=BatterieLow, 100=Reset, 101=reserve
+			// 82=Ch 1, 83=Ch 2, 84=Ch 3 .. 97=Ch 16, 98=PowerOff, 99=BatterieLow, 100=Reset, 101=Warning
 			this.points[4] = (this._buf[3] & 0xFF) * -1000;
 			this.points[5] = (this._buf[4] & 0xFF) * -1000;
 

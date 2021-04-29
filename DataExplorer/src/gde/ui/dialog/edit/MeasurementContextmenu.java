@@ -183,9 +183,6 @@ public class MeasurementContextmenu {
 						case FILTER_FACTOR:
 							MeasurementContextmenu.this.filterFactor.setEnabled(false);
 							break;
-						case TOLERATE_SIGN_CHANGE:
-							MeasurementContextmenu.this.tolerateSignChange.setEnabled(false);
-							break;
 						case DATA_TYPE:
 							MeasurementContextmenu.this.recordDataType.setEnabled(false);
 							break;
@@ -348,14 +345,14 @@ public class MeasurementContextmenu {
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.FILTER_FACTOR.value());
 			}
 		});	
-		this.tolerateSignChange = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
-		this.tolerateSignChange.setText(MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value());
-		this.tolerateSignChange.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				log.log(java.util.logging.Level.FINEST, "tolerateSignChange action performed! " + e); //$NON-NLS-1$
-				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value());
-			}
-		});	
+//		this.tolerateSignChange = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
+//		this.tolerateSignChange.setText(MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value());
+//		this.tolerateSignChange.addListener(SWT.Selection, new Listener() {
+//			public void handleEvent(Event e) {
+//				log.log(java.util.logging.Level.FINEST, "tolerateSignChange action performed! " + e); //$NON-NLS-1$
+//				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value());
+//			}
+//		});	
 		this.recordDataType = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.recordDataType.setText(MeasurementPropertyTypes.DATA_TYPE.value());
 		this.recordDataType.addListener(SWT.Selection, new Listener() {

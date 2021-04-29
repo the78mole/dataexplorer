@@ -1838,7 +1838,7 @@ public class HoTTbinReader {
 				this.points[6] = this.pickerParameters.isFilterEnabled && this.tmpVelocity > 2000000 ? this.points[6] : this.tmpVelocity;
 
 				this.tmpLatitude = DataParser.parse2Short(_buf1, 7) * 10000 + DataParser.parse2Short(_buf1[9], _buf2[0]);
-				if (!this.pickerParameters.isTolerateSignChangeLatitude) this.tmpLatitude = _buf1[6] == 1 ? -1 * this.tmpLatitude : this.tmpLatitude;
+				this.tmpLatitude = _buf1[6] == 1 ? -1 * this.tmpLatitude : this.tmpLatitude;
 				this.tmpLatitudeDelta = Math.abs(this.tmpLatitude - this.points[1]);
 				this.tmpLatitudeDelta = this.tmpLatitudeDelta > 400000 ? this.tmpLatitudeDelta - 400000 : this.tmpLatitudeDelta;
 				this.latitudeTolerance = this.points[6] / 1000.0 * (this.getTimeStep_ms() - this.lastLatitudeTimeStep) / this.pickerParameters.latitudeToleranceFactor;
@@ -1854,7 +1854,7 @@ public class HoTTbinReader {
 				}
 
 				this.tmpLongitude = DataParser.parse2Short(_buf2, 2) * 10000 + DataParser.parse2Short(_buf2, 4);
-				if (!this.pickerParameters.isTolerateSignChangeLongitude) this.tmpLongitude = _buf2[1] == 1 ? -1 * this.tmpLongitude : this.tmpLongitude;
+				this.tmpLongitude = _buf2[1] == 1 ? -1 * this.tmpLongitude : this.tmpLongitude;
 				this.tmpLongitudeDelta = Math.abs(this.tmpLongitude - this.points[2]);
 				this.tmpLongitudeDelta = this.tmpLongitudeDelta > 400000 ? this.tmpLongitudeDelta - 400000 : this.tmpLongitudeDelta;
 				this.longitudeTolerance = this.points[6] / 1000.0 * (this.getTimeStep_ms() - this.lastLongitudeTimeStep) / this.pickerParameters.longitudeToleranceFactor;
