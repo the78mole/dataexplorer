@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -299,6 +300,9 @@ public final class VaultCollector {
 		StatisticsType measurementStatistics = device.getChannelMeasuremts(this.vault.getLogChannelNumber()).get(record.getOrdinal()).getStatistics();
 
 		int triggerRefOrdinal = -1;
+		if (measurementStatistics == null) {//corrupt file, probably OSD included, need to be sorted out
+			log.log(Level.SEVERE, "===>> check corrupt file related to: " + recordSet.getDescription());
+		}
 		if (measurementStatistics.getTriggerRefOrdinal() != null) {
 			int tmpOrdinal = measurementStatistics.getTriggerRefOrdinal().intValue();
 			// if (record.isDisplayable()) { the record may be displayable later --- but note that calculating trigger ranges requires displayable true
