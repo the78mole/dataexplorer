@@ -285,51 +285,51 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Roll</name>
+                <name>misc GPS_1</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Pitch</name>
+                <name>misc GPS_2</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Yaw</name>
+                <name>misc GPS_3</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro x</name>
+                <name>misc GPS_4</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro y</name>
+                <name>misc GPS_5</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro z</name>
+                <name>misc GPS_6</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Vibration</name>
+                <name>misc GPS_7</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
@@ -1307,51 +1307,51 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Roll</name>
+                <name>misc GPS_1</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Pitch</name>
+                <name>misc GPS_2</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Yaw</name>
+                <name>misc GPS_3</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro x</name>
+                <name>misc GPS_4</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro y</name>
+                <name>misc GPS_5</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro z</name>
+                <name>misc GPS_6</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Vibration</name>
+                <name>misc GPS_7</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
@@ -2340,6 +2340,7 @@
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
                 <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
+                <label>label_azimuth</label>
             </Measurement>
             <Measurement>
                 <name>trip</name>
@@ -2364,6 +2365,7 @@
                 <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
             </Measurement>
             <Measurement>
                 <name>event GPS</name>
@@ -2391,51 +2393,51 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Roll</name>
+                <name>misc GPS_1</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Pitch</name>
+                <name>misc GPS_2</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Yaw</name>
+                <name>misc GPS_3</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro x</name>
+                <name>misc GPS_4</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro y</name>
+                <name>misc GPS_5</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro z</name>
+                <name>misc GPS_6</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Vibration</name>
+                <name>misc GPS_7</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
@@ -3039,7 +3041,7 @@
                 <active>true</active>
                 <property name="scale_sync_ref_ordinal" value="7" type="Integer"/>
                 <trailDisplay discloseAll="true" defaultTrail="last"/>
-                <label>label_temperature_ext_max ESC</label>
+                <label>label_temperature_fet_max ESC</label>
             </Measurement>
             <Measurement>
                 <name>event M</name>
@@ -3463,51 +3465,51 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Roll</name>
+                <name>misc GPS_1</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Pitch</name>
+                <name>misc GPS_2</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Yaw</name>
+                <name>misc GPS_3</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro x</name>
+                <name>misc GPS_4</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro y</name>
+                <name>misc GPS_5</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro z</name>
+                <name>misc GPS_6</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Vibration</name>
+                <name>misc GPS_7</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
@@ -4469,6 +4471,7 @@
                 <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <trailDisplay discloseAll="true" defaultTrail="last"/>
             </Measurement>
             <Measurement>
                 <name>event GPS</name>
@@ -4496,51 +4499,51 @@
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Roll</name>
+                <name>misc GPS_1</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Pitch</name>
+                <name>misc GPS_2</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Yaw</name>
+                <name>misc GPS_3</name>
                 <symbol></symbol>
-                <unit>°</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro x</name>
+                <name>misc GPS_4</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro y</name>
+                <name>misc GPS_5</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Gyro z</name>
+                <name>misc GPS_6</name>
                 <symbol></symbol>
-                <unit>m/s</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>Vibration</name>
+                <name>misc GPS_7</name>
                 <symbol></symbol>
-                <unit>%</unit>
+                <unit></unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
@@ -5339,6 +5342,7 @@
         <property name="text_mode" value="true" type="Boolean"/>
         <property name="outlier_sigma" value="3.29" type="Double" description="3.29 sigma allows 0.1% outliers, i.e. we allow 1 lower and 1 upper outlier for a population of 2000 measurements"/>
         <property name="outlier_range_factor" value="2." type="Double" description="outliers are identified only if they lie beyond the tolerance interval extended by a factor of 2.0"/>
+        <property name="sensor_alt_climb" value="0" type="Integer"/>
     </Channels>
     <Desktop>
         <property name="table_tab" value="true"/>
