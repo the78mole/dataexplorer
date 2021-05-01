@@ -1302,6 +1302,7 @@
 	      <arg value="-f"/>
 		  <arg value="-s"/>
 		  <arg value="D9D82CX2Z9"/>
+		  <arg value="--timestamp"/>
 	      <arg value="--verbose"/>
 	      <arg value="${output.mac32}/${app.name}.app"/>
 	    </exec>
@@ -1407,6 +1408,9 @@
 	      <arg value="-f"/>
 		  <arg value="-s"/>
 		  <arg value="D9D82CX2Z9"/>
+		  <arg value="-i"/>
+		  <arg value="gde.DataExplorer"/>
+		  <arg value="--timestamp"/>
 	      <arg value="--verbose"/>
 	      <arg value="${targetDmgPath}"/>
 	    </exec>
@@ -1442,6 +1446,7 @@
 	      <arg value="-f"/>
 		  <arg value="-s"/>
 		  <arg value="D9D82CX2Z9"/>
+		  <arg value="--timestamp"/>
 	      <arg value="--verbose"/>
 	      <arg value="${output.mac64}/${app.name}.app"/>
 	    </exec>
@@ -1525,6 +1530,7 @@
 	      <arg value="+x"/>
 	      <arg value="${mountdir}/${app.name}/RXTX_Post-Install"/>
 	    </exec>
+    	
 
 	    <!-- Detach the temporary image -->
 	    <exec executable="/usr/bin/hdiutil" os="Mac OS X" failonerror="true">
@@ -1541,12 +1547,14 @@
 	      <arg value="-o"/>
 	      <arg value="${targetDmgPath}"/>
 	    </exec>
-    	
     	<!-- sign dmg -->
 	    <exec executable="/usr/bin/codesign" os="Mac OS X" failonerror="true">
 	      <arg value="-f"/>
 		  <arg value="-s"/>
 		  <arg value="D9D82CX2Z9"/>
+		  <arg value="-i"/>
+		  <arg value="gde.DataExplorer"/>
+		  <arg value="--timestamp"/>
 	      <arg value="--verbose"/>
 	      <arg value="${targetDmgPath}"/>
 	    </exec>
