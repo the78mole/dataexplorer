@@ -619,7 +619,7 @@ public class HoTTlogReader extends HoTTbinReader {
 			//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
 			values[19] = _buf[55] * 10000000 + _buf[56] * 100000 + _buf[57] * 1000 + _buf[58]*10;//HH:mm:ss.SSS
 			values[20] = ((_buf[61]-48) * 1000000 + (_buf[63]-48) * 10000 + (_buf[62]-48) * 100) * 10;//yy-MM-dd
-			values[21] = DataParser.parse2Short(_buf, 52) * 1000;
+			values[21] = (DataParser.parse2Short(_buf, 52) - 500) * 1000;
 			//22=Vibration 			
 			//61=Vibration 62-64=freeChars 65=Version
 			values[22] = (_buf[59] & 0xFF) * 1000;
@@ -648,7 +648,7 @@ public class HoTTlogReader extends HoTTbinReader {
 				values[17] = 0;
 				values[18] = _buf[54] * 1000; 
 				//19=GPS hh:mm 20=GPS sss.SSS 21=velE NED east velocity mm/s
-				//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
+				//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=velocityEast
 				values[19] = _buf[55] * 10000000 + _buf[56] * 100000 + _buf[57] * 1000 + _buf[58]*10;//HH:mm:ss.SSS
 				values[20] = 0;
 				values[21] = DataParser.parse2Short(_buf, 59) * 1000;
