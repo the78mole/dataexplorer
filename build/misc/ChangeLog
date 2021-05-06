@@ -10,6 +10,7 @@ Device specific changes/fixes
 	* HoTTAdapter* - remove dependency to property using North/South hemisphere, as well as East/West of meridian
 	* HoTTAdapter* - rename variable GPS values in XML to propagate to history analysis
 	* HoTTAdapter* - correct offset MSL altitude if contained in GPS in *.log
+	* IGCAdapter - add missing unit in device XML
 
 Version 3.4.8 - 24 Apr 2021
 Generic changes/fixes

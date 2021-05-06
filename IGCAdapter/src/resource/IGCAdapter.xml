@@ -49,14 +49,14 @@
 			</Measurement>
 			<Measurement>
 				<name>altitude (GPS)</name>
-				<symbol></symbol>
-				<unit></unit>
+				<symbol>hs</symbol>
+				<unit>m</unit>
 				<active>true</active>
 				<statistics sigma="false" avg="true" max="true" min="true" />
 			</Measurement>
 			<Measurement>
 				<name>climb</name>
-				<symbol>V</symbol>
+				<symbol>vh</symbol>
 				<unit>m/s</unit>
 				<statistics sigma="false" avg="false" max="true" min="true" />
 				<property description="Regression interval in seconds" type="Integer" value="10" name="regression_interval_sec" />
