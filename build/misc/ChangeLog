@@ -11,6 +11,8 @@ Device specific changes/fixes
 	* HoTTAdapter* - rename variable GPS values in XML to propagate to history analysis
 	* HoTTAdapter* - correct offset MSL altitude if contained in GPS in *.log
 	* HoTTAdapter* - correct factor home direction, enable translation for HomeDirection
+	* HoTTAdapter* - refactor method updating GPS type dependent records
+	* HoTTAdapter* - update GPS type dependent records while loading from OSD
 	* IGCAdapter - add missing unit in device XML
 
 Version 3.4.8 - 24 Apr 2021
