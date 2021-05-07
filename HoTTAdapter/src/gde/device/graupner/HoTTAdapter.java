@@ -1257,7 +1257,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		if (recordSet.getChannelConfigNumber() == 3 && recordSet.get(23).getName().startsWith("Version") && recordSet.containsGPSdata())
+		if (recordSet.getChannelConfigNumber() == 3 && recordSet.get(23).getName().startsWith("Version") && recordSet.get(19).hasReasonableData())
 			HoTTAdapter.updateGpsTypeDependent(recordSet.get(23).getLast()/1000, this, recordSet, -1);
 		recordSet.syncScaleOfSyncableRecords();
 	}
