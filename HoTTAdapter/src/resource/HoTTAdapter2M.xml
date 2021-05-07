@@ -278,11 +278,12 @@
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
-                <name>HomeDirection</name>
+                <name>home_direction</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>misc GPS_1</name>
@@ -1300,11 +1301,12 @@
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
-                <name>HomeDirection</name>
+                <name>home_direction</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>misc GPS_1</name>
@@ -2384,11 +2386,12 @@
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
-                <name>HomeDirection</name>
+                <name>home_direction</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>misc GPS_1</name>
@@ -3456,11 +3459,12 @@
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
-                <name>HomeDirection</name>
+                <name>home_direction</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>misc GPS_1</name>
@@ -4489,11 +4493,12 @@
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
-                <name>HomeDirection</name>
+                <name>home_direction</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
+                <property name="factor" value="2.0" type="Double" description="factor to measurement value"/>
             </Measurement>
             <Measurement>
                 <name>misc GPS_1</name>

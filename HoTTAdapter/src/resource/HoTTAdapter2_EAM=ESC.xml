@@ -278,7 +278,7 @@
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
-                <name>HomeDirection</name>
+                <name>home_direction</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
@@ -1300,7 +1300,7 @@
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
-                <name>HomeDirection</name>
+                <name>home_direction</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
@@ -2386,7 +2386,7 @@
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
-                <name>HomeDirection</name>
+                <name>home_direction</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
@@ -3460,7 +3460,7 @@
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
-                <name>HomeDirection</name>
+                <name>home_direction</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
@@ -4494,7 +4494,7 @@
                 <label>label_event GPS</label>
             </Measurement>
             <Measurement>
-                <name>HomeDirection</name>
+                <name>home_direction</name>
                 <symbol></symbol>
                 <unit>°</unit>
                 <active>true</active>
