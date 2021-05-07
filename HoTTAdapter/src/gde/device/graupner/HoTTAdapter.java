@@ -2384,7 +2384,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			tmpRecordSet.get(22).setName("ENL");
 			tmpRecordSet.get(22).setUnit("");
 		}
-		else if ((HoTTbinReader.buf4[9] & 0xFF) == 4) { //RC Electronics Sparrow
+		else if (version == 4) { //RC Electronics Sparrow
 			tmpRecordSet.get(16).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
 			tmpRecordSet.get(16).setUnit("%");
 			tmpRecordSet.get(18).setName(device.getMeasurementReplacement("voltage") + " GPS");
@@ -2407,7 +2407,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				} 
 			}
 		}
-		else if ((HoTTbinReader.buf4[9] & 0xFF) == 1) { //Graupner GPS #1= 33602/S8437,
+		else if (version == 1) { //Graupner GPS #1= 33602/S8437,
 			tmpRecordSet.get(16).setName("velNorth");
 			tmpRecordSet.get(16).setUnit("mm/s");
 			tmpRecordSet.get(18).setName("speedAcc");
