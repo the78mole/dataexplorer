@@ -1904,7 +1904,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							throw new FileNotFoundException(this.tmpDir1);
 
 						String absolutFilePath = this.tmpDir1 + file.getName();
-						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_2bin.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 					}
@@ -1985,7 +1985,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							throw new FileNotFoundException(this.tmpDir1);
 
 						String absolutFilePath = this.tmpDir1 + file.getName();
-						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_log.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 					}
@@ -2065,7 +2065,7 @@ public class TestFileReaderOsdWriter extends TestSuperClass {
 							throw new FileNotFoundException(this.tmpDir1);
 
 						String absolutFilePath = this.tmpDir1 + file.getName();
-						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_bin.osd";
+						absolutFilePath = absolutFilePath.substring(0, absolutFilePath.length() - 4) + "_2log.osd";
 						System.out.println("writing as   : " + absolutFilePath);
 						OsdReaderWriter.write(absolutFilePath, this.channels.getActiveChannel(), GDE.DATA_EXPLORER_FILE_VERSION_INT);
 					}

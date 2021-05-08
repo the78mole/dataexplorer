@@ -788,7 +788,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
 		
 		if (recordSet.get(32).getName().startsWith("Version") && recordSet.get(28).hasReasonableData())
-			HoTTAdapter2.updateGpsTypeDependent(recordSet.get(32).getLast()/1000, this, recordSet, -1);
+			HoTTAdapter2.updateGpsTypeDependent(recordSet.get(32).get(recordSet.get(32).size()/2)/1000, this, recordSet, -1);
 		
 		recordSet.syncScaleOfSyncableRecords();
 	}
