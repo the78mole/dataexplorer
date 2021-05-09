@@ -527,6 +527,7 @@ public class OsdReaderWriter {
 				}
 			}
 		}
+		device.applyMeasurementSpecialties(recordsProperties, recordSet);
 		recordSet.setDeserializedProperties(recordSetProperties);
 		recordSet.setSaved(true);
 		return recordSet;

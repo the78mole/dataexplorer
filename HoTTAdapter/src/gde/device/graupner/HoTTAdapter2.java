@@ -741,7 +741,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 					for (int i = 0, j = 0; i < 16; i++, j+=2) {
 						sb.append(String.format("%2d = %4d; ", i+1, DataParser.parse2Short(dataBuffer, 8 + j) / 16 + 50));					
 					}
-					log.log(Level.OFF, sb.toString());
+					log.log(Level.FINE, sb.toString());
 				}
 				break;
 			}
@@ -785,11 +785,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
-		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
-		
-		if (recordSet.get(32).getName().startsWith("Version") && recordSet.get(28).hasReasonableData())
-			HoTTAdapter2.updateGpsTypeDependent(recordSet.get(32).get(recordSet.get(32).size()/2)/1000, this, recordSet, -1);
-		
+		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);		
 		recordSet.syncScaleOfSyncableRecords();
 	}
 
@@ -2075,7 +2071,36 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		else
 			return new int[0];
 	}  
-	
+
+	/**
+	 * check and adapt stored measurement specialties properties against actual record set records which gets created by device properties XML
+	 * - like GPS type dependent properties
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 */
+	@Override
+	public void applyMeasurementSpecialties(String[] fileRecordsProperties, RecordSet recordSet) {
+		
+		for (int i = 28; i < 31; ++i) {
+			Record record = recordSet.get(i);
+			if (record != null && !record.getName().startsWith("vari")) {
+				if (fileRecordsProperties[i].contains("factor_DOUBLE=")) {
+					int startIndex = fileRecordsProperties[i].indexOf("factor_DOUBLE=") + "factor_DOUBLE=".length();
+					int endIndex = fileRecordsProperties[i].indexOf(Record.DELIMITER, startIndex);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " set - factor_DOUBLE " + fileRecordsProperties[i].substring(startIndex, endIndex));
+					record.setFactor(Double.parseDouble(fileRecordsProperties[i].substring(startIndex, endIndex)));	
+				}
+				if (fileRecordsProperties[i].contains("scale_sync_ref_ordinal_INTEGER=")) {
+					int startIndex = fileRecordsProperties[i].indexOf("scale_sync_ref_ordinal_INTEGER=") + "scale_sync_ref_ordinal_INTEGER=".length();
+					int endIndex = fileRecordsProperties[i].indexOf(Record.DELIMITER, startIndex);
+					if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " set - scale_sync_ref_ordinal_INTEGER " + fileRecordsProperties[i].substring(startIndex, endIndex));
+					record.createProperty(IDevice.SYNC_ORDINAL, DataTypes.INTEGER, Integer.parseInt(fileRecordsProperties[i].substring(startIndex, endIndex))); //$NON-NLS-1$
+				}
+			}
+		}
+		return;
+	}
+
 	/**
 	 * update the record set GPS dependent record meta data
 	 * @param version detected in byte buffer
@@ -2129,9 +2154,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			tmpRecordSet.get(28).setName(device.getMeasurementReplacement("time") + " GPS");
 			tmpRecordSet.get(28).setUnit("HH:mm:ss.SSS");
 			tmpRecordSet.get(28).setFactor(1.0);
-//												tmpRecordSet.get(29).setName("GPS ss.SSS");
-//												tmpRecordSet.get(29).setUnit("ss.SSS");
-//												tmpRecordSet.get(29).setFactor(1.0);
+//		tmpRecordSet.get(29).setName("GPS ss.SSS");
+//		tmpRecordSet.get(29).setUnit("ss.SSS");
+//		tmpRecordSet.get(29).setFactor(1.0);
 			tmpRecordSet.get(30).setName("velEast");
 			tmpRecordSet.get(30).setUnit("mm/s");
 			tmpRecordSet.get(30).setFactor(1.0);
@@ -2144,9 +2169,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			tmpRecordSet.get(28).setName(device.getMeasurementReplacement("time") + " GPS");
 			tmpRecordSet.get(28).setUnit("HH:mm:ss.SSS");
 			tmpRecordSet.get(28).setFactor(1.0);
-//												tmpRecordSet.get(29).setName("GPS ss.SSS");
-//												tmpRecordSet.get(29).setUnit("ss.SSS");
-//												tmpRecordSet.get(29).setFactor(1.0);
+//		tmpRecordSet.get(29).setName("GPS ss.SSS");
+//		tmpRecordSet.get(29).setUnit("ss.SSS");
+//		tmpRecordSet.get(29).setFactor(1.0);
 			tmpRecordSet.get(30).setName(device.getMeasurementReplacement("altitude") + " MSL");
 			tmpRecordSet.get(30).setUnit("m");
 			tmpRecordSet.get(30).setFactor(1.0);

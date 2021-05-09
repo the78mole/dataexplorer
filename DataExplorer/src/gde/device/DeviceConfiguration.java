@@ -2651,6 +2651,16 @@ public class DeviceConfiguration {
 	}
 
 	/**
+	 * check and adapt stored measurement specialties properties against actual record set records which gets created by device properties XML
+	 * - like GPS type dependent properties
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 */
+	public void applyMeasurementSpecialties(String[] fileRecordsProperties, RecordSet recordSet) {
+		return;
+	}
+
+	/**
 	 * query if the given record is longitude or latitude of GPS data, such data needs translation for display as graph
 	 * @param record
 	 * @return

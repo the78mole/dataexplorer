@@ -1017,6 +1017,14 @@ public interface IDevice {
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet);
 
 	/**
+	 * check and adapt stored measurement specialties properties against actual record set records which gets created by device properties XML
+	 * - like GPS type dependent properties
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 */
+	public void applyMeasurementSpecialties(String[] fileRecordsProperties, RecordSet recordSet);
+
+	/**
 	 * remove a MeasurementType object from channel with channel number as given
 	 * @param channelConfigNumber
 	 * @param removeMeasurementType
