@@ -1175,7 +1175,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf2, 1);
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf1, 7);
 		HoTTbinReader.tmpRevolution = DataParser.parse2Short(_buf2, 5);
-		HoTTbinReader.tmpTemperatureFet = _buf1[9] - 20;
+		HoTTbinReader.tmpTemperatureFet = (_buf1[9] & 0xFF) - 20;
 		//70=VoltageM, 71=CurrentM, 72=CapacityM, 73=PowerM, 74=RevolutionM, 75=TemperatureM
 		if (!HoTTbinReader.pickerParameters.isFilterEnabled
 				|| HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 4000 && HoTTbinReader.tmpCurrent > -10 && HoTTbinReader.tmpRevolution > -1
@@ -1195,12 +1195,12 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsESC[74] = HoTTbinReader.tmpRevolution * 1000;
 			HoTTbinReader.pointsESC[75] = HoTTbinReaderD.lastEscFetTemp = HoTTbinReader.tmpTemperatureFet * 1000;
 
-			HoTTbinReader.pointsESC[121] = (_buf2[9] - 20) * 1000;
+			HoTTbinReader.pointsESC[121] = ((_buf2[9] & 0xFF) - 20) * 1000;
 			HoTTbinReader.pointsESC[122] = DataParser.parse2Short(_buf1, 5) * 1000;
 			HoTTbinReader.pointsESC[123] = DataParser.parse2Short(_buf2, 3) * 1000;
 			HoTTbinReader.pointsESC[124] = DataParser.parse2Short(_buf2, 7) * 1000;
-			HoTTbinReader.pointsESC[125] = (_buf2[0] - 20) * 1000;
-			HoTTbinReader.pointsESC[126] = (_buf3[0] - 20) * 1000;
+			HoTTbinReader.pointsESC[125] = ((_buf2[0] & 0xFF) - 20) * 1000;
+			HoTTbinReader.pointsESC[126] = ((_buf3[0] & 0xFF) - 20) * 1000;
 		}
 		//114=VoltageRx_min 115=Speed G, 116=CellVoltage_min G 117=CellNumber_min G 118=Pressure 119=MotorRuntime E 120=Speed E
 		//121=Temperature M2 122=Voltage Mmin 123=Current Mmax 124=RPM Mmax 125=Temperatire M1max 126=Temperature M2max

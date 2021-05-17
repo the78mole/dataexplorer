@@ -1770,7 +1770,7 @@ public class HoTTbinReader {
 					this.points[18] = _buf3[8] * 100; 
 					this.points[19] = _buf3[9] * 10000000 + _buf4[0] * 100000 + _buf4[1] * 1000 + _buf4[2]*10;
 					this.points[20] = ((_buf4[5]-48) * 1000000 + (_buf4[7]-48) * 10000 + (_buf4[6]-48) * 100) * 10;
-					this.points[21] = (DataParser.parse2Short(_buf3, 6) -500) * 1000;
+					this.points[21] = (DataParser.parse2Short(_buf3, 6) - 500) * 1000; //TODO remove offset 500 after correction
 					this.points[22] = (_buf4[3] & 0xFF) * 1000;
 				}
 				else { //Graupner GPS need workaround to distinguish between different Graupner GPS with version #0
@@ -1887,8 +1887,8 @@ public class HoTTbinReader {
 				this.points[16] = DataParser.parse2Short(_buf2, 6) * 1000;
 				this.points[17] = this.tmpVoltage1 * 1000;
 				this.points[18] = this.tmpVoltage2 * 1000;
-				this.points[19] = (_buf2[3] & 0xFF) * 1000;
-				this.points[20] = (_buf2[4] & 0xFF) * 1000;
+				this.points[19] = ((_buf2[3] & 0xFF) - 20) * 1000;
+				this.points[20] = ((_buf2[4] & 0xFF) - 20) * 1000;
 				// 21=Speed, 22=LowestCellVoltage, 23=LowestCellNumber, 24=Pressure, 24=Event
 				this.points[21] = DataParser.parse2Short(_buf4, 1) * 1000; // Speed [km/h
 				this.points[22] = (_buf4[3] & 0xFF) * 1000; // lowest cell voltage 124 = 2.48 V
@@ -1989,8 +1989,8 @@ public class HoTTbinReader {
 				this.points[22] = this.tmpClimb3 * 1000;
 				this.points[23] = this.tmpVoltage1 * 1000;
 				this.points[24] = this.tmpVoltage2 * 1000;
-				this.points[25] = (_buf3[1] & 0xFF) * 1000;
-				this.points[26] = (_buf3[2] & 0xFF) * 1000;
+				this.points[25] = ((_buf3[1] & 0xFF) - 20) * 1000;
+				this.points[26] = ((_buf3[2] & 0xFF) - 20) * 1000;
 				this.points[27] = DataParser.parse2Short(_buf4, 4) * 1000; // revolution
 				this.points[28] = ((_buf4[6] & 0xFF) * 60 + (_buf4[7] & 0xFF)) * 1000; // motor time
 				this.points[29] = DataParser.parse2Short(_buf4, 8) * 1000; // speed
@@ -2046,7 +2046,7 @@ public class HoTTbinReader {
 			this.points[0] = (_buf0[4] & 0xFF) * 1000;
 			this.tmpCapacity = DataParser.parse2Short(_buf1, 7);
 			this.tmpRevolution = DataParser.parse2Short(_buf2, 5);
-			this.tmpTemperatureFet = _buf1[9] - 20;
+			this.tmpTemperatureFet = (_buf1[9] & 0xFF) - 20;
 			if (isPointsValid()) {
 				this.points[1] = this.tmpVoltage * 1000;
 				this.points[2] = this.tmpCurrent * 1000;
@@ -2062,14 +2062,14 @@ public class HoTTbinReader {
 				this.points[5] = this.tmpRevolution * 1000;
 				this.points[6] = this.tmpTemperatureFet * 1000;
 
-				this.points[7] = (_buf2[9] - 20) * 1000;
+				this.points[7] = ((_buf2[9] & 0xFF) - 20) * 1000;
 				// 8=Voltage_min, 9=Current_max, 10=Revolution_max,
 				// 11=Temperature1_max, 12=Temperature2_max
 				this.points[8] = DataParser.parse2Short(_buf1, 5) * 1000;
 				this.points[9] = DataParser.parse2Short(_buf2, 3) * 1000;
 				this.points[10] = DataParser.parse2Short(_buf2, 7) * 1000;
-				this.points[11] = (_buf2[0] - 20) * 1000;
-				this.points[12] = (_buf3[0] - 20) * 1000;
+				this.points[11] = ((_buf2[0] & 0xFF) - 20) * 1000;
+				this.points[12] = ((_buf3[0] & 0xFF) - 20) * 1000;
 				if ((_buf1[1] & 0xFF) != 0)
 					this.points[13] = (_buf1[1] & 0xFF) * 1000; //inverse event
 				++this.parseCount;

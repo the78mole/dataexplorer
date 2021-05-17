@@ -381,7 +381,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[4] = _buf[8] * -1000;
 		values[5] = _buf[9] * -1000;
 		values[6] = (_buf[13] & 0xFF) * 1000;
-		values[7] = ((_buf[14] & 0xFF) - 20) * 1000;
+		values[7] = (_buf[14] & 0xFF) * 1000;
 		values[8] = (_buf[17] & 0xFF) * 1000;
 		if ((_buf[25] & 0x40) > 0 || (_buf[25] & 0x20) > 0 && HoTTbinReader.tmpTemperatureRx >= 70) //T = 70 - 20 = 50 lowest temperature warning
 			values[9] = (_buf[25] & 0x60) * 1000; //warning V,T only
@@ -452,7 +452,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[3] = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 36) - 30000) * 10 : DataParser.parse2UnsignedShort(_buf, 36) * 1000;
 		values[4] = HoTTbinReader.tmpClimb10;
 		values[5] = (_buf[13] & 0xFF) * 1000;				//voltageRx
-		values[6] = ((_buf[14] & 0xFF) - 20) * 1000;//temperaturRx
+		values[6] = (_buf[14] & 0xFF) * 1000;				//temperaturRx
 		values[7] = (_buf[27] & 0x3F) * 1000; 			//inverse event
 
 		if (log.isLoggable(Level.FINER)) {
@@ -491,7 +491,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[8] = (_buf[51] & 0xFF) * 1000;
 		values[9] = 0; 																//trip length
 		values[10] = (_buf[13] & 0xFF) * 1000;				//voltageRx
-		values[11] = ((_buf[14] & 0xFF) - 20) * 1000;	//temperaturRx
+		values[11] = (_buf[14] & 0xFF) * 1000;				//temperaturRx
 		values[12] = (_buf[49] & 0xFF) * 1000;
 		switch (_buf[50]) { //sat-fix
 		case '-':
@@ -543,7 +543,7 @@ public class HoTTlogReader extends HoTTbinReader {
 			//55,56=GPS hh:mm 57,58=GPS sss.SSS 59,60=MSL Altitude
 			values[19] = _buf[55] * 10000000 + _buf[56] * 100000 + _buf[57] * 1000 + _buf[58]*10;//HH:mm:ss.SSS
 			values[20] = ((_buf[61]-48) * 1000000 + (_buf[63]-48) * 10000 + (_buf[62]-48) * 100) * 10;//yy-MM-dd
-			values[21] = (DataParser.parse2Short(_buf, 52) - 500) * 1000;
+			values[21] = (DataParser.parse2Short(_buf, 52) - 500) * 1000; //TODO remove offset 500 after correction
 			//22=Vibration 			
 			//61=Vibration 62-64=freeChars 65=Version
 			values[22] = (_buf[59] & 0xFF) * 1000;
@@ -713,7 +713,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		HoTTbinReader.tmpCurrent = DataParser.parse2Short(_buf, 37);
 		HoTTbinReader.tmpCapacity = DataParser.parse2Short(_buf, 33);
 		HoTTbinReader.tmpRevolution = DataParser.parse2Short(_buf, 41);
-		HoTTbinReader.tmpTemperatureFet = _buf[35] - 20;
+		HoTTbinReader.tmpTemperatureFet = (_buf[35] & 0xFF) - 20;
 		//73=VoltageM, 74=CurrentM, 75=CapacityM, 76=PowerM, 77=RevolutionM, 78=TemperatureM 1, 79=TemperatureM 2 80=Voltage_min, 81=Current_max, 82=Revolution_max, 83=Temperature1_max, 84=Temperature2_max 85=Event M
 		if (!pickerParameters.isFilterEnabled || HoTTbinReader.tmpVoltage > 0 && HoTTbinReader.tmpVoltage < 1000 && HoTTbinReader.tmpCurrent < 4000 && HoTTbinReader.tmpCurrent > -10
 				&& HoTTbinReader.tmpRevolution > -1 && HoTTbinReader.tmpRevolution < 20000
@@ -732,12 +732,12 @@ public class HoTTlogReader extends HoTTbinReader {
 			values[4] = Double.valueOf(values[1] / 1000.0 * values[2]).intValue();
 			values[5] = HoTTbinReader.tmpRevolution * 1000;
 			values[6] = HoTTbinReader.tmpTemperatureFet * 1000;
-			values[7] = (_buf[45] - 20) * 1000;
+			values[7] = ((_buf[45] & 0xFF) - 20) * 1000;
 			values[8] = DataParser.parse2Short(_buf, 31) * 1000;
 			values[9] = DataParser.parse2Short(_buf, 39) * 1000;
 			values[10] = DataParser.parse2Short(_buf, 43) * 1000;
-			values[11] = (_buf[36] - 20) * 1000;
-			values[12] = (_buf[46] - 20) * 1000;
+			values[11] = ((_buf[36] & 0xFF) - 20) * 1000;
+			values[12] = ((_buf[46] & 0xFF) - 20) * 1000;
 		}
 		values[13] = ((_buf[27] & 0xFF) + ((_buf[28] & 0x7F) << 8)) * 1000; //inverse event
 

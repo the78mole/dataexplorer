@@ -737,7 +737,6 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <label>label_temperature_sensor 1 GAM</label>
             </Measurement>
             <Measurement>
@@ -746,7 +745,6 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <property name="scale_sync_ref_ordinal" value="19" type="Integer"/>
                 <label>label_temperature_sensor 2 GAM</label>
             </Measurement>
@@ -1239,7 +1237,6 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <label>label_temperature_sensor 1 EAM</label>
             </Measurement>
             <Measurement>
@@ -1248,7 +1245,6 @@
                 <unit>°C</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="reduction" value="20.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <property name="scale_sync_ref_ordinal" value="25" type="Integer"/>
                 <label>label_temperature_sensor 2 EAM</label>
             </Measurement>

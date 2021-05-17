@@ -1029,7 +1029,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					this.points[27] = _buf3[8] * 100; 
 					this.points[28] = _buf3[9] * 10000000 + _buf4[0] * 100000 + _buf4[1] * 1000 + _buf4[2]*10;//HH:mm:ss.SSS
 					this.points[29] = ((_buf4[5]-48) * 1000000 + (_buf4[7]-48) * 10000 + (_buf4[6]-48) * 100) * 10;//yy-MM-dd
-					this.points[30] = (DataParser.parse2Short(_buf3, 6) -500) * 1000;
+					this.points[30] = (DataParser.parse2Short(_buf3, 6) - 500) * 1000; //TODO remove offset 500 after correction
 					this.points[31] = (_buf4[3] & 0xFF) * 1000;
 					//log.log(Level.OFF, StringHelper.byte2Hex2CharString(_buf4, _buf4.length));
 				}
@@ -1267,9 +1267,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				this.points[76] = ((this._buf3[1] & 0xFF) - 20) * 1000;
 				this.points[77] = ((this._buf3[2] & 0xFF) - 20) * 1000;
 				this.points[78] = DataParser.parse2Short(this._buf4, 4) * 1000;
-				this.points[79] = ((this._buf4[6] & 0xFF) * 60 + (this._buf4[7] & 0xFF)) * 1000; // motor time
-				this.points[80] = DataParser.parse2Short(this._buf4, 8) * 1000; // speed
-				this.points[81] = ((this._buf1[1] & 0xFF) + ((this._buf1[2] & 0x7F) << 8)) * 1000; // inverse event
+				this.points[79] = ((this._buf4[6] & 0xFF) * 60 + (this._buf4[7] & 0xFF)) * 1000; 	// motor time
+				this.points[80] = DataParser.parse2Short(this._buf4, 8) * 1000; 									// speed
+				this.points[81] = ((this._buf1[1] & 0xFF) + ((this._buf1[2] & 0x7F) << 8)) * 1000;// inverse event
 				++this.parseCount;
 				return true;
 			}
@@ -1411,7 +1411,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			this.tmpCurrent = DataParser.parse2Short(this._buf2, 1);
 			this.tmpCapacity = DataParser.parse2Short(this._buf1, 7);
 			this.tmpRevolution = DataParser.parse2Short(this._buf2, 5);
-			this.tmpTemperatureFet = this._buf1[9] - 20;
+			this.tmpTemperatureFet = (this._buf1[9] & 0xFF) - 20;
 			if (this.isChannelsChannel) {
 				// 102=VoltageM, 103=CurrentM, 104=CapacityM, 105=PowerM, 106=RevolutionM, 107=TemperatureM 1, 108=TemperatureM 2 109=Voltage_min, 110=Current_max,
 				// 111=Revolution_max, 112=Temperature1_max, 113=Temperature2_max 114=Event M
@@ -1429,12 +1429,12 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					this.points[106] = this.tmpRevolution * 1000;
 					this.points[107] = this.tmpTemperatureFet * 1000;
 
-					this.points[108] = (this._buf2[9] - 20) * 1000;
+					this.points[108] = ((this._buf2[9] & 0xFF) - 20) * 1000;
 					this.points[109] = DataParser.parse2Short(this._buf1, 5) * 1000;
 					this.points[110] = DataParser.parse2Short(this._buf2, 3) * 1000;
 					this.points[111] = DataParser.parse2Short(this._buf2, 7) * 1000;
-					this.points[112] = (this._buf2[0] - 20) * 1000;
-					this.points[113] = (this._buf3[0] - 20) * 1000;
+					this.points[112] = ((this._buf2[0] & 0xFF) - 20) * 1000;
+					this.points[113] = ((this._buf3[0] & 0xFF) - 20) * 1000;
 					this.points[114] = (this._buf1[1] & 0xFF) * 1000; // inverse event
 					return true;
 				}
@@ -1457,12 +1457,12 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					this.points[86] = this.tmpRevolution * 1000;
 					this.points[87] = this.tmpTemperatureFet * 1000;
 
-					this.points[88] = (this._buf2[9] - 20) * 1000;
+					this.points[88] = ((this._buf2[9] & 0xFF) - 20) * 1000;
 					this.points[89] = DataParser.parse2Short(this._buf1, 5) * 1000;
 					this.points[90] = DataParser.parse2Short(this._buf2, 3) * 1000;
 					this.points[91] = DataParser.parse2Short(this._buf2, 7) * 1000;
-					this.points[92] = (this._buf2[0] - 20) * 1000;
-					this.points[93] = (this._buf3[0] - 20) * 1000;
+					this.points[92] = ((this._buf2[0] & 0xFF) - 20) * 1000;
+					this.points[93] = ((this._buf3[0] & 0xFF) - 20) * 1000;
 					this.points[94] = (this._buf1[1] & 0xFF) * 1000; // inverse event
 					++this.parseCount;
 					return true;

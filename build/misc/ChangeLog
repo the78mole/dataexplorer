@@ -13,6 +13,7 @@ Device specific changes/fixes
 	* HoTTAdapter* - correct factor home direction, enable translation for HomeDirection
 	* HoTTAdapter* - refactor method updating GPS type dependent records
 	* HoTTAdapter* - update GPS type dependent records while loading from OSD
+	* HoTTAdapter* - harmonize temperature offset
 	* IGCAdapter - add missing unit in device XML
 
 Version 3.4.8 - 24 Apr 2021
