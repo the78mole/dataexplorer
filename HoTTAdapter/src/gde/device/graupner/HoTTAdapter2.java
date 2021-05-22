@@ -339,7 +339,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 							points[26] = 0;
 							points[27] = dataBuffer[41] * 100; //voltage GU
 							points[28] = dataBuffer[42] * 10000000 + dataBuffer[43] * 100000 + dataBuffer[44] * 1000 + dataBuffer[45]*10;//HH:mm:ss.SSS
-							points[29] = ((dataBuffer[48]-48) * 1000000 + (dataBuffer[49]-48) * 10000 + (dataBuffer[50]-48) * 100) * 10;//yy-dd-mm
+							points[29] = ((dataBuffer[48]-48) * 1000000 + (dataBuffer[50]-48) * 10000 + (dataBuffer[49]-48) * 100) * 10;//yy-dd-mm
 							points[30] = DataParser.parse2Short(dataBuffer, 39) * 1000;; //Altitude MSL
 							points[31] = (dataBuffer[46] & 0xFF) * 1000; //ENL
 							//three char
