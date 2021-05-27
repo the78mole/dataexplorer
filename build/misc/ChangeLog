@@ -5,6 +5,7 @@ Generic changes/fixes
 	* remove property enumeration value="tolerate_sign_change"
 	* add log output detecting possible corrupt file creating history
 	* codesign Mac OS X - add time stamp and identifier to dmg
+	* Schema update (V43) to reflect removed property as well as updated device XML
 	
 Device specific changes/fixes
 	* HoTTAdapter* - remove dependency to property using North/South hemisphere, as well as East/West of meridian
