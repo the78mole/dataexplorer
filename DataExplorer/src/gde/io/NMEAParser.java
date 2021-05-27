@@ -311,8 +311,9 @@ public class NMEAParser implements IDataParser {
 						if (this.channelConfigNumber == 2) {
 							//UL2 4:voltage, 5:current, 6:height, 7:climb, 8:power, 9:revolution, 11:capacity, 12:energy, 13:valueA1, 14:valueA2, 15:valueA3, 
 							//UL2 16:cellvoltage1, 17:cellvoltage2, 18:cellvoltage3, 19:cellvoltage4, 20:cellvoltage5, 21:cellvoltage6, 23:temperature intern
-							//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+							//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 							//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
+							//CH1-UniLog
 							//Unilog2 15=Voltage, 16=Current, 17=Capacity, 18=Power, 19=Energy, 20=CellBalance, 21=CellVoltage1, 21=CellVoltage2, 23=CellVoltage3, 
 							//Unilog2 24=CellVoltage4, 25=CellVoltage5, 26=CellVoltage6, 27=Revolution, 28=ValueA1, 29=ValueA2, 30=ValueA3, 31=InternTemperature
 							//M-LINK  32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
@@ -325,25 +326,35 @@ public class NMEAParser implements IDataParser {
 						if (this.channelConfigNumber == 2) {
 							//UL2 4:voltage, 5:current, 6:height, 7:climb, 8:power, 9:revolution, 11:capacity, 12:energy, 13:valueA1, 14:valueA2, 15:valueA3, 
 							//UL2 16:cellvoltage1, 17:cellvoltage2, 18:cellvoltage3, 19:cellvoltage4, 20:cellvoltage5, 21:cellvoltage6, 23:temperature intern
-							//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+							//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 							//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 							//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
+							//CH2-UniLog2
 							//Unilog2 	20=Voltage, 21=Current, 22=Capacity, 23=Power, 24=Energy, 25=CellBalance, 26=CellVoltage1, 27=CellVoltage2, 28=CellVoltage3, 
 							//Unilog2 	29=CellVoltage4, 30=CellVoltage5, 31=CellVoltage6, 32=Revolution, 33=ValueA1, 34=ValueA2, 35=ValueA3, 36=InternTemperature
 							//M-LINK  	37=valAdd00 38=valAdd01 39=valAdd02 40=valAdd03 41=valAdd04 42=valAdd05 43=valAdd06 44=valAdd07 45=valAdd08 46=valAdd09 47=valAdd10 48=valAdd11 49=valAdd12 50=valAdd13 51=valAdd14;
 							//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
-						  //int[] in2out = { -1,  -1,  -1,  -1,  15,  16,  -1,  -1,  18,  27,  -1,  17,  19,  28,  29,  30,  21,  22,  23,  24,  25,  26,  -1,  31,  -1,  -1};
-							int[] in2out = { -1,  -1,  -1,  -1,  20,  21,  -1,  -1,  23,  32,  -1,  22,  24,  33,  34,  35,  26,  27,  28,  29,  30,  31,  -1,  36,  -1,  -1};
+							//int[] in2out = { -1,  -1,  -1,  -1,  20,  21,  -1,  -1,  23,  32,  -1,  22,  24,  33,  34,  35,  26,  27,  28,  29,  30,  31,  -1,  36,  -1,  -1};
+							//begin FW1.26
+							//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+							//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+							//SMGPS2 17=AccelerationX 18=AccelerationY 19=AccelerationZ 20=ENL 21=Impulse 22=AirSpeed 23=pressure static 24=pressure TEK 25=climb TEK
+							//CH2-UniLog2
+							//Unilog2 26=voltage_UL 27=current_UL2 28=capacity_UL2 29=power_UL2 30=energy_UL2 31=balance_UL 32=cellVoltage1 33=cellVolt2_ul 34=cellVolltage3_UL 35=cellVoltage4_UL 36=cellVoltage5_UL 37=cellVoltage6_UL 38=revolution_UL 39=a1_UL 40=a2_UL 41=a3_UL 42=temp_UL;
+							//M-LINK 43=valAdd00 44=valAdd01 45=valAdd02 46=valAdd03 47=valAdd04 48=valAdd05 49=valAdd06 50=valAdd07 51=valAdd08 52=valAdd09 53=valAdd10 54=valAdd11 55=valAdd12 56=valAdd13 57=valAdd14;
+							//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
+						//int[] in2out = { -1,  -1,  -1,  -1,  20,  21,  -1,  -1,  23,  32,  -1,  22,  24,  33,  34,  35,  26,  27,  28,  29,  30,  31,  -1,  36,  -1,  -1};
+							int[] in2out = { -1,  -1,  -1,  -1,  26,  27,  -1,  -1,  29,  38,  -1,  28,  30,  39,  40,  41,  32,  33,  34,  35,  36,  37,  -1,  42,  -1,  -1};
 							if (log.isLoggable(Level.FINE)) 
 								log.log(Level.FINE, String.format("isNmeaSentenceTime = %b", this.isNmeaSentenceTime));
-							parseUNILOG2(strValues, in2out, 25, !this.isNmeaSentenceTime);								
+							parseUNILOG2(strValues, in2out, 31, !this.isNmeaSentenceTime);								
 						}
 					}
 				}
 				break;
 			case SETUP1:// setup Multiplex FlightRecorder - time and addresses
 				//$SETUP1;Time;;; A:02;;;;;;; A:09; A:10; A:11;
-				//GPGGA	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
+				//GPGGA	0=latitude 1=longitude 2=altitudeGPS 3=numSatelites
 				for (int i = 4, j = 2; i < this.device.getNumberOfMeasurements(channelConfigNumber); i++, j++) {
 					if (j < strValues.length && strValues[j].trim().length() > 0) {
 						String name = strValues[j].trim();//$NON-NLS-1$
@@ -356,7 +367,7 @@ public class NMEAParser implements IDataParser {
 				break;
 			case SETUP2:// setup Multiplex FlightRecorder
 				//$SETUP2;sec ;;;   °C;;;;;;; km/h;    m;    m;
-				//GPGGA	0=latitude 1=longitude 2=altitudeAbs 3=numSatelites
+				//GPGGA	0=latitude 1=longitude 2=altitudeGPS 3=numSatelites
 				for (int i = 4, j = 2; i < this.device.getNumberOfMeasurements(channelConfigNumber); i++, j++) {
 					if (j < strValues.length &&  strValues[j].trim().length() > 0) {
 						String unit = strValues[j].trim();
@@ -517,7 +528,7 @@ public class NMEAParser implements IDataParser {
 				//GPS 
 				this.values[0] = latitude;
 				this.values[1] = longitude;
-				//this.values[2]  = altitudeAbs;
+				//this.values[2]  = altitudeGPS;
 				//this.values[3]  = numSatelites;
 				//this.values[4]  = PDOP (dilution of precision) 
 				//this.values[5]  = HDOP (horizontal dilution of precision) 
@@ -582,7 +593,7 @@ public class NMEAParser implements IDataParser {
 				log.log(Level.FINE, "GGA " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
 			
 
-			int latitude, longitude, numSatelites, altitudeAbs;
+			int latitude, longitude, numSatelites, altitudeGPS;
 			if (this.lastTimeStamp == timeStamp) { // validate sentence  depends to same sentence set
 				try {
 					if (this.values[0] == 0) {
@@ -613,10 +624,10 @@ public class NMEAParser implements IDataParser {
 					numSatelites = this.values[3];
 				}
 				try {
-					altitudeAbs = (int) (Double.parseDouble(strValues[9].trim()) * 1000.0);
+					altitudeGPS = (int) (Double.parseDouble(strValues[9].trim()) * 1000.0);
 				}
 				catch (Exception e) {
-					altitudeAbs = this.values[2];
+					altitudeGPS = this.values[2];
 				}
 			}
 			else {
@@ -641,17 +652,17 @@ public class NMEAParser implements IDataParser {
 					numSatelites = this.values[3];
 				}
 				try {
-					altitudeAbs = (int) (Double.parseDouble(strValues[9].trim()) * 1000.0);
+					altitudeGPS = (int) (Double.parseDouble(strValues[9].trim()) * 1000.0);
 				}
 				catch (Exception e) {
-					altitudeAbs = this.values[2];
+					altitudeGPS = this.values[2];
 				}
 			}
 
 			//GPS 
 			this.values[0] = latitude;
 			this.values[1] = longitude;
-			this.values[2] = altitudeAbs;
+			this.values[2] = altitudeGPS;
 			this.values[3] = numSatelites;
 			//this.values[4]  = PDOP (dilution of precision) 
 			//this.values[5]  = HDOP (horizontal dilution of precision) 
@@ -659,7 +670,7 @@ public class NMEAParser implements IDataParser {
 			//this.values[7]  = velocity;
 			//this.values[8]  = magneticVariation; // SM GPS-Logger -> altitudeRel;
 			if (log.isLoggable(Level.FINE))
-				log.log(Level.FINE, String.format("lat %9.6f, long %9.6f, alt %d, sats %d", latitude/1000000., longitude/1000000., altitudeAbs/10000, numSatelites/1000));
+				log.log(Level.FINE, String.format("lat %9.6f, long %9.6f, alt %d, sats %d", latitude/1000000., longitude/1000000., altitudeGPS/10000, numSatelites/1000));
 		}
 	}
 
@@ -707,7 +718,7 @@ public class NMEAParser implements IDataParser {
 			//GPS 
 			//this.values[0]  = latitude;
 			//this.values[1]  = longitude;
-			//this.values[2]  = altitudeAbs;
+			//this.values[2]  = altitudeGPS;
 			//this.values[3]  = numSatelites;
 			this.values[4] = PDOP; // (dilution of precision) 
 			this.values[5] = HDOP; // (horizontal dilution of precision) 
@@ -783,7 +794,7 @@ public class NMEAParser implements IDataParser {
 			//GPS 
 			//this.values[0]  = latitude;
 			//this.values[1]  = longitude;
-			//this.values[2]  = altitudeAbs;
+			//this.values[2]  = altitudeGPS;
 			//this.values[3]  = numSatelites;
 			//this.values[4] = PDOP; // (dilution of precision) 
 			//this.values[5] = HDOP; // (horizontal dilution of precision) 
@@ -796,7 +807,7 @@ public class NMEAParser implements IDataParser {
 			//this.values[11] = distanceTotal;
 			//this.values[12] = distanceStart;
 			//this.values[13] = directionStart;
-			//this.values[14] = direction/azimuth;
+			//this.values[14] = direction/azimuth/track;
 		}
 	}
 
@@ -831,7 +842,7 @@ public class NMEAParser implements IDataParser {
 			//GPS 
 			//this.values[0]  = latitude;
 			//this.values[1]  = longitude;
-			//this.values[2]  = altitudeAbs;
+			//this.values[2]  = altitudeGPS;
 			//this.values[3]  = numSatelites;
 			//this.values[4]  = PDOP (dilution of precision) 
 			//this.values[5]  = HDOP (horizontal dilution of precision) 
@@ -914,13 +925,13 @@ public class NMEAParser implements IDataParser {
 				//GPS 
 				this.values[0] = latitude;
 				this.values[1] = longitude;
-				//this.values[2]  = altitudeAbs;
-				//this.values[3]  = numSatelites;
+				//this.values[2] = altitudeGPS;
+				//this.values[3] = numSatelites;
 				//this.values[4] = PDOP; // (dilution of precision) 
 				//this.values[5] = HDOP; // (horizontal dilution of precision) 
 				//this.values[6] = VDOP; // (vertical dilution of precision)
-				//this.values[7]  = velocity;
-				//this.values[8]  = magneticVariation; // SM GPS-Logger -> altitudeRel;
+				//this.values[7] = velocity;
+				//this.values[8] = magneticVariation; // SM GPS-Logger -> altitudeRel;
 			}
 		}
 	}
@@ -1008,7 +1019,7 @@ public class NMEAParser implements IDataParser {
 			//GPS 
 			//this.values[0]  = latitude;
 			//this.values[1]  = longitude;
-			//this.values[2]  = altitudeAbs;
+			//this.values[2]  = altitudeGPS;
 			//this.values[3]  = numSatelites;
 			//this.values[4] = PDOP; // (dilution of precision) 
 			//this.values[5] = HDOP; // (horizontal dilution of precision) 
@@ -1027,25 +1038,37 @@ public class NMEAParser implements IDataParser {
 	 * 4: Strecke (gesamt zurückgelegt)
 	 * 5: Entfernung vom Startpunkt Luftlinie
 	 * 6: Richtung vom Startpunkt
+	 * 7: Gleitzahl, in der Form „1:xx (yy.y km/h)“, dabei ist 1:xx die Gleitzahl, kein gültiger Wert ist „1:--“
+	 * 8: SpeedGleitzahl, in der Form „1:xx (yy.y km/h)“
 	 * @param strValues
 	 */
 	void parseSMGPS(String[] strValues) {
-		//final String STRING_GLIDE_RATIO_UNIT = "m/1"; //$NON-NLS-1$
-		for (int i = 0; i < strValues.length && i < 6; i++) {
+		for (int i = 0; i < strValues.length - 1 && i < 7; i++) {
 			try {
 				String[] tmpValues = strValues[i + 1].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
-				//if (i != 6) {
+				if (i != 6) {
 					this.values[8 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
 					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().startsWith(tmpValues[1].substring(0, 1))) {
 						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
 					}
-				//}
-				//else {
-				//	this.values[8 + i] = (int) (Double.parseDouble(tmpValues[1]) * 1000.0);
-				//	if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().equals(STRING_GLIDE_RATIO_UNIT)) {
-				//		this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(STRING_GLIDE_RATIO_UNIT);
-				//	}
-				//}
+				}
+				else {
+					tmpValues = strValues[i + 1].replace("  ", " ").trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
+					if (!tmpValues[1].startsWith("-")) {
+						this.values[8 + i + 1] = (int) (Double.parseDouble(tmpValues[1]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i + 1).getUnit().equals("m/1")) {
+							this.device.getMeasurement(this.channelConfigNumber, 8 + i + 1).setUnit("m/1");
+						}
+						this.values[8 + i + 2] = (int) (Double.parseDouble(tmpValues[3]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i + 2).getUnit().equals("km/h")) {
+							this.device.getMeasurement(this.channelConfigNumber, 8 + i + 2).setUnit("km/h");
+						} 
+					}
+					else {
+						this.values[8 + i + 1] = 0;
+						this.values[8 + i + 2] = 0;
+					}
+				}
 			}
 			catch (Exception e) {
 				// ignore and leave value unchanged
@@ -1055,20 +1078,22 @@ public class NMEAParser implements IDataParser {
 		//GPS 
 		//this.values[0]  = latitude;
 		//this.values[1]  = longitude;
-		//this.values[2]  = altitudeAbs;
+		//this.values[2]  = altitudeGPS;
 		//this.values[3]  = numSatelites;
 		//this.values[4]  = PDOP (dilution of precision) 
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
 		//this.values[6]  = VDOP (vertical dilution of precision)		
 		//this.values[7]  = velocity;
 		//SMGPS
-		//this.values[8]  = altitudeRel;
-		//this.values[9]  = climb;
+		//this.values[8] = altitudeRel;
+		//this.values[9] = climb;
 		//this.values[10] = voltageRx;
 		//this.values[11] = distanceTotal;
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
-		//this.values[14] = direction;
+		//this.values[14] = trackAngle;
+		//this.values[15] = glideRatio;
+		//this.values[16] = speedGlideRatio;
 	}
 
 	/**
@@ -1078,14 +1103,21 @@ public class NMEAParser implements IDataParser {
 	 * 2: Acceleration Y
 	 * 3: Acceleration Z
 	 * 4: ENL
-	 * 4: Impulse
+	 * 5: Impulse
+	 * 6: Airspeed in [km/h]
+	 * 7: statischer Luftdruck in [hPa]
+	 * 8: Luftdruck TEK in [hPa]
+	 * 9: Vario TEK in [m/s]
 	 * @param strValues
 	 */
 	void parseSMGPS2(String[] strValues) {
-		for (int i = 0; i < strValues.length && i < 5; i++) {
+		for (int i = 0; i < strValues.length - 1 && i < 9; i++) {
 			try {
 				String[] tmpValues = strValues[i + 1].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
-					this.values[15 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
+					this.values[17 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
+					if (!this.device.getMeasurement(this.channelConfigNumber, 17 + i).getUnit().startsWith(tmpValues[1].substring(0, 1))) {
+						this.device.getMeasurement(this.channelConfigNumber, 17 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
+					}
 			}
 			catch (Exception e) {
 				// ignore and leave value unchanged
@@ -1095,26 +1127,32 @@ public class NMEAParser implements IDataParser {
 		//GPS 
 		//this.values[0]  = latitude;
 		//this.values[1]  = longitude;
-		//this.values[2]  = altitudeAbs;
+		//this.values[2]  = altitudeGPS;
 		//this.values[3]  = numSatelites;
 		//this.values[4]  = PDOP (dilution of precision) 
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
 		//this.values[6]  = VDOP (vertical dilution of precision)		
 		//this.values[7]  = velocity;
 		//SMGPS
-		//this.values[8]  = altitudeRel;
-		//this.values[9]  = climb;
+		//this.values[8] = altitudeRel;
+		//this.values[9] = climb;
 		//this.values[10] = voltageRx;
 		//this.values[11] = distanceTotal;
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
-		//this.values[14] = direction;
+		//this.values[14] = trackAngle;
+		//this.values[15] = glideRatio;
+		//this.values[16] = speedGlideRatio;
 		//SMGPS2
-		//this.values[15]  = acceleration x;
-		//this.values[16]  = acceleration y;
-		//this.values[17] = acceleration z;
-		//this.values[18] = noise level;
-		//this.values[19] = Impulse;
+		//this.values[17] = acceleration x;
+		//this.values[18] = acceleration y;
+		//this.values[19] = acceleration z;
+		//this.values[20] = noise level;
+		//this.values[21] = Impulse;
+		//this.values[22] = Airspeed [km/h];
+		//this.values[23] = static Airpressure [hPa];
+		//this.values[24] = Airpressure TEK [hPa];
+		//this.values[25] = Vario TEK [m/s];
 	}
 
 	/**
@@ -1134,7 +1172,7 @@ public class NMEAParser implements IDataParser {
 	void parseUNILOG(String[] strValues) {
 		if (this.deviceName.equals("GPS-Logger")) {
 			if (this.channelConfigNumber == 1) {
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//Unilog 	15=Voltage, 16=Current, 17=Power, 18=Revolution, 19=VoltageRx, 20=Altitude, 21=ValueA1, 22=ValueA2, 23=ValueA3
 				//M-LINK    24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
@@ -1154,17 +1192,25 @@ public class NMEAParser implements IDataParser {
 		}
 		else if (this.deviceName.equals("GPS-Logger2") || this.deviceName.equals("GPS-Logger3")) {
 			if (this.channelConfigNumber == 1) {
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
+				//CH1-UniLog
 				//Unilog 	20=Voltage, 21=Current, 22=Power, 32=Revolution, 24=VoltageRx, 25=Altitude, 26=ValueA1, 27=ValueA2, 28=ValueA3
-				//M-LINK    29=valAdd00 30=valAdd01 31=valAdd02 32=valAdd03 33=valAdd04 34=valAdd05 35=valAdd06 36=valAdd07 37=valAdd08 38=valAdd09 39=valAdd10 40=valAdd11 41=valAdd12 42=valAdd13 43=valAdd14;
+				//M-LINK  29=valAdd00 30=valAdd01 31=valAdd02 32=valAdd03 33=valAdd04 34=valAdd05 35=valAdd06 36=valAdd07 37=valAdd08 38=valAdd09 39=valAdd10 40=valAdd11 41=valAdd12 42=valAdd13 43=valAdd14;
+				//begin FW1.26
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+				//SMGPS2 17=AccelerationX 18=AccelerationY 19=AccelerationZ 20=ENL 21=Impulse 22=AirSpeed 23=pressure static 24=pressure TEK 25=climb TEK
+				//CH1-UniLog
+				//Unilog 26=voltage_UL 27=current_UL 28=power_UL 29=revolution_UL 30=voltageRx_UL 31=altitude_UL 32=a1_UL 33=a2_UL 34=a3_UL;
+				//M-LINK 35=valAdd00 36=valAdd01 37=valAdd02 38=valAdd03 39=valAdd04 40=valAdd05 41=valAdd06 42=valAdd07 43=valAdd08 44=valAdd09 45=valAdd10 46=valAdd11 47=valAdd12 48=valAdd13 49=valAdd14;
 				for (int i = 0; i < strValues.length && i < 9; i++) {
 					try {
 						String[] tmpValues = strValues[i + 1].trim().split(GDE.STRING_BLANK);
-						this.values[20 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
-						if (!this.device.getMeasurement(this.channelConfigNumber, 20 + i).getUnit().equals(tmpValues[1])) {
-							this.device.getMeasurement(this.channelConfigNumber, 20 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
+						this.values[26 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 26 + i).getUnit().equals(tmpValues[1])) {
+							this.device.getMeasurement(this.channelConfigNumber, 26 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
 						}
 					}
 					catch (Exception e) {
@@ -1177,7 +1223,7 @@ public class NMEAParser implements IDataParser {
 		//GPS 
 		//this.values[0]  = latitude;
 		//this.values[1]  = longitude;
-		//this.values[2]  = altitudeAbs;
+		//this.values[2]  = altitudeGPS;
 		//this.values[3]  = numSatelites;
 		//this.values[4]  = PDOP (dilution of precision) 
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
@@ -1190,7 +1236,7 @@ public class NMEAParser implements IDataParser {
 		//this.values[11] = distanceTotal;
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
-		//this.values[14] = direction;
+		//this.values[14] = trackAngle;
 		//Unilog
 		//this.values[15] = voltageUniLog;
 		//this.values[16] = currentUniLog;
@@ -1316,7 +1362,7 @@ public class NMEAParser implements IDataParser {
 		//GPS 
 		//this.values[0]  = latitude;
 		//this.values[1]  = longitude;
-		//this.values[2]  = altitudeAbs;
+		//this.values[2]  = altitudeGPS;
 		//this.values[3]  = numSatelites;
 		//this.values[4]  = PDOP (dilution of precision) 
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
@@ -1329,7 +1375,7 @@ public class NMEAParser implements IDataParser {
 		//this.values[11] = distanceTotal;
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
-		//this.values[14] = direction;
+		//this.values[14] = trackAngle;
 		//Unilog
 		//this.values[15] = voltageUniLog;
 		//this.values[16] = currentUniLog;
@@ -1373,7 +1419,7 @@ public class NMEAParser implements IDataParser {
 	 * @param strValues
 	 * @param inOutMapping
 	 * @param indexBalance
-	 * @param checkTime true will check if actual sentence has newer time tha the one worked with before
+	 * @param checkTime true will check if actual sentence has newer time compared to the one worked with before
 	 */
 	void parseUNILOG2(String[] strValues, int[] inOutMapping, int indexBalance, boolean checkTime) {
 		if (checkTime) {
@@ -1420,6 +1466,7 @@ public class NMEAParser implements IDataParser {
 		//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
 		//UniLog2      { -1,  -1,  -1,  -1, 	1, 		2, 15,  16,   4,  13,   0,   3,   5,  18,  19,  20,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
 		//GPS-Logger   { -1,  -1,  -1,  -1,  15,  16,  -1,  -1,  18,  27,  -1,  17,  19,  28,  29,  30,  21,  22,  23,  24,  25,  26,  -1,  31,  -1,  -1};
+		//GPS-Logger2/3{ -1,  -1,  -1,  -1,  26,  27,  -1,  -1,  29,  38,  -1,  28,  30,  39,  40,  41,  32,  33,  34,  35,  36,  37,  -1,  42,  -1,  -1};
 		for (int i = 4; i < strValues.length; i++) {
 			try {
 				if (inOutMapping[i] >= 0) {
@@ -1455,7 +1502,7 @@ public class NMEAParser implements IDataParser {
 	void parseMLINK(String[] strValues) {
 		if (this.deviceName.equals("GPS-Logger")) {
 			if (this.channelConfigNumber == 1) { //UniLog
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//Unilog 	15=Voltage, 16=Current, 17=Power, 18=Revolution, 19=VoltageRx, 20=Altitude, 21=ValueA1, 22=ValueA2, 23=ValueA3
 				//M-LINK  24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
@@ -1474,7 +1521,7 @@ public class NMEAParser implements IDataParser {
 				}
 			}
 			if (this.channelConfigNumber == 2) { //UniLog2
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//Unilog2 15=Voltage, 16=Current, 17=Capacity, 18=Power, 19=Energy, 20=CellBalance, 21=CellVoltage1, 21=CellVoltage2, 23=CellVoltage3, 
 				//Unilog2 24=CellVoltage4, 25=CellVoltage5, 26=CellVoltage6, 27=Revolution, 28=ValueA1, 29=ValueA2, 30=ValueA3, 31=InternTemperature
@@ -1496,18 +1543,26 @@ public class NMEAParser implements IDataParser {
 		}
 		else if (this.deviceName.equals("GPS-Logger2") || this.deviceName.equals("GPS-Logger3")) {
 			if (this.channelConfigNumber == 1) { //UniLog
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
 				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
+				//CH1-UniLog
 				//Unilog 	20=Voltage, 21=Current, 22=Power, 32=Revolution, 24=VoltageRx, 25=Altitude, 26=ValueA1, 27=ValueA2, 28=ValueA3
 				//M-LINK  29=valAdd00 30=valAdd01 31=valAdd02 32=valAdd03 33=valAdd04 34=valAdd05 35=valAdd06 36=valAdd07 37=valAdd08 38=valAdd09 39=valAdd10 40=valAdd11 41=valAdd12 42=valAdd13 43=valAdd14;
+				//begin FW1.26
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+				//SMGPS2 17=AccelerationX 18=AccelerationY 19=AccelerationZ 20=ENL 21=Impulse 22=AirSpeed 23=pressure static 24=pressure TEK 25=climb TEK
+				//CH1-UniLog
+				//Unilog 26=voltage_UL 27=current_UL 28=power_UL 29=revolution_UL 30=voltageRx_UL 31=altitude_UL 32=a1_UL 33=a2_UL 34=a3_UL;
+				//M-LINK 35=valAdd00 36=valAdd01 37=valAdd02 38=valAdd03 39=valAdd04 40=valAdd05 41=valAdd06 42=valAdd07 43=valAdd08 44=valAdd09 45=valAdd10 46=valAdd11 47=valAdd12 48=valAdd13 49=valAdd14;
 				for (int i = 1; i < strValues.length && i <= 15; i++) {
 					try {
 						String[] tmpValues = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
 						int address = Integer.parseInt(tmpValues[0]);
-						this.values[29 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
-						if (!this.device.getMeasurement(this.channelConfigNumber, 29 + address).getUnit().equals(tmpValues[3])) {
-							this.device.getMeasurement(this.channelConfigNumber, 29 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.CHAR_STAR)) : tmpValues[3]);
+						this.values[35 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 35 + address).getUnit().equals(tmpValues[3])) {
+							this.device.getMeasurement(this.channelConfigNumber, 35 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.CHAR_STAR)) : tmpValues[3]);
 						}
 					}
 					catch (Exception e) {
@@ -1516,19 +1571,27 @@ public class NMEAParser implements IDataParser {
 				}
 			}
 			if (this.channelConfigNumber == 2) { //UniLog2
-				//GPS 		0=latitude 1=longitude 2=altitudeAbs 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
-				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=direction;
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=trackAngle;
 				//SMGPS2 	15=AccelerationX 16=AccelerationY 17=AccelerationZ 18=ENL 19=Impuls
+				//CH2-UniLog2
 				//Unilog2 	20=Voltage, 21=Current, 22=Capacity, 23=Power, 24=Energy, 25=CellBalance, 26=CellVoltage1, 27=CellVoltage2, 28=CellVoltage3, 
 				//Unilog2 	29=CellVoltage4, 30=CellVoltage5, 31=CellVoltage6, 32=Revolution, 33=ValueA1, 34=ValueA2, 35=ValueA3, 36=InternTemperature
 				//M-LINK  	37=valAdd00 38=valAdd01 39=valAdd02 40=valAdd03 41=valAdd04 42=valAdd05 43=valAdd06 44=valAdd07 45=valAdd08 46=valAdd09 47=valAdd10 48=valAdd11 49=valAdd12 50=valAdd13 51=valAdd14;
+				//begin FW1.26
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+				//SMGPS2 17=AccelerationX 18=AccelerationY 19=AccelerationZ 20=ENL 21=Impulse 22=AirSpeed 23=pressure static 24=pressure TEK 25=climb TEK
+				//CH2-UniLog2
+				//Unilog2 26=voltage_UL 27=current_UL2 28=capacity_UL2 29=power_UL2 30=energy_UL2 31=balance_UL 32=cellVoltage1 33=cellVolt2_ul 34=cellVolltage3_UL 35=cellVoltage4_UL 36=cellVoltage5_UL 37=cellVoltage6_UL 38=revolution_UL 39=a1_UL 40=a2_UL 41=a3_UL 42=temp_UL;
+				//M-LINK 43=valAdd00 44=valAdd01 45=valAdd02 46=valAdd03 47=valAdd04 48=valAdd05 49=valAdd06 50=valAdd07 51=valAdd08 52=valAdd09 53=valAdd10 54=valAdd11 55=valAdd12 56=valAdd13 57=valAdd14;
 				for (int i = 1; i < strValues.length && i <= 15; i++) {
 					try {
 						String[] tmpValues = strValues[i].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
 						int address = Integer.parseInt(tmpValues[0]);
-						this.values[37 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
-						if (!this.device.getMeasurement(this.channelConfigNumber, 37 + address).getUnit().equals(tmpValues[3])) {
-							this.device.getMeasurement(this.channelConfigNumber, 37 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.CHAR_STAR)) : tmpValues[3]);
+						this.values[43 + address] = (int) (Double.parseDouble(tmpValues[2]) * 1000.0);
+						if (!this.device.getMeasurement(this.channelConfigNumber, 43 + address).getUnit().equals(tmpValues[3])) {
+							this.device.getMeasurement(this.channelConfigNumber, 43 + address).setUnit(tmpValues[3].contains(GDE.STRING_STAR) ? tmpValues[3].substring(0, tmpValues[3].indexOf(GDE.CHAR_STAR)) : tmpValues[3]);
 						}
 					}
 					catch (Exception e) {
@@ -1559,7 +1622,7 @@ public class NMEAParser implements IDataParser {
 		//GPS 
 		//this.values[0]  = latitude;
 		//this.values[1]  = longitude;
-		//this.values[2]  = altitudeAbs;
+		//this.values[2]  = altitudeGPS;
 		//this.values[3]  = numSatelites;
 		//this.values[4]  = PDOP (dilution of precision) 
 		//this.values[5]  = HDOP (horizontal dilution of precision) 
@@ -1572,7 +1635,7 @@ public class NMEAParser implements IDataParser {
 		//this.values[11] = distanceTotal;
 		//this.values[12] = distanceStart;
 		//this.values[13] = directionStart;
-		//this.values[14] = direction;
+		//this.values[14] = trackAngle;
 		//Unilog
 		//this.values[15] = voltageUniLog;
 		//this.values[16] = currentUniLog;

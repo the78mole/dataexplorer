@@ -480,7 +480,7 @@
 <entry key="42_isRoundOut">false</entry>
 <entry key="19_defMinValue">0.0</entry>
 <entry key="3_isStartpointZero">false</entry>
-<entry key="10_isStartEndDefined">true</entry>
+<entry key="10_isStartEndDefined">false</entry>
 <entry key="10_defMinValue">4.5</entry>
 <entry key="14_color">128,64,0</entry>
 <entry key="30_isPositionLeft">true</entry>

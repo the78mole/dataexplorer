@@ -151,7 +151,12 @@ public class TestOsdReaderWriter extends TestSuperClass {
 								fileDeviceName = this.legacyDeviceNames.get(fileDeviceName);
 							if (fileDeviceName.toLowerCase().contains("hottviewer") || fileDeviceName.toLowerCase().contains("mpu") || fileDeviceName.contains("HoTTAdapter3") || fileDeviceName.contains("HoTTAdapterD"))
 								continue;
+							
+							fileDeviceName = fileDeviceName.contains("(") ? fileDeviceName.split(" ")[0] : fileDeviceName; //(GPS-Logger (UL)
 							DeviceConfiguration deviceConfig = this.deviceConfigurations.get(fileDeviceName);
+							if (deviceConfig == null) 
+								continue;
+							
 							IDevice device = this.getInstanceOfDevice(deviceConfig);
 							this.analyzer.setActiveDevice(device);
 							System.out.println(fileDeviceName + ": working with : " + file);
