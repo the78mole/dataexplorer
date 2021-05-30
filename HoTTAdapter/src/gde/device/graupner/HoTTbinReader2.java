@@ -216,10 +216,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 									HoTTbinReader2.gpsBinParser.parse();
 									
 									if (!isGPSdetected) {
-										if (!isReasonableData(buf4) || tmpRecordSet.get(28).size() == 0)
-											break;
-										HoTTAdapter2.updateGpsTypeDependent((buf4[9] & 0xFF), device, tmpRecordSet, tmpRecordSet.getRecordDataSize(true));
-										isGPSdetected = true;
+										if (isReasonableData(buf4) && HoTTbinReader2.recordSet.get(28).size() > 0 && HoTTbinReader2.recordSet.get(28).get(HoTTbinReader2.recordSet.get(28).size()-1) != 0) {
+											HoTTAdapter2.updateGpsTypeDependent((buf4[9] & 0xFF), device, HoTTbinReader2.recordSet, HoTTbinReader2.recordSet.getRecordDataSize(true));
+											isGPSdetected = true;
+										}
 									}
 									
 									bufCopier.clearBuffers();
@@ -518,10 +518,10 @@ public class HoTTbinReader2 extends HoTTbinReader {
 										migrationJobs.add(Sensor.GPS);
 										
 										if (!isGPSdetected) {
-											if (!isReasonableData(buf4) || tmpRecordSet.get(28).size() == 0 || tmpRecordSet.get(28).get(tmpRecordSet.get(28).size()-1) == 0)
-												break;
-											HoTTAdapter2.updateGpsTypeDependent((buf4[9] & 0xFF), device, tmpRecordSet, i-1);
-											isGPSdetected = true;
+											if (isReasonableData(buf4) && HoTTbinReader2.recordSet.get(28).size() > 0 && HoTTbinReader2.recordSet.get(28).get(HoTTbinReader2.recordSet.get(28).size()-1) != 0) {
+												HoTTAdapter2.updateGpsTypeDependent((buf4[9] & 0xFF), device, HoTTbinReader2.recordSet, i-1);
+												isGPSdetected = true;
+											}
 										}
 									}
 									break;

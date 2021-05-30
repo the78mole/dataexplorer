@@ -210,7 +210,7 @@ public class HoTTlogReader extends HoTTbinReader {
 								parseGPS(HoTTbinReader.buf, HoTTbinReader.pointsGPS, false);
 								HoTTbinReader.recordSetGPS.addPoints(HoTTbinReader.pointsGPS, HoTTbinReader.timeStep_ms);
 								if (!isGPSdetected) {
-									startTimeStamp_ms = HoTTAdapter.updateGpsTypeDependent((HoTTbinReader.buf[65] & 0xFF), device, tmpRecordSet, startTimeStamp_ms);
+									startTimeStamp_ms = HoTTAdapter.updateGpsTypeDependent((HoTTbinReader.buf[65] & 0xFF), device, HoTTbinReader.recordSetGPS, startTimeStamp_ms);
 									isGPSdetected = true;								
 								}
 								break;

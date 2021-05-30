@@ -187,7 +187,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 							isReceiverData = false;
 						}
 						if (isGPSData && !isGPSdetected) {
-							HoTTAdapter2.updateGpsTypeDependent((HoTTbinReader.buf[65] & 0xFF), device, tmpRecordSet, 0);
+							HoTTAdapter2.updateGpsTypeDependent((HoTTbinReader.buf[65] & 0xFF), device, HoTTlogReader2.recordSet, 0);
 							isGPSdetected = true;					
 						}
 						break;

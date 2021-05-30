@@ -842,15 +842,15 @@ public class HoTTbinReader {
 									}
 									// recordSetGPS initialized and ready to add data
 									bufCopier.copyToFreeBuffer();
-									if (bufCopier.is3BuffersFull()) {
+									if (bufCopier.is4BuffersFull()) {
 										parseAddGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 										bufCopier.clearBuffers();
 									}
 									if (!isGPSdetected) {
-										if (!isReasonableData(buf4) || tmpRecordSet.get(19).size() == 0)
-											continue;
-										startTimeStamp_ms = HoTTAdapter.updateGpsTypeDependent((HoTTbinReader.buf4[9] & 0xFF), device, tmpRecordSet, startTimeStamp_ms);
-										isGPSdetected = true;
+										if (isReasonableData(buf4) && HoTTbinReader.recordSetGPS.get(19).size() > 0 && HoTTbinReader.recordSetGPS.get(19).get(HoTTbinReader.recordSetGPS.get(19).size()-1) != 0) {
+											startTimeStamp_ms = HoTTAdapter.updateGpsTypeDependent((HoTTbinReader.buf4[9] & 0xFF), device, HoTTbinReader.recordSetGPS, startTimeStamp_ms);
+											isGPSdetected = true;
+										}
 									}
 								}
 								break;
@@ -1229,10 +1229,10 @@ public class HoTTbinReader {
 										parseAddGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 
 										if (!isGPSdetected) {
-											if (!isReasonableData(buf4) || tmpRecordSet.get(19).size() == 0)
-												continue;
-											startTimeStamp_ms = HoTTAdapter.updateGpsTypeDependent((HoTTbinReader.buf4[9] & 0xFF), device, tmpRecordSet, startTimeStamp_ms);
-											isGPSdetected = true;
+											if (isReasonableData(buf4) && HoTTbinReader.recordSetGPS.get(19).size() > 0 && HoTTbinReader.recordSetGPS.get(19).get(HoTTbinReader.recordSetGPS.get(19).size()-1) != 0) {
+												startTimeStamp_ms = HoTTAdapter.updateGpsTypeDependent((HoTTbinReader.buf4[9] & 0xFF), device, HoTTbinReader.recordSetGPS, startTimeStamp_ms);
+												isGPSdetected = true;
+											}
 										}
 									}
 									break;
