@@ -65,9 +65,9 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 	Composite								fillerComposite, addonComposite;
 
 	Group										gpsLoggerGroup;
-	CLabel									serialNumberLabel,firmwareLabel,dataRatecLabel,startModusLabel,stopModusLabel,timeZoneLabel,timeAutoLabel,varioLimitClimbLabel,varioLimitSinkLabel,varioTonLabel,timeZoneUnitLabel,varioLimitUnitLabel,modusIgcLabel,modusDistanceLabel,telemetryTypeLabel,varioFactorLabel,varioFilterLabel,minMaxRxLabel;
+	CLabel									serialNumberLabel,firmwareLabel,languageLabel,dataRateLabel,startModusLabel,stopModusLabel,timeZoneLabel,timeAutoLabel,varioLimitClimbLabel,varioLimitSinkLabel,varioTonLabel,timeZoneUnitLabel,varioLimitUnitLabel,smoothAltitudeLabel,modusIgcLabel,modusDistanceLabel,telemetryTypeLabel,varioFactorLabel,varioFilterLabel,minMaxRxLabel;
 	Text										serialNumberText, firmwareText;
-	CCombo									dataRateCombo, startModusCombo, stopModusCombo, timeZoneCombo, timeAutoCombo, varioLimitClimbCombo, varioLimitSinkCombo, varioToneCombo, modusIgcCombo, modusDistanceCombo, telemetryTypeCombo, varioFactorCombo, varioFilterCombo, minMaxRxCombo;
+	CCombo									languageCombo, dataRateCombo, startModusCombo, stopModusCombo, timeZoneCombo, timeAutoCombo, varioLimitClimbCombo, varioLimitSinkCombo, varioToneCombo, smoothAltitudeCombo, modusIgcCombo, modusDistanceCombo, telemetryTypeCombo, varioFactorCombo, varioFilterCombo, minMaxRxCombo;
 
 	Group										gpsTelemertieAlarmGroup;
 	Button									heightMaxAlarmButton, speedMaxAlarmButton, speedMinAlarmButton, distanceMaxButton, distanceMinButton, tripLengthButton, voltageRxButton;
@@ -80,6 +80,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 	CCombo									frskyIdCombo;
 
 	final SetupReaderWriter	configuration;
+	final String[]					languageValues	= {"Deutsch", "English"};
 	final String[]					dataRateValues	= Messages.getString(MessageIds.GDE_MSGT2020).split(GDE.STRING_COMMA);
 	final String[]					startValues			= Messages.getString(MessageIds.GDE_MSGT2021).split(GDE.STRING_COMMA);
 	final String[]					stopValues			= Messages.getString(MessageIds.GDE_MSGT2072).split(GDE.STRING_COMMA);
@@ -99,9 +100,11 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 			"  1.0", "  2.5", "  5.0", "  7.5", " 10.0", " 15.0", " 20.0", " 25.0", " 30.0", " 35.0", " 40.0", " 45.0", " 50.0", " 60.0", " 70.0", " 80.0", " 90.0", " 99.0" };
 	final String[]					voltageRxValues	= {
 			"  3.00", "  3.25", "  3.50", "  3.75", "  4.00", "  4.25", "  4.50", "  4.75", "  4.80", "  4.85", "  4.90", "  4.95", "  5.00", "  5.05", "  5.10", "  5.15", "  5.20", "  5.25", "  5.50", "  6.00", "  6.25", "  6.50", "  6.75", "  7.00", "  7.25", "  7.50", "  7.75", "  8.00" };
+	
+	final String[]					smoothAltNull		= Messages.getString(MessageIds.GDE_MSGI2002).split(GDE.STRING_COMMA);
 	final String[]					igcModes				= Messages.getString(MessageIds.GDE_MSGT2069).split(GDE.STRING_COMMA);
 	final String[]					distanceModes		= Messages.getString(MessageIds.GDE_MSGT2071).split(GDE.STRING_COMMA);
-	final String[]					telemetrieTypes	= { " - - - ", " Futaba", " JR DMSS", " HoTT", " JetiDuplex", " M-Link", " FrSky", "Spektrum" };
+	final String[]					telemetrieTypes	= { " - - - ", " Futaba", " JR DMSS", " HoTT", " JetiDuplex", " M-Link", " FrSky", " Spektrum", " P2Bus" };
 	final String[]					varioFactors;
 	final String[]					varioFilters		= Messages.getString(MessageIds.GDE_MSGT2019).split(GDE.STRING_COMMA);
 	final String[]					frskyIDs				= { " 0x00", " 0xA1", " 0x22", " 0x83", " 0xE4", " 0x45", " 0xC6", " 0x67", " 0x48", " 0xE9", " 0x6A", " 0xCB", " 0xAC", " 0x0D", " 0x8E",
@@ -133,6 +136,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 		this.serialNumberText.setText(GDE.STRING_EMPTY + this.configuration.serialNumber);
 		this.firmwareText.setText(String.format(" %.2f", this.configuration.firmwareVersion / 100.0)); //$NON-NLS-1$
 
+		this.languageCombo.select(this.configuration.language);
 		this.dataRateCombo.select(this.configuration.datarate);
 		this.startModusCombo.select(this.configuration.startModus);
 		this.stopModusCombo.select(this.configuration.stopModus);
@@ -192,7 +196,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 		}
 
 		if (this.gpsLoggerGroup != null && !this.gpsLoggerGroup.isDisposed()) {
-		//0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT, 4=JetiDuplex, 5=M-Link, 6=FrSky 7=Spektrum
+		//0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT, 4=JetiDuplex, 5=M-Link, 6=FrSky 7=Spektrum 8=PowerBox
 			switch (this.telemetryTypeCombo.getSelectionIndex()) {
 			case 7: //Spektrum
 				if (GPSLoggerSetupConfiguration2.spektrumAdapterGroupStatic != null && !GPSLoggerSetupConfiguration2.spektrumAdapterGroupStatic.isDisposed()) {
@@ -245,7 +249,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				gpsLoggerGroupLData.left = new FormAttachment(0, 1000, 10);
 				gpsLoggerGroupLData.top = new FormAttachment(0, 1000, 5);
 				gpsLoggerGroupLData.width = 290;
-				gpsLoggerGroupLData.height = GDE.IS_MAC ? 405 : 410;
+				gpsLoggerGroupLData.height = GDE.IS_MAC ? 420 : 425;
 				RowLayout gpsLoggerGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.gpsLoggerGroup.setLayout(gpsLoggerGroupLayout);
 				this.gpsLoggerGroup.setLayoutData(gpsLoggerGroupLData);
@@ -255,7 +259,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.serialNumberLabel = new CLabel(this.gpsLoggerGroup, SWT.NONE);
 					RowData serialNumberLabelLData = new RowData();
 					serialNumberLabelLData.width = GDE.IS_LINUX ? 90 : 100;
-					serialNumberLabelLData.height = 20;
+					serialNumberLabelLData.height = 18;
 					this.serialNumberLabel.setLayoutData(serialNumberLabelLData);
 					this.serialNumberLabel.setText(Messages.getString(MessageIds.GDE_MSGT2032));
 					this.serialNumberLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -273,7 +277,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.firmwareLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData firmwareLabelLData = new RowData();
 					firmwareLabelLData.width = GDE.IS_LINUX ? 65 : 75;
-					firmwareLabelLData.height = 20;
+					firmwareLabelLData.height = 18;
 					this.firmwareLabel.setLayoutData(firmwareLabelLData);
 					this.firmwareLabel.setText(Messages.getString(MessageIds.GDE_MSGT2033));
 					this.firmwareLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -298,7 +302,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.telemetryTypeLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData telemetryTypeLabelLData = new RowData();
 					telemetryTypeLabelLData.width = 130;
-					telemetryTypeLabelLData.height = 20;
+					telemetryTypeLabelLData.height = 18;
 					this.telemetryTypeLabel.setLayoutData(telemetryTypeLabelLData);
 					this.telemetryTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.telemetryTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2075));
@@ -342,7 +346,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						this.fixSerialNumberButton = new Button(this.addonComposite, SWT.CHECK | SWT.LEFT);
 						FormData sensorTypeLabelLData = new FormData();
 						sensorTypeLabelLData.width = 280;
-						sensorTypeLabelLData.height = 20;
+						sensorTypeLabelLData.height = 18;
 						sensorTypeLabelLData.left = new FormAttachment(0, 1000, 2);
 						sensorTypeLabelLData.top = new FormAttachment(0, 1000, 0);
 						this.fixSerialNumberButton.setLayoutData(sensorTypeLabelLData);
@@ -361,7 +365,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						this.fixStartPositionButton = new Button(this.addonComposite, SWT.CHECK | SWT.LEFT);
 						FormData sensorTypeLabelLData = new FormData();
 						sensorTypeLabelLData.width = 285;
-						sensorTypeLabelLData.height = 20;
+						sensorTypeLabelLData.height = 18;
 						sensorTypeLabelLData.left = new FormAttachment(0, 1000, 2);
 						sensorTypeLabelLData.top = new FormAttachment(0, 1000, 22);
 						this.fixStartPositionButton.setLayoutData(sensorTypeLabelLData);
@@ -386,7 +390,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						this.robbeTBoxButton = new Button(this.addonComposite, SWT.CHECK | SWT.LEFT);
 						FormData sensorTypeLabelLData = new FormData();
 						sensorTypeLabelLData.width = 130;
-						sensorTypeLabelLData.height = 20;
+						sensorTypeLabelLData.height = 18;
 						sensorTypeLabelLData.left = new FormAttachment(0, 1000, 2);
 						sensorTypeLabelLData.top = new FormAttachment(0, 1000, 22);
 						this.robbeTBoxButton.setLayoutData(sensorTypeLabelLData);
@@ -405,7 +409,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 						this.frskyIdLabel = new CLabel(this.addonComposite, SWT.RIGHT);
 						FormData frskyIdLabelLData = new FormData();
 						frskyIdLabelLData.width = 130;
-						frskyIdLabelLData.height = 20;
+						frskyIdLabelLData.height = 18;
 						frskyIdLabelLData.left = new FormAttachment(0, 1000, 0);
 						frskyIdLabelLData.top = new FormAttachment(0, 1000, 0);
 						this.frskyIdLabel.setLayoutData(frskyIdLabelLData);
@@ -436,13 +440,42 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.addonComposite.layout();
 				}
 				{
-					this.dataRatecLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
-					RowData dataRatecLabelLData = new RowData();
-					dataRatecLabelLData.width = 130;
-					dataRatecLabelLData.height = 20;
-					this.dataRatecLabel.setLayoutData(dataRatecLabelLData);
-					this.dataRatecLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.dataRatecLabel.setText(Messages.getString(MessageIds.GDE_MSGT2034));
+					this.languageLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
+					RowData languageLabelLData = new RowData();
+					languageLabelLData.width = 130;
+					languageLabelLData.height = 18;
+					this.languageLabel.setLayoutData(languageLabelLData);
+					this.languageLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.languageLabel.setText(Messages.getString(MessageIds.GDE_MSGT2014));
+				}
+				{
+					this.languageCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER);
+					RowData dataRateCComboLData = new RowData();
+					dataRateCComboLData.width = COMBO_WIDTH;
+					dataRateCComboLData.height = 17;
+					this.languageCombo.setLayoutData(dataRateCComboLData);
+					this.languageCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.languageCombo.setItems(this.languageValues);
+					this.languageCombo.select(this.configuration.language);
+					this.languageCombo.setEditable(false);
+					this.languageCombo.setBackground(this.application.COLOR_WHITE);
+					this.languageCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "dataRateCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration1.this.configuration.language = (byte) GPSLoggerSetupConfiguration1.this.languageCombo.getSelectionIndex();
+							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.dataRateLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
+					RowData dataRateLabelLData = new RowData();
+					dataRateLabelLData.width = 130;
+					dataRateLabelLData.height = 18;
+					this.dataRateLabel.setLayoutData(dataRateLabelLData);
+					this.dataRateLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.dataRateLabel.setText(Messages.getString(MessageIds.GDE_MSGT2034));
 				}
 				{
 					this.dataRateCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER);
@@ -468,7 +501,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.startModusLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData startModusLabelLData = new RowData();
 					startModusLabelLData.width = 130;
-					startModusLabelLData.height = 20;
+					startModusLabelLData.height = 18;
 					this.startModusLabel.setLayoutData(startModusLabelLData);
 					this.startModusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.startModusLabel.setText(Messages.getString(MessageIds.GDE_MSGT2035));
@@ -497,7 +530,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.stopModusLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData stopModusLabelLData = new RowData();
 					stopModusLabelLData.width = 130;
-					stopModusLabelLData.height = 20;
+					stopModusLabelLData.height = 18;
 					this.stopModusLabel.setLayoutData(stopModusLabelLData);
 					this.stopModusLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.stopModusLabel.setText(Messages.getString(MessageIds.GDE_MSGT2026));
@@ -526,7 +559,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.timeZoneLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData timeZoneLabelLData = new RowData();
 					timeZoneLabelLData.width = 130;
-					timeZoneLabelLData.height = 20;
+					timeZoneLabelLData.height = 18;
 					this.timeZoneLabel.setLayoutData(timeZoneLabelLData);
 					this.timeZoneLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeZoneLabel.setText(Messages.getString(MessageIds.GDE_MSGT2036));
@@ -556,7 +589,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.timeZoneUnitLabel = new CLabel(this.gpsLoggerGroup, SWT.CENTER);
 					RowData timeZoneUnitLabelLData = new RowData();
 					timeZoneUnitLabelLData.width = 79;
-					timeZoneUnitLabelLData.height = 20;
+					timeZoneUnitLabelLData.height = 18;
 					this.timeZoneUnitLabel.setLayoutData(timeZoneUnitLabelLData);
 					this.timeZoneUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeZoneUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2037));
@@ -565,7 +598,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.timeAutoLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData timeZoneLabelLData = new RowData();
 					timeZoneLabelLData.width = 130;
-					timeZoneLabelLData.height = 20;
+					timeZoneLabelLData.height = 18;
 					this.timeAutoLabel.setLayoutData(timeZoneLabelLData);
 					this.timeAutoLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.timeAutoLabel.setText(Messages.getString(MessageIds.GDE_MSGT2073));
@@ -594,7 +627,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitClimbLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData varioLimitLabelLData = new RowData();
 					varioLimitLabelLData.width = 130;
-					varioLimitLabelLData.height = 20;
+					varioLimitLabelLData.height = 18;
 					this.varioLimitClimbLabel.setLayoutData(varioLimitLabelLData);
 					this.varioLimitClimbLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioLimitClimbLabel.setText(Messages.getString(MessageIds.GDE_MSGT2038));
@@ -623,7 +656,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitUnitLabel = new CLabel(this.gpsLoggerGroup, SWT.CENTER);
 					RowData varioLimitUnitLabelLData = new RowData();
 					varioLimitUnitLabelLData.width = 79;
-					varioLimitUnitLabelLData.height = 20;
+					varioLimitUnitLabelLData.height = 18;
 					this.varioLimitUnitLabel.setLayoutData(varioLimitUnitLabelLData);
 					this.varioLimitUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioLimitUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2039));
@@ -632,7 +665,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitSinkLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData varioLimitLabelLData = new RowData();
 					varioLimitLabelLData.width = 130;
-					varioLimitLabelLData.height = 20;
+					varioLimitLabelLData.height = 18;
 					this.varioLimitSinkLabel.setLayoutData(varioLimitLabelLData);
 					this.varioLimitSinkLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioLimitSinkLabel.setText(Messages.getString(MessageIds.GDE_MSGT2074));
@@ -661,7 +694,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioLimitUnitLabel = new CLabel(this.gpsLoggerGroup, SWT.CENTER);
 					RowData varioLimitUnitLabelLData = new RowData();
 					varioLimitUnitLabelLData.width = 79;
-					varioLimitUnitLabelLData.height = 20;
+					varioLimitUnitLabelLData.height = 18;
 					this.varioLimitUnitLabel.setLayoutData(varioLimitUnitLabelLData);
 					this.varioLimitUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioLimitUnitLabel.setText(Messages.getString(MessageIds.GDE_MSGT2039));
@@ -670,7 +703,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioTonLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData varioTonLabelLData = new RowData();
 					varioTonLabelLData.width = 130;
-					varioTonLabelLData.height = 20;
+					varioTonLabelLData.height = 18;
 					this.varioTonLabel.setLayoutData(varioTonLabelLData);
 					this.varioTonLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.varioTonLabel.setText(Messages.getString(MessageIds.GDE_MSGT2040));
@@ -699,7 +732,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioFactorLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData varioFactorLabelLData = new RowData();
 					varioFactorLabelLData.width = 130;
-					varioFactorLabelLData.height = 20;
+					varioFactorLabelLData.height = 18;
 					this.varioFactorLabel.setLayoutData(varioFactorLabelLData);
 					this.varioFactorLabel.setText(Messages.getString(MessageIds.GDE_MSGT2078));
 					this.varioFactorLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -727,7 +760,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.varioFilterLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData varioFilterLabelLData = new RowData();
 					varioFilterLabelLData.width = 130;
-					varioFilterLabelLData.height = 20;
+					varioFilterLabelLData.height = 18;
 					this.varioFilterLabel.setLayoutData(varioFilterLabelLData);
 					this.varioFilterLabel.setText("Vario Filter");
 					this.varioFilterLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -752,10 +785,39 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					});
 				}
 				{
+					this.smoothAltitudeLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
+					RowData smoothAltitudeLabelLData = new RowData();
+					smoothAltitudeLabelLData.width = 130;
+					smoothAltitudeLabelLData.height = 18;
+					this.smoothAltitudeLabel.setLayoutData(smoothAltitudeLabelLData);
+					this.smoothAltitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.smoothAltitudeLabel.setText(Messages.getString(MessageIds.GDE_MSGI2001));
+				}
+				{
+					this.smoothAltitudeCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER);
+					RowData smoothAltitudeComboLData = new RowData();
+					smoothAltitudeComboLData.width = COMBO_WIDTH;
+					smoothAltitudeComboLData.height = 17;
+					this.smoothAltitudeCombo.setLayoutData(smoothAltitudeComboLData);
+					this.smoothAltitudeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.smoothAltitudeCombo.setItems(this.smoothAltNull);
+					this.smoothAltitudeCombo.select(this.configuration.smoothAltitudeNulling);
+					this.smoothAltitudeCombo.setEditable(false);
+					this.smoothAltitudeCombo.setBackground(this.application.COLOR_WHITE);
+					this.smoothAltitudeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "varioToneCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration1.this.configuration.smoothAltitudeNulling = (byte) GPSLoggerSetupConfiguration1.this.smoothAltitudeCombo.getSelectionIndex();
+							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
 					this.modusIgcLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData modusIgcLabelLData = new RowData();
 					modusIgcLabelLData.width = 130;
-					modusIgcLabelLData.height = 20;
+					modusIgcLabelLData.height = 18;
 					this.modusIgcLabel.setLayoutData(modusIgcLabelLData);
 					this.modusIgcLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.modusIgcLabel.setText(Messages.getString(MessageIds.GDE_MSGT2068));
@@ -784,7 +846,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.modusDistanceLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData modusDistanceLabelLData = new RowData();
 					modusDistanceLabelLData.width = 130;
-					modusDistanceLabelLData.height = 20;
+					modusDistanceLabelLData.height = 18;
 					this.modusDistanceLabel.setLayoutData(modusDistanceLabelLData);
 					this.modusDistanceLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.modusDistanceLabel.setText(Messages.getString(MessageIds.GDE_MSGT2027));
@@ -813,7 +875,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.minMaxRxLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
 					RowData minMaxRxLabelLData = new RowData();
 					minMaxRxLabelLData.width = 130;
-					minMaxRxLabelLData.height = 20;
+					minMaxRxLabelLData.height = 18;
 					this.minMaxRxLabel.setLayoutData(minMaxRxLabelLData);
 					this.minMaxRxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2080));
 					this.minMaxRxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -842,9 +904,9 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				this.gpsTelemertieAlarmGroup = new Group(this, SWT.NONE);
 				FormData gpsTelemertieGroupLData = new FormData();
 				gpsTelemertieGroupLData.left = new FormAttachment(0, 1000, 10);
-				gpsTelemertieGroupLData.top = new FormAttachment(0, 1000, 430);
+				gpsTelemertieGroupLData.top = new FormAttachment(0, 1000, 450);
 				gpsTelemertieGroupLData.width = 290;
-				gpsTelemertieGroupLData.height = 175;
+				gpsTelemertieGroupLData.height = 155;
 				this.gpsTelemertieAlarmGroup.setLayoutData(gpsTelemertieGroupLData);
 				this.gpsTelemertieAlarmGroup.setLayout(new RowLayout(org.eclipse.swt.SWT.HORIZONTAL));
 				this.gpsTelemertieAlarmGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -860,7 +922,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.fillerComposite = new Composite(this.gpsTelemertieAlarmGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
 					fillerCompositeRALData.width = 15;
-					fillerCompositeRALData.height = 20;
+					fillerCompositeRALData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
@@ -933,7 +995,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.heightMaxAlarmLabel = new CLabel(this.gpsTelemertieAlarmGroup, SWT.CENTER);
 					RowData heightLabelLData = new RowData();
 					heightLabelLData.width = 89;
-					heightLabelLData.height = 20;
+					heightLabelLData.height = 18;
 					this.heightMaxAlarmLabel.setLayoutData(heightLabelLData);
 					this.heightMaxAlarmLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.heightMaxAlarmLabel.setText(Messages.getString(MessageIds.GDE_MSGT2042));
@@ -942,7 +1004,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.fillerComposite = new Composite(this.gpsTelemertieAlarmGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
 					fillerCompositeRALData.width = 15;
-					fillerCompositeRALData.height = 20;
+					fillerCompositeRALData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
@@ -1015,7 +1077,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.speedAlarmLabel = new CLabel(this.gpsTelemertieAlarmGroup, SWT.CENTER);
 					RowData velocityLabelLData = new RowData();
 					velocityLabelLData.width = 89;
-					velocityLabelLData.height = 20;
+					velocityLabelLData.height = 18;
 					this.speedAlarmLabel.setLayoutData(velocityLabelLData);
 					this.speedAlarmLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.speedAlarmLabel.setText(Messages.getString(MessageIds.GDE_MSGT2044));
@@ -1024,7 +1086,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.fillerComposite = new Composite(this.gpsTelemertieAlarmGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
 					fillerCompositeRALData.width = 15;
-					fillerCompositeRALData.height = 20;
+					fillerCompositeRALData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
@@ -1097,7 +1159,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.speedAlarmLabel = new CLabel(this.gpsTelemertieAlarmGroup, SWT.CENTER);
 					RowData velocityLabelLData = new RowData();
 					velocityLabelLData.width = 89;
-					velocityLabelLData.height = 20;
+					velocityLabelLData.height = 18;
 					this.speedAlarmLabel.setLayoutData(velocityLabelLData);
 					this.speedAlarmLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.speedAlarmLabel.setText(Messages.getString(MessageIds.GDE_MSGT2044));
@@ -1106,7 +1168,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.fillerComposite = new Composite(this.gpsTelemertieAlarmGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
 					fillerCompositeRALData.width = 15;
-					fillerCompositeRALData.height = 20;
+					fillerCompositeRALData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
@@ -1177,7 +1239,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.distanceMaxLabel = new CLabel(this.gpsTelemertieAlarmGroup, SWT.CENTER);
 					RowData distanceLabelLData = new RowData();
 					distanceLabelLData.width = 89;
-					distanceLabelLData.height = 20;
+					distanceLabelLData.height = 18;
 					this.distanceMaxLabel.setLayoutData(distanceLabelLData);
 					this.distanceMaxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.distanceMaxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2046));
@@ -1186,7 +1248,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.fillerComposite = new Composite(this.gpsTelemertieAlarmGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
 					fillerCompositeRALData.width = 15;
-					fillerCompositeRALData.height = 20;
+					fillerCompositeRALData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
@@ -1257,7 +1319,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.distanceMinLabel = new CLabel(this.gpsTelemertieAlarmGroup, SWT.CENTER);
 					RowData distanceLabelLData = new RowData();
 					distanceLabelLData.width = 89;
-					distanceLabelLData.height = 20;
+					distanceLabelLData.height = 18;
 					this.distanceMinLabel.setLayoutData(distanceLabelLData);
 					this.distanceMinLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.distanceMinLabel.setText(Messages.getString(MessageIds.GDE_MSGT2046));
@@ -1266,7 +1328,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.fillerComposite = new Composite(this.gpsTelemertieAlarmGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
 					fillerCompositeRALData.width = 15;
-					fillerCompositeRALData.height = 20;
+					fillerCompositeRALData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
@@ -1339,7 +1401,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.tripLengthLabel = new CLabel(this.gpsTelemertieAlarmGroup, SWT.CENTER);
 					RowData pathLengthLabelLData = new RowData();
 					pathLengthLabelLData.width = 89;
-					pathLengthLabelLData.height = 20;
+					pathLengthLabelLData.height = 18;
 					this.tripLengthLabel.setLayoutData(pathLengthLabelLData);
 					this.tripLengthLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.tripLengthLabel.setText(Messages.getString(MessageIds.GDE_MSGT2048));
@@ -1348,7 +1410,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.fillerComposite = new Composite(this.gpsTelemertieAlarmGroup, SWT.NONE);
 					RowData fillerCompositeRALData = new RowData();
 					fillerCompositeRALData.width = 15;
-					fillerCompositeRALData.height = 20;
+					fillerCompositeRALData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRALData);
 				}
 				{
@@ -1421,7 +1483,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.voltageRxLabel = new CLabel(this.gpsTelemertieAlarmGroup, SWT.CENTER);
 					RowData voltageRxLabelLData = new RowData();
 					voltageRxLabelLData.width = 89;
-					voltageRxLabelLData.height = 20;
+					voltageRxLabelLData.height = 18;
 					this.voltageRxLabel.setLayoutData(voltageRxLabelLData);
 					this.voltageRxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageRxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2050));

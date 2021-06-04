@@ -72,7 +72,7 @@ public class SetupReaderWriter {
 	short								modusDistance								= 0;																										// 9 0=3D; 1=2D
 	short								varioThresholdSink					= 8;																										// 10 0 --> 50 step 1
 	short								daylightSavingModus					= 1;																										// 11 0=manual; 1=auto
-	short								telemetryType								= 0;																										// 12 0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT, 4=JetiDuplex, 5=M-Link, 6=FrSky
+	short								telemetryType								= 0;																										// 12 0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT, 4=JetiDuplex, 5=M-Link, 6=FrSky, 7=Spektrum, 8=P2Bus
 	short								rxControl										= 0;																										// 13 0=OFF, 1=Min/Live/Max 2=StartPoint
 	int									jetiExMask									= 0xFFFFFFFF;																						// 14,15 bit0=undefined, bit1=time bit*=refer to converter
 	short								varioFactor									= 0;																										// 16 1 + factor/10
@@ -92,7 +92,10 @@ public class SetupReaderWriter {
 	byte								robbe_T_Box									= 0;																										// ..29 Robbe_T_Box
 	short								varioFilter									= 0;																										// 30 Vario filter
 	short								speedMinAlarm								= 30;																										// 31 10km/h --> 1000km/h
-	//short[] B = new short[6]; // 32-37
+	byte								language										= 0;																										// 32..
+	byte 								freeA												= 0;																										// ..32
+	short								jetiExMask_UL								= 0;																										// 33
+	//short[] B = new short[4]; // 34-37
 	byte								mLinkAddressVario						= 0;																										// 38.. 0 - 15, "--"
 	byte								mLinkAddressVoltageRx				= 16;																										// ..38 0 - 15, "--"
 	byte								mLinkAddressSpeed						= 1;																										// 39..
@@ -120,11 +123,11 @@ public class SetupReaderWriter {
 	byte								mLinkAddressFlightDirection	= 13;																										// 50..
 	byte								mLinkAddressFree50					= 0;																										// ..50
 	byte								mLinkAddressDirectionRel		= 14;																										// 51..
-	byte								mLinkAddressFree51					= 0;																										// ..51
+	byte								smoothAltitudeNulling				= 0;																										// ..51
 	byte								mLinkAddressHeightGain			= 6;																										// 52..
-	byte								mLinkAddressFree52					= 0;																										// ..52
+	byte								powerBoxP2BusAdresse				= (byte) 188;																						// ..52
 	//short[] C = short int[1]; 																																						// 53
-	short								firmwareVersion							= 119;																									// 54
+	short								firmwareVersion							= 126;																									// 54
 	short								modusIGC										= 1;																										// 55
 	byte 								startSlotSBUS[] 						= new byte[8];																					// 56-59
 	byte								spektrumSensors							= 0;																										// 60..
@@ -188,11 +191,14 @@ public class SetupReaderWriter {
 				this.voltageUlAlarm 				= DataParser.parse2Short(buffer, 50);
 				this.capacityUlAlarm 				= DataParser.parse2Short(buffer, 52);
 				this.distanceMinAlarm				= DataParser.parse2Short(buffer, 54);
-				this.serialNumberFix 				= buffer[56]; // 29.. fixe_Seriennummer;
-				this.robbe_T_Box 						= buffer[57]; // ..29 Robbe_T_Box;
+				this.serialNumberFix 				= buffer[56]; 												// 29.. fixe_Seriennummer;
+				this.robbe_T_Box 						= buffer[57]; 												// ..29 Robbe_T_Box;
 				this.varioFilter 						= DataParser.parse2Short(buffer, 58); // 30 Vario filter
 				this.speedMinAlarm					= DataParser.parse2Short(buffer, 60);	// 31 10km/h --> 1000km/h
-				//B[6]
+				this.language								= buffer[62];													// 32.. 0= german, 1=english
+				this.freeA									= buffer[63];													// ..32
+				this.jetiExMask_UL					= DataParser.parse2Short(buffer, 64);	// 33
+				//B[4]
 				this.mLinkAddressVario 				= buffer[74];		// 38..
 				this.mLinkAddressVario 				= buffer[75];		// ..38
 				this.mLinkAddressSpeed 				= buffer[76];		// 39..
@@ -208,7 +214,9 @@ public class SetupReaderWriter {
 				this.mLinkAddressAccZ					= buffer[96];		// 49..		
 				this.mLinkAddressFlightDirection	= buffer[98];// 50..
 				this.mLinkAddressDirectionRel	= buffer[100];	// 51..
+				this.smoothAltitudeNulling		= buffer[101];	// ..51
 				this.mLinkAddressHeightGain		= buffer[102];	// 52..
+				this.powerBoxP2BusAdresse			= buffer[103];	// ..52
 				//short[] C 									= short int[1]; // 53..
 				this.firmwareVersion 					= DataParser.parse2Short(buffer, 106);	// 54
 				this.modusIGC 								= DataParser.parse2Short(buffer, 108);	// 55
@@ -279,7 +287,7 @@ public class SetupReaderWriter {
 				buffer[29] = (byte) ((this.jetiExMask & 0xFF000000) >> 24);
 				buffer[30] = (byte) (this.varioFactor & 0x00FF);
 				buffer[31] = (byte) ((this.varioFactor & 0xFF00) >> 8);
-				buffer[32] = (byte) (this.frskyAddr & 0x00FF);						// 17 0x00 -> 0x1B
+				buffer[32] = (byte) (this.frskyAddr & 0x00FF);									// 17 0x00 -> 0x1B
 				buffer[33] = (byte) ((this.frskyAddr & 0xFF00) >> 8);
 				buffer[34] = (byte) (this.telemetryAlarms & 0x00FF);
 				buffer[35] = (byte) ((this.telemetryAlarms & 0xFF00) >> 8);
@@ -304,13 +312,17 @@ public class SetupReaderWriter {
 				buffer[53] = (byte) ((this.capacityUlAlarm & 0xFF00) >> 8);
 				buffer[54] = (byte) (this.distanceMinAlarm & 0x00FF);
 				buffer[55] = (byte) ((this.distanceMinAlarm & 0xFF00) >> 8);
-				buffer[56] = this.serialNumberFix; 											// 29.. fixe_Seriennummer;
-				buffer[57] = this.robbe_T_Box; 													// ..29 Robbe_T_Box;
-				buffer[58] = (byte) (this.varioFilter & 0x00FF);				// 30 Vario filter
+				buffer[56] = this.serialNumberFix; 																// 29.. fixe_Seriennummer;
+				buffer[57] = this.robbe_T_Box; 																		// ..29 Robbe_T_Box;
+				buffer[58] = (byte) (this.varioFilter & 0x00FF);									// 30 Vario filter
 				buffer[59] = (byte) ((this.varioFilter & 0xFF00) >> 8);
-				buffer[60] = (byte) (this.speedMinAlarm & 0x00FF);			// 31 10km/h --> 1000km/h
+				buffer[60] = (byte) (this.speedMinAlarm & 0x00FF);								// 31 10km/h --> 1000km/h
 				buffer[61] = (byte) ((this.speedMinAlarm & 0xFF00) >> 8);
-				//B[6]
+				buffer[62] = (byte) (this.language & 0x00FF);											// 32.. 0= german, 1=english
+				buffer[63] = this.freeA;																					// ..32
+				buffer[64] = (byte) (this.jetiExMask_UL & 0x00FF);								// 33
+				buffer[65] = (byte) ((this.jetiExMask_UL & 0xFF00) >> 8);
+				//B[4]
 				buffer[74] = this.mLinkAddressVario;															// 38..
 				buffer[75] = this.mLinkAddressVoltageRx;													// ..38
 				buffer[76] = (byte) (this.mLinkAddressSpeed & 0x00FF);						// 39..
@@ -327,21 +339,21 @@ public class SetupReaderWriter {
 				buffer[87] = 0;
 				buffer[88] = (byte) (this.mLinkAddressHeightMax & 0x00FF);				// 45..
 				buffer[89] = 0;
-				buffer[90] = (byte) (this.mLinkAddressENL & 0x00FF);				// 46..
+				buffer[90] = (byte) (this.mLinkAddressENL & 0x00FF);							// 46..
 				buffer[91] = 0;
-				buffer[92] = (byte) (this.mLinkAddressAccX & 0x00FF);				// 47..
+				buffer[92] = (byte) (this.mLinkAddressAccX & 0x00FF);							// 47..
 				buffer[93] = 0;
-				buffer[94] = (byte) (this.mLinkAddressAccY & 0x00FF);			// 48..
+				buffer[94] = (byte) (this.mLinkAddressAccY & 0x00FF);							// 48..
 				buffer[95] = 0;
-				buffer[96] = (byte) (this.mLinkAddressAccZ & 0x00FF);				// 49..
+				buffer[96] = (byte) (this.mLinkAddressAccZ & 0x00FF);							// 49..
 				buffer[97] = 0;
 				buffer[98] = (byte) (this.mLinkAddressFlightDirection & 0x00FF);	// 50..
 				buffer[99] = 0;
 				buffer[100] = (byte) (this.mLinkAddressDirectionRel & 0x00FF);		// 51..
-				buffer[101] = 0;
-				buffer[102] = (byte) (this.mLinkAddressHeightGain & 0x00FF);			// 52..
-				buffer[103] = 0;
-				//C 10																														// 53
+				buffer[101] = this.smoothAltitudeNulling;													// ..51
+				buffer[102] = this.mLinkAddressHeightGain;												// 52..
+				buffer[103] = this.powerBoxP2BusAdresse;													// ..52
+				//C [1]																														// 53
 				buffer[106] = (byte) (this.firmwareVersion & 0x00FF);							// 54
 				buffer[107] = (byte) ((this.firmwareVersion & 0xFF00) >> 8);			// 54
 				buffer[108] = (byte) (this.modusIGC & 0x00FF);										// 55

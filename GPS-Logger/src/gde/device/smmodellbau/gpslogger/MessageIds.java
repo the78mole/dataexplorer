@@ -26,6 +26,8 @@ public class MessageIds {
 
 	public final static String	GDE_MSGW2000 = "GDE_MSGW2000";
 	public final static String	GDE_MSGI2000 = "GDE_MSGI2000";
+	public final static String	GDE_MSGI2001 = "GDE_MSGI2001";
+	public final static String	GDE_MSGI2002 = "GDE_MSGI2002";
 	public final static String	GDE_MSGT2000 = "GDE_MSGT2000";
 	public final static String	GDE_MSGT2001 = "GDE_MSGT2001";
 	public final static String	GDE_MSGT2002 = "GDE_MSGT2002";
@@ -39,6 +41,8 @@ public class MessageIds {
 	public final static String	GDE_MSGT2010 = "GDE_MSGT2010";
 	public final static String	GDE_MSGT2011 = "GDE_MSGT2011";
 	public final static String	GDE_MSGT2012 = "GDE_MSGT2012";
+	public final static String	GDE_MSGT2013 = "GDE_MSGT2013";
+	public final static String	GDE_MSGT2014 = "GDE_MSGT2014";
 	public final static String	GDE_MSGT2015 = "GDE_MSGT2015";
 	public final static String	GDE_MSGT2016 = "GDE_MSGT2016";
 	public final static String	GDE_MSGT2017 = "GDE_MSGT2017";

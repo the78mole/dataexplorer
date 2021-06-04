@@ -18,6 +18,7 @@ Device specific changes/fixes
 	* HoTTAdapter2 - fix GPS data import single sensor
 	* IGCAdapter - add missing unit in device XML
 	* GPS-Logger2/3 - additional measurements added with 1.26 (NMEA Import)
+	* GPS-Logger* - update configuration according 1.26
 
 Version 3.4.8 - 24 Apr 2021
 Generic changes/fixes

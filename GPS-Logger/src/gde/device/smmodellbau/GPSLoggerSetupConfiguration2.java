@@ -94,7 +94,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 	CLabel									spektrumAddressLabel;
 	CCombo									spektrumAddressCombo;
 	final String[]					spektrumAddresses = { " 0 ", " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 ", " 9 "};
-	Button									spektrumEscSensor, spektrumCurrentSensor, spektrumVarioSensor, spektrumLiPoMonitor;
+	Button									spektrumGPSSensor, spektrumVarioSensor, spektrumGforceSensor, spektrumUserSensor, spektrumSpeedSensor;
 	
 	Group										fixGpsStartPositionGroup;
 	static Group						fixGpsStartPositionGroupStatic;
@@ -216,10 +216,11 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 		this.jetiExSelectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2088, new Object[] {this.configuration.getJetiMeasurementCount()}));
 
 		this.spektrumAddressCombo.select(this.configuration.spektrumNumber);
-		this.spektrumEscSensor.setSelection((this.configuration.spektrumSensors & 0x01) == 0);
-		this.spektrumCurrentSensor.setSelection((this.configuration.spektrumSensors & 0x02) == 0);
-		this.spektrumVarioSensor.setSelection((this.configuration.spektrumSensors & 0x04) == 0);
-		this.spektrumLiPoMonitor.setSelection((this.configuration.spektrumSensors & 0x08) == 0);
+		this.spektrumGPSSensor.setSelection((this.configuration.spektrumSensors & 0x01) == 0);
+		this.spektrumVarioSensor.setSelection((this.configuration.spektrumSensors & 0x02) == 0);
+		this.spektrumGforceSensor.setSelection((this.configuration.spektrumSensors & 0x04) == 0);
+		this.spektrumUserSensor.setSelection((this.configuration.spektrumSensors & 0x08) == 0);
+		this.spektrumSpeedSensor.setSelection((this.configuration.spektrumSensors & 0x10) == 0);
 		
 		this.useFixGpsStartPositionButton.setSelection((GPSLoggerSetupConfiguration2.this.configuration.fixPositionLatitude >> 24 & 0x80) > 0);
 		double tempLatitudeValue = ((GPSLoggerSetupConfiguration2.this.configuration.fixPositionLatitude & 0x3FFFFFFF) / 10000.0);
@@ -258,7 +259,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressVarioLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel1LData = new RowData();
 					addressLabel1LData.width = labelWidth;
-					addressLabel1LData.height = 20;
+					addressLabel1LData.height = 18;
 					this.addressVarioLabel.setLayoutData(addressLabel1LData);
 					this.addressVarioLabel.setText(Messages.getString(MessageIds.GDE_MSGT2059));
 				}
@@ -298,7 +299,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressSpeedLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel2LData = new RowData();
 					addressLabel2LData.width = labelWidth;
-					addressLabel2LData.height = 20;
+					addressLabel2LData.height = 18;
 					this.addressSpeedLabel.setLayoutData(addressLabel2LData);
 					this.addressSpeedLabel.setText(Messages.getString(MessageIds.GDE_MSGT2060));
 				}
@@ -338,7 +339,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressSpeedMaxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel2maxLData = new RowData();
 					addressLabel2maxLData.width = labelWidth;
-					addressLabel2maxLData.height = 20;
+					addressLabel2maxLData.height = 18;
 					this.addressSpeedMaxLabel.setLayoutData(addressLabel2maxLData);
 					this.addressSpeedMaxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2060) + "_max");
 				}
@@ -378,7 +379,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressHeightLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel3LData = new RowData();
 					addressLabel3LData.width = labelWidth;
-					addressLabel3LData.height = 20;
+					addressLabel3LData.height = 18;
 					this.addressHeightLabel.setLayoutData(addressLabel3LData);
 					this.addressHeightLabel.setText(Messages.getString(MessageIds.GDE_MSGT2061));
 				}
@@ -418,7 +419,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressHeightMaxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel3maxLData = new RowData();
 					addressLabel3maxLData.width = labelWidth;
-					addressLabel3maxLData.height = 20;
+					addressLabel3maxLData.height = 18;
 					this.addressHeightMaxLabel.setLayoutData(addressLabel3maxLData);
 					this.addressHeightMaxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2061) + "_max");
 				}
@@ -458,7 +459,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressDistanceLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel4LData = new RowData();
 					addressLabel4LData.width = labelWidth;
-					addressLabel4LData.height = 20;
+					addressLabel4LData.height = 18;
 					this.addressDistanceLabel.setLayoutData(addressLabel4LData);
 					this.addressDistanceLabel.setText(Messages.getString(MessageIds.GDE_MSGT2062));
 				}
@@ -498,7 +499,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressDirectionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel5LData = new RowData();
 					addressLabel5LData.width = labelWidth;
-					addressLabel5LData.height = 20;
+					addressLabel5LData.height = 18;
 					this.addressDirectionLabel.setLayoutData(addressLabel5LData);
 					this.addressDirectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2063));
 				}
@@ -538,7 +539,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressFlightDirectionLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel6LData = new RowData();
 					addressLabel6LData.width = labelWidth;
-					addressLabel6LData.height = 20;
+					addressLabel6LData.height = 18;
 					this.addressFlightDirectionLabel.setLayoutData(addressLabel6LData);
 					this.addressFlightDirectionLabel.setText(Messages.getString(MessageIds.GDE_MSGT2028));
 				}
@@ -578,7 +579,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressDirectionRelLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel7LData = new RowData();
 					addressLabel7LData.width = labelWidth;
-					addressLabel7LData.height = 20;
+					addressLabel7LData.height = 18;
 					this.addressDirectionRelLabel.setLayoutData(addressLabel7LData);
 					this.addressDirectionRelLabel.setText(Messages.getString(MessageIds.GDE_MSGT2029));
 				}
@@ -618,7 +619,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressTripLengthLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel8LData = new RowData();
 					addressLabel8LData.width = labelWidth;
-					addressLabel8LData.height = 20;
+					addressLabel8LData.height = 18;
 					this.addressTripLengthLabel.setLayoutData(addressLabel8LData);
 					this.addressTripLengthLabel.setText(Messages.getString(MessageIds.GDE_MSGT2064));
 				}
@@ -658,7 +659,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressHeightGainLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel9LData = new RowData();
 					addressLabel9LData.width = labelWidth;
-					addressLabel9LData.height = 20;
+					addressLabel9LData.height = 18;
 					this.addressHeightGainLabel.setLayoutData(addressLabel9LData);
 					this.addressHeightGainLabel.setText(Messages.getString(MessageIds.GDE_MSGT2076));
 				}
@@ -698,7 +699,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressVoltageRxLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel14LData = new RowData();
 					addressLabel14LData.width = labelWidth;
-					addressLabel14LData.height = 20;
+					addressLabel14LData.height = 18;
 					this.addressVoltageRxLabel.setLayoutData(addressLabel14LData);
 					this.addressVoltageRxLabel.setText(Messages.getString(MessageIds.GDE_MSGT2049));
 				}
@@ -738,7 +739,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressEnlLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel10LData = new RowData();
 					addressLabel10LData.width = labelWidth;
-					addressLabel10LData.height = 20;
+					addressLabel10LData.height = 18;
 					this.addressEnlLabel.setLayoutData(addressLabel10LData);
 					this.addressEnlLabel.setText(Messages.getString(MessageIds.GDE_MSGT2084));
 				}
@@ -778,7 +779,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressAccXLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel11LData = new RowData();
 					addressLabel11LData.width = labelWidth;
-					addressLabel11LData.height = 20;
+					addressLabel11LData.height = 18;
 					this.addressAccXLabel.setLayoutData(addressLabel11LData);
 					this.addressAccXLabel.setText(Messages.getString(MessageIds.GDE_MSGT2085));
 				}
@@ -818,7 +819,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressAccYLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel12LData = new RowData();
 					addressLabel12LData.width = labelWidth;
-					addressLabel12LData.height = 20;
+					addressLabel12LData.height = 18;
 					this.addressAccYLabel.setLayoutData(addressLabel12LData);
 					this.addressAccYLabel.setText(Messages.getString(MessageIds.GDE_MSGT2086));
 				}
@@ -858,7 +859,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.addressAccZLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel13LData = new RowData();
 					addressLabel13LData.width = labelWidth;
-					addressLabel13LData.height = 20;
+					addressLabel13LData.height = 18;
 					this.addressAccZLabel.setLayoutData(addressLabel13LData);
 					this.addressAccZLabel.setText(Messages.getString(MessageIds.GDE_MSGT2087));
 				}
@@ -1503,7 +1504,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				FormData unilogTelemtryAlarmsGroupLData = new FormData();
 				unilogTelemtryAlarmsGroupLData.width = 290;
 				unilogTelemtryAlarmsGroupLData.height = 143;
-				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 430);
+				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 450);
 				unilogTelemtryAlarmsGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.unilogTelemtryAlarmsGroup.setLayoutData(unilogTelemtryAlarmsGroupLData);
 				this.unilogTelemtryAlarmsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1519,7 +1520,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.currentButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData currentButtonLData = new RowData();
 					currentButtonLData.width = buttonWidth;
-					currentButtonLData.height = 20;
+					currentButtonLData.height = 18;
 					this.currentButton.setLayoutData(currentButtonLData);
 					this.currentButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.currentButton.setText(Messages.getString(MessageIds.GDE_MSGT2066));
@@ -1585,7 +1586,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.currentLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER);
 					RowData currentLabelLData = new RowData();
 					currentLabelLData.width = 50;
-					currentLabelLData.height = 20;
+					currentLabelLData.height = 18;
 					this.currentLabel.setLayoutData(currentLabelLData);
 					this.currentLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.currentLabel.setText(Messages.getString(MessageIds.GDE_MSGT2051));
@@ -1601,7 +1602,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.voltageStartButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData voltageStartButtonLData = new RowData();
 					voltageStartButtonLData.width = buttonWidth;
-					voltageStartButtonLData.height = 20;
+					voltageStartButtonLData.height = 18;
 					this.voltageStartButton.setLayoutData(voltageStartButtonLData);
 					this.voltageStartButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageStartButton.setText(Messages.getString(MessageIds.GDE_MSGT2052));
@@ -1666,7 +1667,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.voltageStartLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
 					RowData voltageStartLabelLData = new RowData();
 					voltageStartLabelLData.width = 50;
-					voltageStartLabelLData.height = 20;
+					voltageStartLabelLData.height = 18;
 					this.voltageStartLabel.setLayoutData(voltageStartLabelLData);
 					this.voltageStartLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageStartLabel.setText(Messages.getString(MessageIds.GDE_MSGT2053));
@@ -1682,7 +1683,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.voltageButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData voltageButtonLData = new RowData();
 					voltageButtonLData.width = buttonWidth;
-					voltageButtonLData.height = 20;
+					voltageButtonLData.height = 18;
 					this.voltageButton.setLayoutData(voltageButtonLData);
 					this.voltageButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.voltageButton.setText(Messages.getString(MessageIds.GDE_MSGT2054));
@@ -1746,7 +1747,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				{
 					RowData voltageLabelLData = new RowData();
 					voltageLabelLData.width = 50;
-					voltageLabelLData.height = 20;
+					voltageLabelLData.height = 18;
 					this.voltageLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
 					this.voltageLabel.setLayoutData(voltageLabelLData);
 					this.voltageLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1763,7 +1764,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.capacityButton = new Button(this.unilogTelemtryAlarmsGroup, SWT.CHECK | SWT.LEFT);
 					RowData voltageRxULButtonLData = new RowData();
 					voltageRxULButtonLData.width = buttonWidth;
-					voltageRxULButtonLData.height = 20;
+					voltageRxULButtonLData.height = 18;
 					this.capacityButton.setLayoutData(voltageRxULButtonLData);
 					this.capacityButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.capacityButton.setText(Messages.getString(MessageIds.GDE_MSGT2056));
@@ -1828,7 +1829,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.capacityLabel = new CLabel(this.unilogTelemtryAlarmsGroup, SWT.CENTER | SWT.EMBEDDED);
 					RowData voltageRxULLabelLData = new RowData();
 					voltageRxULLabelLData.width = 50;
-					voltageRxULLabelLData.height = 20;
+					voltageRxULLabelLData.height = 18;
 					this.capacityLabel.setLayoutData(voltageRxULLabelLData);
 					this.capacityLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.capacityLabel.setText(Messages.getString(MessageIds.GDE_MSGT2057));
@@ -1852,7 +1853,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				mLinkAddressesGroupLData.top = new FormAttachment(0, 1000, 5);
 				mLinkAddressesGroupLData.left = new FormAttachment(0, 1000, 15);
 				mLinkAddressesGroupLData.width = 290;
-				mLinkAddressesGroupLData.height = 145;
+				mLinkAddressesGroupLData.height = 165;
 				this.spektrumAdapterGroup.setLayoutData(mLinkAddressesGroupLData);
 				this.spektrumAdapterGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 				this.spektrumAdapterGroup.setText(Messages.getString(MessageIds.GDE_MSGT2094));
@@ -1902,22 +1903,22 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fillerComposite = new Composite(this.spektrumAdapterGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
 					fillerCompositeRA1LData.width = this.fillerWidth;
-					fillerCompositeRA1LData.height = 20;
+					fillerCompositeRA1LData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 				}
 				{
-					this.spektrumEscSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
+					this.spektrumGPSSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
 					RowData analogAlarm1DirectionButtonLData = new RowData();
 					analogAlarm1DirectionButtonLData.width = 280 - this.fillerWidth;
 					analogAlarm1DirectionButtonLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
-					this.spektrumEscSensor.setLayoutData(analogAlarm1DirectionButtonLData);
-					this.spektrumEscSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.spektrumEscSensor.setText(Messages.getString(MessageIds.GDE_MSGT2096));
-					this.spektrumEscSensor.addSelectionListener(new SelectionAdapter() {
+					this.spektrumGPSSensor.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.spektrumGPSSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.spektrumGPSSensor.setText(Messages.getString(MessageIds.GDE_MSGT2096));
+					this.spektrumGPSSensor.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "spektrumEscSensor.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors = (byte) (GPSLoggerSetupConfiguration2.this.spektrumEscSensor.getSelection() 
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "spektrumGPSSensor.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors = (byte) (GPSLoggerSetupConfiguration2.this.spektrumGPSSensor.getSelection() 
 									? GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors & 0xFE
 									: GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors | 0x01);
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
@@ -1928,22 +1929,22 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fillerComposite = new Composite(this.spektrumAdapterGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
 					fillerCompositeRA1LData.width = this.fillerWidth;
-					fillerCompositeRA1LData.height = 20;
+					fillerCompositeRA1LData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 				}
 				{
-					this.spektrumCurrentSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
+					this.spektrumVarioSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
 					RowData analogAlarm1DirectionButtonLData = new RowData();
 					analogAlarm1DirectionButtonLData.width = 280 - this.fillerWidth;
 					analogAlarm1DirectionButtonLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
-					this.spektrumCurrentSensor.setLayoutData(analogAlarm1DirectionButtonLData);
-					this.spektrumCurrentSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.spektrumCurrentSensor.setText(Messages.getString(MessageIds.GDE_MSGT2097));
-					this.spektrumCurrentSensor.addSelectionListener(new SelectionAdapter() {
+					this.spektrumVarioSensor.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.spektrumVarioSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.spektrumVarioSensor.setText(Messages.getString(MessageIds.GDE_MSGT2097));
+					this.spektrumVarioSensor.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "spektrumCurrentSensor.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors = (byte) (GPSLoggerSetupConfiguration2.this.spektrumCurrentSensor.getSelection() 
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "spektrumVarioSensor.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors = (byte) (GPSLoggerSetupConfiguration2.this.spektrumVarioSensor.getSelection() 
 									? GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors & 0xFD
 									: GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors | 0x02);
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
@@ -1954,22 +1955,22 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fillerComposite = new Composite(this.spektrumAdapterGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
 					fillerCompositeRA1LData.width = this.fillerWidth;
-					fillerCompositeRA1LData.height = 20;
+					fillerCompositeRA1LData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 				}
 				{
-					this.spektrumVarioSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
+					this.spektrumGforceSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
 					RowData analogAlarm1DirectionButtonLData = new RowData();
 					analogAlarm1DirectionButtonLData.width = 280 - this.fillerWidth;
 					analogAlarm1DirectionButtonLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
-					this.spektrumVarioSensor.setLayoutData(analogAlarm1DirectionButtonLData);
-					this.spektrumVarioSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.spektrumVarioSensor.setText(Messages.getString(MessageIds.GDE_MSGT2098));
-					this.spektrumVarioSensor.addSelectionListener(new SelectionAdapter() {
+					this.spektrumGforceSensor.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.spektrumGforceSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.spektrumGforceSensor.setText(Messages.getString(MessageIds.GDE_MSGT2098));
+					this.spektrumGforceSensor.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "spektrumVarioSensor.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors = (byte) (GPSLoggerSetupConfiguration2.this.spektrumVarioSensor.getSelection() 
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "spektrumGforceSensor.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors = (byte) (GPSLoggerSetupConfiguration2.this.spektrumGforceSensor.getSelection() 
 									? GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors & 0xFB
 									: GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors | 0x04);
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
@@ -1980,24 +1981,50 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fillerComposite = new Composite(this.spektrumAdapterGroup, SWT.NONE);
 					RowData fillerCompositeRA1LData = new RowData();
 					fillerCompositeRA1LData.width = this.fillerWidth;
-					fillerCompositeRA1LData.height = 20;
+					fillerCompositeRA1LData.height = 18;
 					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
 				}
 				{
-					this.spektrumLiPoMonitor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
+					this.spektrumUserSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
 					RowData analogAlarm1DirectionButtonLData = new RowData();
 					analogAlarm1DirectionButtonLData.width = 280 - this.fillerWidth;
 					analogAlarm1DirectionButtonLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
-					this.spektrumLiPoMonitor.setLayoutData(analogAlarm1DirectionButtonLData);
-					this.spektrumLiPoMonitor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-					this.spektrumLiPoMonitor.setText(Messages.getString(MessageIds.GDE_MSGT2099));
-					this.spektrumLiPoMonitor.addSelectionListener(new SelectionAdapter() {
+					this.spektrumUserSensor.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.spektrumUserSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.spektrumUserSensor.setText(Messages.getString(MessageIds.GDE_MSGT2099));
+					this.spektrumUserSensor.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "spektrumLiPoMonitor.widgetSelected, event=" + evt); //$NON-NLS-1$
-							GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors = (byte) (GPSLoggerSetupConfiguration2.this.spektrumLiPoMonitor.getSelection() 
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "spektrumUserSensor.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors = (byte) (GPSLoggerSetupConfiguration2.this.spektrumUserSensor.getSelection() 
 									? GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors & 0xF7
 									: GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors | 0x08);
+							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.fillerComposite = new Composite(this.spektrumAdapterGroup, SWT.NONE);
+					RowData fillerCompositeRA1LData = new RowData();
+					fillerCompositeRA1LData.width = this.fillerWidth;
+					fillerCompositeRA1LData.height = 18;
+					this.fillerComposite.setLayoutData(fillerCompositeRA1LData);
+				}
+				{
+					this.spektrumSpeedSensor = new Button(this.spektrumAdapterGroup, SWT.CHECK | SWT.LEFT);
+					RowData analogAlarm1DirectionButtonLData = new RowData();
+					analogAlarm1DirectionButtonLData.width = 280 - this.fillerWidth;
+					analogAlarm1DirectionButtonLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+					this.spektrumSpeedSensor.setLayoutData(analogAlarm1DirectionButtonLData);
+					this.spektrumSpeedSensor.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.spektrumSpeedSensor.setText(Messages.getString(MessageIds.GDE_MSGT2013));
+					this.spektrumSpeedSensor.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							GPSLoggerSetupConfiguration2.log.log(java.util.logging.Level.FINEST, "spektrumSpeedSensor.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors = (byte) (GPSLoggerSetupConfiguration2.this.spektrumSpeedSensor.getSelection() 
+									? GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors & 0xEF
+									: GPSLoggerSetupConfiguration2.this.configuration.spektrumSensors | 0x10);
 							GPSLoggerSetupConfiguration2.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -2010,7 +2037,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				FormData fixGpsStartPositionGroupLData = new FormData();
 				fixGpsStartPositionGroupLData.width = 290;
 				fixGpsStartPositionGroupLData.height = 143;
-				fixGpsStartPositionGroupLData.top = new FormAttachment(0, 1000, 430);
+				fixGpsStartPositionGroupLData.top = new FormAttachment(0, 1000, 450);
 				fixGpsStartPositionGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.fixGpsStartPositionGroup.setLayoutData(fixGpsStartPositionGroupLData);
 				this.fixGpsStartPositionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -2026,7 +2053,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.useFixGpsStartPositionButton = new Button(this.fixGpsStartPositionGroup, SWT.CHECK | SWT.LEFT);
 					RowData currentButtonLData = new RowData();
 					currentButtonLData.width = 250;
-					currentButtonLData.height = 20;
+					currentButtonLData.height = 18;
 					this.useFixGpsStartPositionButton.setLayoutData(currentButtonLData);
 					this.useFixGpsStartPositionButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					this.useFixGpsStartPositionButton.setText(Messages.getString(MessageIds.GDE_MSGT2091));
@@ -2058,7 +2085,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fixLatitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel1LData = new RowData();
 					addressLabel1LData.width = labelWidth;
-					addressLabel1LData.height = 20;
+					addressLabel1LData.height = 18;
 					this.fixLatitudeLabel.setLayoutData(addressLabel1LData);
 					this.fixLatitudeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2083).split(GDE.STRING_COMMA)[3].split(GDE.STRING_BLANK)[1]);
 				}
@@ -2109,7 +2136,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fixLatitudeUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel1LData = new RowData();
 					addressLabel1LData.width = 70;
-					addressLabel1LData.height = 20;
+					addressLabel1LData.height = 18;
 					this.fixLatitudeUnitLabel.setLayoutData(addressLabel1LData);
 					this.fixLatitudeUnitLabel.setText("[° ']   S|N");
 				}
@@ -2118,7 +2145,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fixLongitudeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel1LData = new RowData();
 					addressLabel1LData.width = labelWidth;
-					addressLabel1LData.height = 20;
+					addressLabel1LData.height = 18;
 					this.fixLongitudeLabel.setLayoutData(addressLabel1LData);
 					this.fixLongitudeLabel.setText(Messages.getString(MessageIds.GDE_MSGT2083).split(GDE.STRING_COMMA)[4].split(GDE.STRING_BLANK)[1]);
 				}
@@ -2169,7 +2196,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fixLongitudeUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel1LData = new RowData();
 					addressLabel1LData.width = 70;
-					addressLabel1LData.height = 20;
+					addressLabel1LData.height = 18;
 					this.fixLongitudeUnitLabel.setLayoutData(addressLabel1LData);
 					this.fixLongitudeUnitLabel.setText("[° ']   W|O");
 				}
@@ -2178,7 +2205,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fixHeightLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel1LData = new RowData();
 					addressLabel1LData.width = labelWidth;
-					addressLabel1LData.height = 20;
+					addressLabel1LData.height = 18;
 					this.fixHeightLabel.setLayoutData(addressLabel1LData);
 					this.fixHeightLabel.setText(Messages.getString(MessageIds.GDE_MSGT2083).split(GDE.STRING_COMMA)[7].substring(3));
 				}
@@ -2225,7 +2252,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 					this.fixHeightUnitLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 					RowData addressLabel1LData = new RowData();
 					addressLabel1LData.width = 70;
-					addressLabel1LData.height = 20;
+					addressLabel1LData.height = 18;
 					this.fixHeightUnitLabel.setLayoutData(addressLabel1LData);
 					this.fixHeightUnitLabel.setText("[m]");
 				}
