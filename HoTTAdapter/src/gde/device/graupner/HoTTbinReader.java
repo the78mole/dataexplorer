@@ -1447,7 +1447,7 @@ public class HoTTbinReader {
 				this.points[4] = (_buf[3] & 0xFF) * -1000;
 				this.points[5] = (_buf[4] & 0xFF) * -1000;
 				this.points[6] = (_buf[35] & 0xFF) * 1000;
-				this.points[7] = (_buf[36] & 0xFF) * 1000;
+				this.points[7] = ((_buf[36] & 0xFF) - 20) * 1000;
 				this.points[8] = (_buf[39] & 0xFF) * 1000;
 				if ((_buf[32] & 0x40) > 0 || (_buf[32] & 0x25) > 0 && this.tmpTemperatureRx >= 70) // T = 70 - 20 = 50 lowest temperature warning
 					this.points[9] = (_buf[32] & 0x65) * 1000; // warning E,V,T only
@@ -1627,7 +1627,7 @@ public class HoTTbinReader {
 				this.points[3] = DataParser.parse2UnsignedShort(_buf2, 0) * 1000;
 				this.points[4] = this.tmpClimb10 * 1000;
 				this.points[5] = (_buf0[1] & 0xFF) * 1000;
-				this.points[6] = (_buf0[2] & 0xFF) * 1000;
+				this.points[6] = ((_buf0[2] & 0xFF) - 20) * 1000;
 				this.points[7] = (_buf1[1] & 0x3F) * 1000; // inverse event
 				return true;
 			}
@@ -1726,7 +1726,7 @@ public class HoTTbinReader {
 				this.points[8] = (_buf1[3] & 0xFF) * 1000;
 				this.points[9] = 0;
 				this.points[10] = (_buf0[1] & 0xFF) * 1000;
-				this.points[11] = (_buf0[2] & 0xFF) * 1000;
+				this.points[11] = ((_buf0[2] & 0xFF) - 20) * 1000;
 				this.points[12] = (_buf3[3] & 0xFF) * 1000;
 				
 				switch (_buf3[4]) { //sat-fix

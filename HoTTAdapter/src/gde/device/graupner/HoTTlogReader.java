@@ -374,14 +374,14 @@ public class HoTTlogReader extends HoTTbinReader {
 		//0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
 		//data bytes: 12=RX-S-STR 13=voltageRx 14=TemperatureRx 15=Rx-DBM 16=RX-S-QUA 17=voltageRx_min 18=VPack_low_byte 19=VPack_high_byte 20=Tx-DBM 21=?
 		HoTTbinReader.tmpVoltageRx = (_buf[13] & 0xFF);
-		HoTTbinReader.tmpTemperatureRx = (_buf[2] & 0xFF);
+		HoTTbinReader.tmpTemperatureRx = (_buf[14] & 0xFF);
 		values[1] = (_buf[16] & 0xFF) * 1000;
 		values[3] = DataParser.parse2Short(_buf, 18) * 1000;
 		values[2] = (convertRxDbm2Strength(_buf[9] & 0xFF)) * 1000;
 		values[4] = _buf[8] * -1000;
 		values[5] = _buf[9] * -1000;
 		values[6] = (_buf[13] & 0xFF) * 1000;
-		values[7] = (_buf[14] & 0xFF) * 1000;
+		values[7] = ((_buf[14] & 0xFF) - 20) * 1000;
 		values[8] = (_buf[17] & 0xFF) * 1000;
 		if ((_buf[25] & 0x40) > 0 || (_buf[25] & 0x20) > 0 && HoTTbinReader.tmpTemperatureRx >= 70) //T = 70 - 20 = 50 lowest temperature warning
 			values[9] = (_buf[25] & 0x60) * 1000; //warning V,T only
