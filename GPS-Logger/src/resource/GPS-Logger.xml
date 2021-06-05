@@ -137,6 +137,18 @@
                 <active>true</active>
             </Measurement>
             <Measurement>
+                <name>glide_ratio</name>
+                <symbol>g</symbol>
+                <unit>m/1</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>speed_glide_ratio</name>
+                <symbol>vg</symbol>
+                <unit>km/h</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
                 <name>voltage_UL</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
@@ -422,6 +434,18 @@
                 <name>azimuth</name>
                 <symbol></symbol>
                 <unit>°</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>glide_ratio</name>
+                <symbol>g</symbol>
+                <unit>m/1</unit>
+                <active>true</active>
+            </Measurement>
+            <Measurement>
+                <name>speed_glide_ratio</name>
+                <symbol>vg</symbol>
+                <unit>km/h</unit>
                 <active>true</active>
             </Measurement>
             <Measurement>
