@@ -141,12 +141,14 @@
                 <symbol>g</symbol>
                 <unit>m/1</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="false" min="false"/>
             </Measurement>
             <Measurement>
                 <name>speed_glide_ratio</name>
                 <symbol>vg</symbol>
                 <unit>km/h</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="false" min="false"/>
             </Measurement>
             <Measurement>
                 <name>acceleration X</name>
@@ -512,15 +514,17 @@
             </Measurement>
             <Measurement>
                 <name>glide_ratio</name>
-                <symbol>r</symbol>
+                <symbol>g</symbol>
                 <unit>m/1</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="false" min="false"/>
             </Measurement>
             <Measurement>
                 <name>speed_glide_ratio</name>
-                <symbol>vr</symbol>
+                <symbol>vg</symbol>
                 <unit>km/h</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="false" min="false"/>
             </Measurement>
             <Measurement>
                 <name>acceleration X</name>

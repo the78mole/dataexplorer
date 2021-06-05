@@ -94,7 +94,7 @@
                 <unit>m</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-             </Measurement>
+            </Measurement>
             <Measurement>
                 <name>climb</name>
                 <symbol>vs</symbol>
@@ -141,19 +141,21 @@
                 <symbol>g</symbol>
                 <unit>m/1</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="false" min="false"/>
             </Measurement>
             <Measurement>
                 <name>speed_glide_ratio</name>
                 <symbol>vg</symbol>
                 <unit>km/h</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="false" min="false"/>
             </Measurement>
             <Measurement>
                 <name>voltage_UL</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="16" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_current" triggerRefOrdinal="18" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>current_UL</name>
@@ -171,14 +173,14 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
+                <statistics comment="comment_trigger_current" triggerRefOrdinal="18" sigma="true" avg="true" max="true" min="false"/>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute_UL</name>
                 <symbol>rpm</symbol>
                 <unit>rpm</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
+                <statistics comment="comment_trigger_current" triggerRefOrdinal="18" sigma="true" avg="true" max="true" min="false"/>
             </Measurement>
             <Measurement>
                 <name>voltage_rx_UL</name>
@@ -192,14 +194,14 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics sumTriggerText="text_trigger_motor_sum" sumByTriggerRefOrdinal="16" triggerRefOrdinal="16" sigma="false" avg="false" max="true" min="true"/>
+                <statistics sumTriggerText="text_trigger_motor_sum" sumByTriggerRefOrdinal="18" triggerRefOrdinal="18" sigma="false" avg="false" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>velocity_UL</name>
                 <symbol>v</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_current" triggerRefOrdinal="18" sigma="true" avg="true" max="true" min="true"/>
                 <property description="offset to measurement value" type="Double" value="0.0" name="offset"/>
                 <property description="factor to measurement value" type="Double" value="1.0" name="factor"/>
             </Measurement>
@@ -208,7 +210,7 @@
                 <symbol>c</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics triggerRefOrdinal="16" sigma="false" avg="true" max="true" min="true"/>
+                <statistics triggerRefOrdinal="18" sigma="false" avg="true" max="true" min="true"/>
                 <property description="offset to measurement value" type="Double" value="0.0" name="offset"/>
                 <property description="factor to measurement value" type="Double" value="1.0" name="factor"/>
             </Measurement>
@@ -441,19 +443,21 @@
                 <symbol>g</symbol>
                 <unit>m/1</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="false" min="false"/>
             </Measurement>
             <Measurement>
                 <name>speed_glide_ratio</name>
                 <symbol>vg</symbol>
                 <unit>km/h</unit>
                 <active>true</active>
+                <statistics sigma="false" avg="true" max="false" min="false"/>
             </Measurement>
             <Measurement>
                 <name>voltage_UL</name>
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="16" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_current" triggerRefOrdinal="18" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>current_UL</name>
@@ -478,14 +482,14 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
+                <statistics comment="comment_trigger_current" triggerRefOrdinal="18" sigma="true" avg="true" max="true" min="false"/>
             </Measurement>
             <Measurement>
                 <name>energy_UL</name>
                 <symbol>E</symbol>
                 <unit>Wmin</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
+                <statistics comment="comment_trigger_current" triggerRefOrdinal="18" sigma="true" avg="true" max="true" min="false"/>
             </Measurement>
             <Measurement>
                 <name>balance_UL</name>
@@ -546,7 +550,7 @@
                 <symbol>n</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="16" sigma="true" avg="true" max="true" min="false"/>
+                <statistics comment="comment_trigger_current" triggerRefOrdinal="18" sigma="true" avg="true" max="true" min="false"/>
             </Measurement>
             <Measurement>
                 <name>a_1_value_UL</name>
