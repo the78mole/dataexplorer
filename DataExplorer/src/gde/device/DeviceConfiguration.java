@@ -30,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -2869,4 +2870,13 @@ public class DeviceConfiguration {
 	 * @return the replacement
 	 */
 	public String getMeasurementReplacement(String key) { return xmlResource.getReplacement(key); }
+	
+	/**
+	 * cross check and update given channel configuration to drive correct selection, p.e. if simplified OSD stored with Android version
+	 * @param channelConfig "1 : UniLog2"
+	 * @param recordSetInfo map containing actual recordSet related information
+	 * @return new signature of channelConfiguration
+	 */
+	public String crossCheckChannelConfig(String channelConfig, HashMap<String, String> recordSetInfo) { return channelConfig; }
+
 }

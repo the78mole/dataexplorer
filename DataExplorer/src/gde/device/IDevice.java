@@ -1138,5 +1138,13 @@ public interface IDevice {
 	 * @return the replacement
 	 */
 	public String getMeasurementReplacement(String key);
+	
+	/**
+	 * cross check and update given channel configuration to drive correct selection, p.e. if simplified OSD stored with Android version
+	 * @param channelConfig "1 : UniLog2"
+	 * @param recordSetInfo map containing actual recordSet related information
+	 * @return new signature of channelConfiguration
+	 */
+	public String crossCheckChannelConfig(String channelConfig, HashMap<String, String> recordSetInfo);
 
 }

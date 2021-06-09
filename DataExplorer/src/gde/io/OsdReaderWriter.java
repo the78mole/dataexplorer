@@ -317,6 +317,7 @@ public class OsdReaderWriter {
 				recordDataSize = Long.valueOf(recordSetInfo.get(GDE.RECORD_DATA_SIZE)).intValue();
 				//recordSetDataPointer = Long.valueOf(recordSetInfo.get(RECORD_SET_DATA_POINTER)).longValue();
 
+				channelConfig = Analyzer.getInstance().getActiveDevice().crossCheckChannelConfig(channelConfig, recordSetInfo);
 				channel = channels.get(channels.getChannelNumber(channelConfig));
 				if (channel == null) { // 1.st try channelConfiguration not found
 					try { // get channel last digit and use as channel config ordinal
