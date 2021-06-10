@@ -59,6 +59,7 @@ import gde.messages.Messages;
 import gde.ui.DataExplorer;
 import gde.utils.FileUtils;
 import gde.utils.GPSHelper;
+import gde.utils.StringHelper;
 
 /**
  * GPS-Logger device class, used as template for new device implementations
@@ -189,6 +190,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				//CH2-UniLog2
 				//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 				//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+				
+				//begin GDE 3.4.9
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+				//CH1-UniLog
+				//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+				//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+				//CH2-UniLog2
+				//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+				//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+				//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 				data.parse(vec, vec.size());
 				lastLength += (subLenght+12);
 
@@ -219,6 +231,103 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	}
 
 	/**
+	 * check and adapt stored measurement properties against actual record set records which gets created by device properties XML
+	 * - calculated measurements could be later on added to the device properties XML
+	 * - devices with battery cell voltage does not need to all the cell curves which does not contain measurement values
+	 * @param fileRecordsProperties - all the record describing properties stored in the file
+	 * @param recordSet - the record sets with its measurements build up with its measurements from device properties XML
+	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
+	 */
+	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
+		// check for device file contained record properties which are not contained in actual configuration
+		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth;
+		//CH1-UniLog
+		//Unilog 15=voltageUniLog 16=currentUniLog 17=powerUniLog 18=revolutionUniLog 19=voltageRxUniLog 20=heightUniLog 21=a1UniLog 22=a2UniLog 23=a3UniLog;
+		//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
+		//CH2-UniLog2
+		//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
+		//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+		
+		//begin GDE 3.4.9
+		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+		//CH1-UniLog
+		//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+		//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+		//CH2-UniLog2
+		//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+		//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+		//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
+
+		String[] recordKeys = recordSet.getRecordNames();
+
+		StringBuilder sb = new StringBuilder().append(GDE.LINE_SEPARATOR);
+
+		Vector<String> cleanedRecordNames = new Vector<String>();
+		//incoming filePropertiesRecordNames may mismatch recordKeyNames, but addNoneCalculation will use original name
+		Vector<String> noneCalculationRecordNames = new Vector<String>();
+
+		try {
+			if (fileRecordsProperties.length != recordKeys.length) {
+				//begin GDE 3.4.9 Ch1=41 measurements, CH2=49 measurements
+				//SMGPS  added 15=GlideRatio 16=SpeedGlideRatio;
+				for (int i = 0, j = 0; i < recordKeys.length; i++) {
+					switch (i) {
+					case 15: //GlideRatio
+					case 16: //SpeedGlideRatio
+						sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
+						recordSet.get(i).setActive(null);
+						break;
+					default:
+						if (j < fileRecordsProperties.length) {
+							HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+							sb.append(String.format("%02d %19s match %19s isAvtive = %s\n", i, recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+							cleanedRecordNames.add(recordKeys[i]);
+							noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+							if (fileRecordsProperties[j].contains("_isActive=false")) recordSet.get(i).setActive(false);
+							++j;
+						}
+						else {//some Android saved record sets contain less fileRecordsProperties, mark rest as calculation
+							sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
+							recordSet.get(i).setActive(null);
+						}
+						break;
+					}
+				}
+			}
+			else { //already adapted record set stored
+				for (int i = 0; i < recordKeys.length; i++) {
+					if (!fileRecordsProperties[i].contains("_isActive")) {
+						sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
+						recordSet.get(i).setActive(null);
+						cleanedRecordNames.add(recordKeys[i]);
+					}
+					else {
+						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[i], Record.DELIMITER, Record.propertyKeys);
+						sb.append(String.format("%02d %19s match %19s isAvtive = %s\n", i, recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+						cleanedRecordNames.add(recordKeys[i]);
+						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+						if (fileRecordsProperties[i].contains("_isActive=false")) recordSet.get(i).setActive(false);
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			log.log(Level.SEVERE, String.format("recordKey to fileRecordsProperties mismatch, check:\n %s \nfileRecordsProperties.length = %d recordKeys.length = %d %s", e.getMessage(),
+					fileRecordsProperties.length, recordKeys.length, sb.toString()));
+		}
+
+		recordKeys = cleanedRecordNames.toArray(new String[1]);
+		//incoming filePropertiesRecordNames may mismatch recordKeyNames, but addNoneCalculation will use original incoming name
+		recordSet.setNoneCalculationRecordNames(noneCalculationRecordNames.toArray(new String[1]));
+
+		if (log.isLoggable(Level.FINE)) log.log(Level.FINE, sb.toString());
+
+		return recordKeys;
+	}
+
+	/**
 	 * add record data size points from file stream to each measurement
 	 * it is possible to add only none calculation records if makeInActiveDisplayable calculates the rest
 	 * do not forget to call makeInActiveDisplayable afterwards to calculate the missing data
@@ -232,7 +341,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 	public void addDataBufferAsRawDataPoints(RecordSet recordSet, byte[] dataBuffer, int recordDataSize, boolean doUpdateProgressBar) throws DataInconsitsentException {
 		int dataBufferSize = GDE.SIZE_BYTES_INTEGER * recordSet.getNoneCalculationRecordNames().length;
 		byte[] convertBuffer = new byte[dataBufferSize];
-		int[] points = new int[recordSet.size()];
+		int[] points = new int[recordSet.getNoneCalculationRecordNames().length];
 		String sThreadId = String.format("%06d", Thread.currentThread().getId()); //$NON-NLS-1$
 		int progressCycle = 0;
 		Vector<Integer> timeStamps = new Vector<Integer>(1, 1);
@@ -262,18 +371,30 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 			//CH2-UniLog2
 			//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 			//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+			
+			//begin GDE 3.4.9
+			//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+			//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+			//CH1-UniLog
+			//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+			//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+			//CH2-UniLog2
+			//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+			//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+			//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 			for (int j = 0; j < points.length; j++) {
 				points[j] = (((convertBuffer[0 + (j * 4)] & 0xff) << 24) + ((convertBuffer[1 + (j * 4)] & 0xff) << 16) + ((convertBuffer[2 + (j * 4)] & 0xff) << 8) + ((convertBuffer[3 + (j * 4)] & 0xff) << 0));
 			}
 
 			if (recordSet.isTimeStepConstant())
-				recordSet.addPoints(points);
+				recordSet.addNoneCalculationRecordsPoints(points);
 			else
-				recordSet.addPoints(points, timeStamps.get(i) / 10.0);
+				recordSet.addNoneCalculationRecordsPoints(points, timeStamps.get(i) / 10.0);
 
 			if (doUpdateProgressBar && i % 50 == 0) this.application.setProgress(((++progressCycle * 5000) / recordDataSize), sThreadId);
 		}
 		if (doUpdateProgressBar) this.application.setProgress(100, sThreadId);
+		this.updateVisibilityStatus(recordSet, true);
 		recordSet.syncScaleOfSyncableRecords();
 	}
 
@@ -309,6 +430,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				//CH2-UniLog2
 				//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 				//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+				
+				//begin GDE 3.4.9
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+				//CH1-UniLog
+				//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+				//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+				//CH2-UniLog2
+				//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+				//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+				//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 				if (record.getOrdinal() > 1) {
 					dataTableRow[index + 1] = record.getDecimalFormat().format((offset + ((record.realGet(rowIndex) / 1000.0) - reduction) * factor));
 				}
@@ -342,6 +474,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//CH2-UniLog2
 		//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 		//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+		
+		//begin GDE 3.4.9
+		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+		//CH1-UniLog
+		//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+		//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+		//CH2-UniLog2
+		//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+		//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+		//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 		if (record.getOrdinal() == 2 || record.getOrdinal() == 8) { 
 			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
 			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
@@ -392,6 +535,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//CH2-UniLog2
 		//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 		//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+		
+		//begin GDE 3.4.9
+		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+		//CH1-UniLog
+		//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+		//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+		//CH2-UniLog2
+		//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+		//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+		//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 		if (record.getOrdinal() == 2 || record.getOrdinal() == 8) { 
 			PropertyType property = record.getProperty(MeasurementPropertyTypes.DO_SUBTRACT_FIRST.value());
 			boolean subtractFirst = property != null ? Boolean.valueOf(property.getValue()).booleanValue() : false;
@@ -445,6 +599,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//CH2-UniLog2
 		//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 		//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+		
+		//begin GDE 3.4.9
+		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+		//CH1-UniLog
+		//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+		//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+		//CH2-UniLog2
+		//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+		//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+		//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 		String[] measurementNames = this.getMeasurementNames(channelConfigNumber);
 		// check if measurements isActive == false and set to isDisplayable == false
 		for (int i = 0; i < recordSet.size(); ++i) {
@@ -494,6 +659,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//CH2-UniLog2
 		//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 		//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+		
+		//begin GDE 3.4.9
+		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+		//CH1-UniLog
+		//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+		//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+		//CH2-UniLog2
+		//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+		//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+		//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 		//calculate azimuth/track
 		Record recordAzimuth = recordSet.get(14);
     //exclude azimuth calculation while opening older OSD files
@@ -662,6 +838,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//CH2-UniLog2
 		//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 		//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+		
+		//begin GDE 3.4.9
+		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+		//CH1-UniLog
+		//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+		//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+		//CH2-UniLog2
+		//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+		//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+		//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 		new FileHandler().exportFileKMZ(Messages.getString(MessageIds.GDE_MSGT2003), 1, 0, 2, 7, 9, 11, -1, type == DeviceConfiguration.HEIGHT_RELATIVE, type == DeviceConfiguration.HEIGHT_CLAMPTOGROUND);
 	}
 
@@ -678,6 +865,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//CH2-UniLog2
 		//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 		//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+		
+		//begin GDE 3.4.9
+		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+		//CH1-UniLog
+		//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+		//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+		//CH2-UniLog2
+		//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+		//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+		//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 		if (isGarminExtension)
 			new FileHandler().exportFileGPX(Messages.getString(gde.messages.MessageIds.GDE_MSGT0730), 	0, 1, 2, 7, 3, 5, 6, 4, new int[] {15,16,17});
 		else
@@ -703,6 +901,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				//CH2-UniLog2
 				//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 				//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+				
+				//begin GDE 3.4.9
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+				//CH1-UniLog
+				//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+				//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+				//CH2-UniLog2
+				//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+				//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+				//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 				containsGPSdata = activeRecordSet.get(0).hasReasonableData() && activeRecordSet.get(1).hasReasonableData() && activeRecordSet.get(2).hasReasonableData();
 			}
 		}
@@ -728,6 +937,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 				//CH2-UniLog2
 				//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 				//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+				
+				//begin GDE 3.4.9
+				//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+				//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+				//CH1-UniLog
+				//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+				//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+				//CH2-UniLog2
+				//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+				//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+				//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 				final int additionalMeasurementOrdinal = this.getGPS2KMZMeasurementOrdinal();
 				exportFileName = new FileHandler().exportFileKMZ(1, 0, 2, additionalMeasurementOrdinal, 9, 11, -1, true, isExportTmpDir);
 			}
@@ -748,6 +968,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//CH2-UniLog2
 		//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 		//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+		
+		//begin GDE 3.4.9
+		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+		//CH1-UniLog
+		//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+		//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+		//CH2-UniLog2
+		//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+		//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+		//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 		if (this.kmzMeasurementOrdinal == null) // keep usage as initial supposed and use speed measurement ordinal
 			return 7;
 
@@ -767,6 +998,17 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//CH2-UniLog2
 		//Unilog2 15=voltage_UL 16=current_UL2 17=capacity_UL2 18=power_UL2 19=energy_UL2 20=balance_UL 21=cellVoltage1 22=cellVolt2_ul 23=cellVolltage3_UL 24=cellVoltage4_UL 25=cellVoltage5_UL 26=cellVoltage6_UL 27=revolution_UL 28=a1_UL 29=a2_UL 30=a3_UL 31=temp_UL;
 		//M-LINK 32=valAdd00 33=valAdd01 34=valAdd02 35=valAdd03 36=valAdd04 37=valAdd05 38=valAdd06 39=valAdd07 40=valAdd08 41=valAdd09 42=valAdd10 43=valAdd11 44=valAdd12 45=valAdd13 46=valAdd14;
+		
+		//begin GDE 3.4.9
+		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
+		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
+		//CH1-UniLog
+		//Unilog 17=voltageUniLog 18=currentUniLog 19=powerUniLog 20=revolutionUniLog 21=voltageRxUniLog 22=heightUniLog 23=a1UniLog 24=a2UniLog 25=a3UniLog;
+		//M-LINK 26=valAdd00 27=valAdd01 28=valAdd02 29=valAdd03 30=valAdd04 31=valAdd05 32=valAdd06 33=valAdd07 34=valAdd08 35=valAdd09 36=valAdd10 37=valAdd11 38=valAdd12 39=valAdd13 40=valAdd14;
+		//CH2-UniLog2
+		//Unilog2 17=Voltage, 18=Current, 19=Capacity, 20=Power, 21=Energy, 222=CellBalance, 23=CellVoltage1, 24=CellVoltage2, 25=CellVoltage3, 
+		//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
+		//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 		Record recordLatitude = recordSet.get(0);
 		Record recordLongitude = recordSet.get(1);
 		Record baroAlitude = recordSet.get(8);
@@ -838,4 +1080,20 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track;
 		return new int[] { 8, 11, 7}; 
 	}  
+	
+	/**
+	 * cross check and update given channel configuration to drive correct selection, p.e. if simplified OSD stored with Android version
+	 * @param channelConfig "1 : UniLog2"
+	 * @param recordSetInfo map containing actual recordSet related information
+	 * @return new signature of channelConfiguration "2 : UniLog2"
+	 */
+	public String crossCheckChannelConfig(String channelConfig, HashMap<String, String> recordSetInfo) { 
+		if (channelConfig.endsWith("UniLog2")) {
+			String updateChannelConfig = "2 : UniLog2";
+			recordSetInfo.put(GDE.CHANNEL_CONFIG_NAME, updateChannelConfig);
+			return updateChannelConfig; 
+		}
+		return channelConfig;
+	}
+
 }

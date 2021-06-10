@@ -320,7 +320,8 @@ public class NMEAParser implements IDataParser {
 							//Unilog2 26=CellVoltage4, 27=CellVoltage5, 28=CellVoltage6, 29=Revolution, 30=ValueA1, 31=ValueA2, 32=ValueA3, 33=InternTemperature
 							//M-LINK  34=valAdd00 35=valAdd01 36=valAdd02 37=valAdd03 38=valAdd04 39=valAdd05 40=valAdd06 41=valAdd07 42=valAdd08 43=valAdd09 44=valAdd10 45=valAdd11 46=valAdd12 47=valAdd13 48=valAdd14;
 							//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
-							int[] in2out = { -1,  -1,  -1,  -1,  17,  18,  -1,  -1,  20,  29,  -1,  19,  21,  30,  31,  32,  23,  24,  25,  26,  27,  28,  -1,  32,  -1,  -1};
+						//int[] in2out = { -1,  -1,  -1,  -1,  15,  16,  -1,  -1,  18,  27,  -1,  17,  19,  28,  29,  30,  21,  22,  23,  24,  25,  26,  -1,  31,  -1,  -1};
+							int[] in2out = { -1,  -1,  -1,  -1,  17,  18,  -1,  -1,  20,  29,  -1,  19,  21,  30,  31,  32,  23,  24,  25,  26,  27,  28,  -1,  33,  -1,  -1};
 							parseUNILOG2(strValues, in2out, 20, false);								
 						}
 					}
@@ -1338,34 +1339,6 @@ public class NMEAParser implements IDataParser {
 			}
 			log.log(Level.FINE, s.toString());
 		}
-
-		//GPS 
-		//this.values[0]  = latitude;
-		//this.values[1]  = longitude;
-		//this.values[2]  = altitudeGPS;
-		//this.values[3]  = numSatelites;
-		//this.values[4]  = PDOP (dilution of precision) 
-		//this.values[5]  = HDOP (horizontal dilution of precision) 
-		//this.values[6]  = VDOP (vertical dilution of precision)
-		//this.values[7]  = velocity;
-		//SMGPS
-		//this.values[8]  = altitudeRel;
-		//this.values[9]  = climb;
-		//this.values[10] = voltageRx;
-		//this.values[11] = distanceTotal;
-		//this.values[12] = distanceStart;
-		//this.values[13] = directionStart;
-		//this.values[14] = trackAngle;
-		//Unilog
-		//this.values[15] = voltageUniLog;
-		//this.values[16] = currentUniLog;
-		//this.values[17] = powerUniLog;
-		//this.values[18] = revolutionUniLog;
-		//this.values[19] = voltageRxUniLog;
-		//this.values[20] = heightUniLog;
-		//this.values[21] = a1UniLog;
-		//this.values[22] = a2UniLog;
-		//this.values[23] = a3UniLog;
 	}
 
 	/**
