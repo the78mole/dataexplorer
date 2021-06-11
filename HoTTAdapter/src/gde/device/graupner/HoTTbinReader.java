@@ -1744,7 +1744,7 @@ public class HoTTbinReader {
 					break;
 				default:
 					try {
-						this.points[13] = Integer.valueOf(String.format("%c", _buf3[4])) * 1000;
+						this.points[13] = Integer.valueOf(String.format("%c", 0xFF & _buf3[4])) * 1000;
 					}
 					catch (NumberFormatException e1) {
 						this.points[13] = 1000;

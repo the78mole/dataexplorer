@@ -508,7 +508,7 @@ public class HoTTlogReader extends HoTTbinReader {
 			break;
 		default:
 			try {
-				values[13] = Integer.valueOf(String.format("%c", _buf[50])) * 1000;
+				values[13] = Integer.valueOf(String.format("%c", 0xFF & _buf[50])) * 1000;
 			}
 			catch (NumberFormatException e1) {
 				values[13] = 1000;
