@@ -1,27 +1,45 @@
-GNU DataExplorer - News - comes with Version 3.4.8 - 24 Apr 2021
+GNU DataExplorer - News - comes with Version 3.4.9 - 14 Jun 2021
 
 Generic changes/fixes
-	* enable record based scale sync property updates (outside device XML)
+	* remove property enumeration value="tolerate_sign_change"
+	* add log output detecting possible corrupt file creating history
+	* codesign Mac OS X - add time stamp and identifier to dmg
+	* Schema update (V43) to reflect removed property as well as updated device XML
+	* add IDevice method to correct channel if required (simplified OSD from GDE Android)
 	
 Device specific changes/fixes
-	* HoTTAdapter* - fix scale synchronization, formatting, unit and factor to support different GPS data source
-	* HoTTAdapter* - change SM GPS-Logger names from gyro to acceleration
-	* HoTTAdapter* - change GPS time and year to more readable format
-	* HoTTAdapter2 - fix parsing altitude,climb values while EAM is configured as primary
-	* HoTTAdapter2 - fix missing GAM, EAM, ESC parsing while no known GPS is connected
-	* HoTTAdapter2 - enable simple GPS type detection while reading through 19200 Baud protocol
-	* Triangoli - add initial support
+	* HoTTAdapter* - remove dependency to property using North/South hemisphere, as well as East/West of meridian
+	* HoTTAdapter* - rename variable GPS values in XML to propagate to history analysis
+	* HoTTAdapter* - correct offset MSL altitude if contained in GPS in *.log
+	* HoTTAdapter* - correct factor home direction, enable translation for HomeDirection
+	* HoTTAdapter* - refactor method updating GPS type dependent records
+	* HoTTAdapter* - update GPS type dependent records while loading from OSD
+	* HoTTAdapter* - harmonize temperature offset to fix scale sync problem in HoTTAdapter2
+	* HoTTAdapter2 - fix GPS data import single sensor
+	* IGCAdapter - add missing unit in device XML
+	* GPS-Logger3 - additional measurements added with firmware 1.26 (NMEA Import)
+	* GPS-Logger* - update configuration according firmware 1.26
+	* GPS-Logger* - fix visualization dialog
 	
 Generelle Änderungen/Verbesserungen
-	* Skalen-Synchronisations Eigenschaften auf Record Basis ermöglicht (ausserhalb Geräte XML)
+	* "tolerate_sign_change" aus XML Schema entfernt
+	* zusätzlicher Logeintrag für Historienanalyse zur Erkennung von fehlerhaften Einträgen
+	* Mac OS X Signierung wieder aktiviert
+	* XML Schema Update (V43), um entferntes Eintrag zu reflektieren und neue Geräte XML auszurollen
+	* IDevice Interface-Methode hinzugefügt, um vereinfacht gesicherte OSD Dateien (Android) lesen zu können
 
 Geräte spezifische Änderungen/Verbesserungen
-	* HoTTAdapter* - Synchronization, Formatierung, Einheit und Faktor zur Unterstützung unterschiedlicher GPS korrigiert
-	* HoTTAdapter* - SM GPS-Logger Namen von Gyro nach Beschleunigung geändert
-	* HoTTAdapter* - GPS Zeit und Datum zu besser lesbarem Format geändert
-	* HoTTAdapter2 - Parsingfehler bei eingestellten EAM als primärer Sensor für Höhe und Steigwerte korrigiert
-	* HoTTAdapter2 - Fehlendes parsen von GAM, EAM, ESC bei nicht erkanntem GPS Type gelöst
-	* HoTTAdapter2 - Simple GPS Type Erkennung implementiert bei Datenaufnahme mit 19200 Baud Protokoll
-	* Triangoli - add initial support
+	* HoTTAdapter* - Eigenschaft zur Unterdrückung Nord/Süd-Halbkugel und West/Ost entfernt
+	* HoTTAdapter* - Umbenennung von GPS-Type abhängigen Variablennamen, erscheinen in der Historienanalyse oder bei nicht erkanntem GPS-Type
+	* HoTTAdapter* - GPS-Höhe Offset korrigiert Sparrow (*.log)
+	* HoTTAdapter* - StartRichtung Korrektur des Faktors, und Sprachunterstützung
+	* HoTTAdapter* - Methode zum Update der GPS-Type abhängigen Werte umstruktoriert
+	* HoTTAdapter* - GPS-Type abhängige Werte werden jetzt auch beim Öffnen von OSD berücksichtigt
+	* HoTTAdapter* - Angleichung der Temperatur-Offsets zur Behebung des Skalensynchronisationsproblems
+	* HoTTAdapter2 - Korrektur GPS Datenimport bei ausschliesslichem GPS als Sensor
+	* IGCAdapter - add missing unit in device XML
+	* GPS-Logger3 - zusätzlich Messwerte für Version Firmware 1.26 (NMEA Import)
+	* GPS-Logger* - Update der Konfiguration entsprechend FW 1.26
+	* GPS-Logger* - Anzeigedialog korrigiert
 
 	

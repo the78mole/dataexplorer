@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.4.9 - xx yyy 2021
+Version 3.4.9 - 14 Jun 2021
 Generic changes/fixes
 	* remove property enumeration value="tolerate_sign_change"
 	* add log output detecting possible corrupt file creating history
@@ -18,7 +18,7 @@ Device specific changes/fixes
 	* HoTTAdapter* - harmonize temperature offset to fix scale sync problem in HoTTAdapter2
 	* HoTTAdapter2 - fix GPS data import single sensor
 	* IGCAdapter - add missing unit in device XML
-	* GPS-Logger2/3 - additional measurements added with 1.26 (NMEA Import)
+	* GPS-Logger3 - additional measurements added with 1.26 (NMEA Import)
 	* GPS-Logger* - update configuration according 1.26
 	* GPS-Logger* - fix visualization dialog
 
