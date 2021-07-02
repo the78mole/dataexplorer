@@ -138,15 +138,13 @@ public class CoreDataReader {
 					String searchPath = filePath.substring(0, filePath.lastIndexOf(GDE.FILE_SEPARATOR));
 					String filter = filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR) + 1, filePath.lastIndexOf(GDE.CHAR_UNDER_BAR) - 3);
 					List<File> logFiles = FileUtils.getFileListing(new File(searchPath), 0, filter);
+					int numberLogFiles = logFiles.size();
+					int numberProcessedLogFiles = 1;
 					for (File logFile : logFiles) {
 						log.log(Level.OFF, logFile.getAbsolutePath());
 
 						FileInputStream fis = new FileInputStream(logFile);
 						InputStreamReader in = new InputStreamReader(fis, "ISO-8859-1"); //$NON-NLS-1$
-
-						long inputFileSize = new File(filePath).length();
-						int progressLineLength = 0;
-
 						BufferedReader br = new BufferedReader(in);
 
 						String strLine;
@@ -278,12 +276,6 @@ public class CoreDataReader {
 							}
 							//log.log(Level.OFF, strLine);
 
-							progressLineLength = progressLineLength > strLine.length() ? progressLineLength : strLine.length();
-							int progress = (int) (line * 100 / (inputFileSize / progressLineLength));
-							if (progress <= 90 && progress > GDE.getUiNotification().getProgressPercentage() && progress % 10 == 0) {
-								GDE.getUiNotification().setProgress(progress);
-							}
-
 							List<String> array = new ArrayList<String>();
 							array.addAll(Arrays.asList(strLine.replace("|", ";").split(";")));
 							if (array != null && array.size() > 0) {
@@ -298,6 +290,11 @@ public class CoreDataReader {
 							}
 						}
 						in.close();
+
+						int progress = (int) (numberProcessedLogFiles++ * 100 / numberLogFiles);
+						if (progress <= 90 && progress > GDE.getUiNotification().getProgressPercentage()) {
+							GDE.getUiNotification().setProgress(progress);
+						}
 					}
 				}
 				catch (Exception e) {//Catch exception if any
@@ -305,7 +302,7 @@ public class CoreDataReader {
 					DataExplorer.getInstance().openMessageDialogAsync(gde.messages.Messages.getString(MessageIds.GDE_MSGE2952, new String[] { filePath, String.valueOf(line) }));
 				}
 
-				GDE.getUiNotification().setProgress(100);
+				GDE.getUiNotification().setProgress(99);
 
 				activeChannel.setActiveRecordSet(recordSetName);
 				activeChannel.applyTemplate(recordSetName, true);
@@ -329,6 +326,7 @@ public class CoreDataReader {
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				activeChannel.get(recordSetName).updateVisibleAndDisplayableRecordsForTable();
 				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
+				GDE.getUiNotification().setProgress(100);
 			}
 		}
 		catch (Exception e) {

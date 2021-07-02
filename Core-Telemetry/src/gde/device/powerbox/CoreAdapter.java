@@ -465,12 +465,13 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 				try {
 					CoreAdapter.this.application.setPortConnected(true);
 					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName;
+						String selectedImportFile = (fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName).replace(GDE.STRING_FILE_SEPARATOR_WINDOWS, GDE.STRING_FILE_SEPARATOR_UNIX);
+						selectedImportFile = selectedImportFile.replace(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
 
 						if (fd.getFileName().length() > 4) {
 							try {
-								Integer channelConfigNumber = CoreAdapter.this.dialog != null && !CoreAdapter.this.dialog.isDisposed() ? CoreAdapter.this.dialog.getTabFolderSelectionIndex() + 1 : null;
+								Integer channelConfigNumber = CoreAdapter.this.dialog != null && !CoreAdapter.this.dialog.isDisposed() ? CoreAdapter.this.dialog.getTabFolderSelectionIndex() + 1 : 1;
 								String recordNameExtend = selectedImportFile.substring(selectedImportFile.indexOf(GDE.CHAR_UNDER_BAR) + 1, selectedImportFile.lastIndexOf(GDE.CHAR_UNDER_BAR) - 3);
 								CoreDataReader.read(selectedImportFile, CoreAdapter.this, recordNameExtend, channelConfigNumber, true);
 							}
