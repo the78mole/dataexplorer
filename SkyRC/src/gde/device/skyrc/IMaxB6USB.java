@@ -439,7 +439,7 @@ public class IMaxB6USB extends MC3000 implements IDevice {
 		int maxVoltage = Integer.MIN_VALUE;
 		int minVoltage = Integer.MAX_VALUE;
 		//0=Voltage 1=Current 2=Capacity 3=Power 4=Energy 5=Temperature Ext  6=Temperature Int 7=Resistance
-		points[0] = DataParser.parse2Short(dataBuffer[10], dataBuffer[9]);
+		points[0] = DataParser.parse2UnsignedShort(dataBuffer[10], dataBuffer[9]);
 		points[1] = DataParser.parse2Short(dataBuffer[12], dataBuffer[11]);
 		points[2] = DataParser.parse2Short(dataBuffer[6], dataBuffer[5]) * 1000;
 		points[3] = Double.valueOf(points[0] / 1000.0 * points[1]).intValue(); // power U*I [W]

@@ -233,7 +233,7 @@ public class ImaxB6GathererThread extends Thread {
 	private Object[] processDataChannel(final int number, RecordSet recordSet, String processRecordSetKey, final byte[] channelBuffer, final byte[] dataBuffer, final int[] points) throws DataInconsitsentException {
 		final String $METHOD_NAME = "processOutlet"; //$NON-NLS-1$
 		Object[] result = new Object[2];
-		//LI battery： 	0=BALACE-CHARGE 1=CHARGE 2=DISCHARGE 3=STORAGE 4=FAST-CHARGE
+		//LI battery： 	0：CHARGE, 1：DISCHARGE, 2：STORAGE, 3：FAST CHG, 4：BALANCE
 		//Ni battery:		0=CHARGE 1=AUTO_CHARGE 2=DISCHARGE 3=RE_PEAK 4=CYCLE
 		//Pb battery:		0=CHARGE 1=DISCHARGE
 		String processTypeName = this.device.getProcessingTypeName(channelBuffer);
