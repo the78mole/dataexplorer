@@ -310,7 +310,7 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
-			newValue = value / 1000.0;
+			newValue = value / 10000.0;
 			break;
 
 		case DEFAULT:
@@ -353,7 +353,7 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
-			newValue = value * 1000.0;
+			newValue = value * 10000.0;
 			break;
 
 		case DEFAULT:
@@ -471,7 +471,7 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = CoreAdapter.this.dialog != null && !CoreAdapter.this.dialog.isDisposed() ? CoreAdapter.this.dialog.getTabFolderSelectionIndex() + 1 : null;
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX) + 1, selectedImportFile.lastIndexOf(GDE.CHAR_DOT));
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.indexOf(GDE.CHAR_UNDER_BAR) + 1, selectedImportFile.lastIndexOf(GDE.CHAR_UNDER_BAR) - 3);
 								CoreDataReader.read(selectedImportFile, CoreAdapter.this, recordNameExtend, channelConfigNumber, true);
 							}
 							catch (Throwable e) {

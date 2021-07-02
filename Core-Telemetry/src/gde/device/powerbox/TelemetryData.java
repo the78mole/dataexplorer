@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 import gde.GDE;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
+import gde.utils.FileUtils;
 
 /**
  *
@@ -291,6 +292,10 @@ public class TelemetryData {
 		String										name;
 		/** parameter unit */
 		String										unit;
+		/** parameter decimals */
+		int												decimals;
+		/** parameter decimals */
+		int												dataType = TelemetryData.T_DATA16;
 		/** list of telemetry values */
 		ArrayList<TelemetryItem>	data;
 		/** maximum and minimum values */
@@ -304,10 +309,11 @@ public class TelemetryData {
 		 * @param _name parameter name
 		 * @param _unit parameter unit
 		 */
-		TelemetryVar(int _param, String _name, String _unit) {
+		TelemetryVar(int _param, String _name, String _unit, int _decimals) {
 			this.param = _param;
 			this.name = _name;
 			this.unit = _unit;
+			this.decimals = _decimals;
 			this.data = new ArrayList<TelemetryItem>();
 			this.timeSteps = new TimeVector();
 		}
@@ -320,9 +326,14 @@ public class TelemetryData {
 			this.param = e.param;
 			this.name = e.name;
 			this.unit = e.unit;
+			this.decimals = e.decimals;
+			this.dataType = e.dataType;
 			this.data = new ArrayList<TelemetryItem>(e.data);
 			this.timeSteps = new TimeVector();
 		}
+		
+		public void setDataType(int _dataType) { this.dataType = _dataType; }
+		public int getDataType() { return this.dataType; }
 
 		/**
 		 * Adds a new telemetry item
@@ -362,14 +373,14 @@ public class TelemetryData {
 		 * @return unit of telemetry item
 		 */
 		public String getUnit() {
-			return this.unit;
+			return this.unit.trim();
 		}
 
 		/**
 		 * @return name of telemetry item
 		 */
 		public String getName() {
-			return this.name;
+			return this.name.trim();
 		}
 
 		/**
@@ -568,7 +579,7 @@ public class TelemetryData {
 		/** decimals */
 		private int		decimals;
 		/** value */
-		private int		value;
+		int		value;
 		/** time stamp */
 		private long	timestamp;
 
@@ -814,81 +825,86 @@ public class TelemetryData {
 	boolean loadCSV(String file) {
 		int line = 0;
 		try {
-			FileInputStream fis = new FileInputStream(file);
-			InputStreamReader in = new InputStreamReader(fis, "ISO-8859-1"); //$NON-NLS-1$
-
-			long inputFileSize = new File(file).length();
-			int progressLineLength = 0;
-
-			BufferedReader br = new BufferedReader(in);
-
-			String strLine;
-			while ((strLine = br.readLine()) != null) {
-				line++;
-				strLine = strLine.trim();
-				/*First character - commentary?
-				#AppVer=1.95
-				#TCfwVer=1.21
-				#SCfwVer=1.4
-				#Model=X-Perience Pro@0x5F33C7FF
-				#SensorsTable
-				*/
-				if (strLine.length() == 0 || strLine.startsWith("#")) { //$NON-NLS-1$
-					if (strLine.startsWith("#AppVer"))
-						this.appVer = strLine.substring(8).trim();
-					else if (strLine.startsWith("#TCfwVer"))
-						this.tcFwVer = strLine.substring(9).trim();
-					else if (strLine.startsWith("#SCfwVer"))
-						this.scFwVer = strLine.substring(9).trim();
-					else if (strLine.startsWith("#Model")) {						
-						this.modelName = strLine.substring(7).trim().split("@")[0];
-					}
-					else if (strLine.startsWith("#SensorsTable")) {
-						this.isSensorTable = true;
-						this.isStartLogEntries = false;
-						log.log(Level.FINER, "SensorsTable");
-					}
-					else if (strLine.startsWith("#Time")) {
-						this.startTime_ms = Long.parseLong(strLine.substring(8).trim(), 16) * 1000;
-						this.isSensorTable = false;
-						this.isStartLogEntries = true;
-						//log.log(Level.OFF, "Time = " + StringHelper.getFormatedTime("YYYY-MM-dd hh:mm:ss.SSS", startTime_ms));
-					}
-					continue;
-				}
-				
-				if (isSensorTable) //patch time stamp 0 to enable adding sensor
-					strLine = "000000000;" + strLine;
-				else if (isStartLogEntries && strLine.startsWith(":")) {
-					strLine = String.format("%09d;%s", this.startTime_ms + Integer.parseInt(strLine.substring(1, 3)) * 1000, strLine.substring(4));
-				}
-
-				progressLineLength = progressLineLength > strLine.length() ? progressLineLength : strLine.length();
-				int progress = (int) (line * 100 / (inputFileSize / progressLineLength));
-				if (progress <= 90 && progress > GDE.getUiNotification().getProgressPercentage() && progress % 10 == 0) {
-					GDE.getUiNotification().setProgress(progress);
-					try {
-						Thread.sleep(2);
-					}
-					catch (Exception e) {
-						// ignore
-					}
-				}
-
-				List<String> array = new ArrayList<String>();
-				array.addAll(Arrays.asList(strLine.replace("|", ";").split(";")));
-				if (array != null && array.size() > 0) {
-					if (array.size() == 4) { //only sensors/variables may have 4 entries in array while missing a unit 
-						log.log(Level.WARNING, String.format("Sensor data unknown! - %s", array));
-						array.add(GDE.STRING_EMPTY);
+			//find all depending log files
+			String searchPath = file.substring(0, file.lastIndexOf(GDE.FILE_SEPARATOR));
+			String filter = file.substring(file.lastIndexOf(GDE.FILE_SEPARATOR) + 1, file.lastIndexOf(GDE.CHAR_UNDER_BAR) - 3);
+			List<File> logFiles = FileUtils.getFileListing(new File(searchPath), 0, filter);
+			for (File logFile : logFiles) {
+				log.log(Level.OFF, logFile.getAbsolutePath());
+			
+				FileInputStream fis = new FileInputStream(logFile);
+				InputStreamReader in = new InputStreamReader(fis, "ISO-8859-1"); //$NON-NLS-1$
+	
+				long inputFileSize = new File(file).length();
+				int progressLineLength = 0;
+	
+				BufferedReader br = new BufferedReader(in);
+	
+				String strLine;
+				while ((strLine = br.readLine()) != null) {
+					line++;
+					strLine = strLine.trim();
+					/*First character - commentar?
+					#AppVer=1.95
+					#TCfwVer=1.21
+					#SCfwVer=1.4
+					#Model=X-Perience Pro@0x5F33C7FF
+					#SensorsTable
+					*/
+					if (strLine.length() == 0 || strLine.startsWith("#")) { //$NON-NLS-1$
+						if (strLine.startsWith("#AppVer"))
+							this.appVer = strLine.substring(8).trim();
+						else if (strLine.startsWith("#TCfwVer"))
+							this.tcFwVer = strLine.substring(9).trim();
+						else if (strLine.startsWith("#SCfwVer"))
+							this.scFwVer = strLine.substring(9).trim();
+						else if (strLine.startsWith("#Model")) {						
+							this.modelName = strLine.substring(7).trim().split("@")[0];
+						}
+						else if (strLine.startsWith("#SensorsTable")) {
+							this.isSensorTable = true;
+							this.isStartLogEntries = false;
+							log.log(Level.OFF, "SensorsTable");
+						}
+						else if (strLine.startsWith("#Time")) {
+							this.startTime_ms = Long.parseLong(strLine.substring(8).trim(), 16) * 1000;
+							//all sensors and variables evaluated, recordSet can be build
+							
+							this.isSensorTable = false;
+							this.isStartLogEntries = true;
+							//log.log(Level.OFF, "Time = " + StringHelper.getFormatedTime("YYYY-MM-dd hh:mm:ss.SSS", startTime_ms));
+						}
 						continue;
 					}
-					//if (!array.get(0).equals("000000000")) //print sensor measurements
-					//	log.log(Level.OFF, array.toString());
-					parseLineParams(array.toArray(new String[5]));
+					
+					if (isSensorTable) //patch time stamp 0 to enable adding sensor
+						strLine = "000000000;" + strLine;
+					else if (isStartLogEntries && strLine.startsWith(":")) {
+						strLine = String.format("%09d;%s", this.startTime_ms + Integer.parseInt(strLine.substring(1, 3)) * 1000, strLine.substring(4));
+					}
+					log.log(Level.OFF, strLine);
+	
+					progressLineLength = progressLineLength > strLine.length() ? progressLineLength : strLine.length();
+					int progress = (int) (line * 100 / (inputFileSize / progressLineLength));
+					if (progress <= 90 && progress > GDE.getUiNotification().getProgressPercentage() && progress % 10 == 0) {
+						GDE.getUiNotification().setProgress(progress);
+					}
+	
+					List<String> array = new ArrayList<String>();
+					array.addAll(Arrays.asList(strLine.replace("|", ";").split(";")));
+					if (array != null && array.size() > 0) {
+						if (array.size() == 4) { //only sensors/variables may have 4 entries in array while missing a unit 
+							//log.log(Level.WARNING, String.format("Sensor data unknown! - %s", array));
+							array.add(GDE.STRING_EMPTY);
+							continue;
+						}
+						//if (!array.get(0).equals("000000000")) //print sensor measurements
+						//	log.log(Level.OFF, array.toString());
+						parseLineParams(array.toArray(new String[5]));
+					}
 				}
-			}
 			in.close();
+			}
 			return true;
 		}
 		catch (Exception e) {//Catch exception if any
@@ -968,7 +984,12 @@ public class TelemetryData {
 				break;
 			case ST_UNIT:
 				unit = param;
-				TelemetryVar var = new TelemetryVar(paramId, label, unit);
+				//call the parameter decimals
+				state = ST_DECIMALS;
+				break;
+			case ST_DECIMALS:
+				decimals = Integer.parseInt(param);
+				TelemetryVar var = new TelemetryVar(paramId, label, unit, decimals);
 				TelemetrySensor s = this.getSensor(deviceId);
 				if (s != null) {
 					if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, String.format("%s %03d add variable %s[%s] ID=%d", s.getName(), deviceId, var.name, unit, paramId));
@@ -977,9 +998,6 @@ public class TelemetryData {
 				//no function
 				return;
 			case ST_START_INDEX:
-				state = ST_VALUES;
-				break;
-			case ST_DECIMALS:
 				state = ST_VALUES;
 				break;
 			case ST_VALUES:
@@ -1049,13 +1067,13 @@ public class TelemetryData {
 								decimals=0;
 							break;
 						}
-						if (TelemetryData.log.isLoggable(Level.FINE) && deviceId == 200 && paramId >= 20) //GPS-Logger Höhe
-							log.log(Level.FINE, String.format("TelemetryData: deviceId=%03d, paramId=%02d, value=%d, decimals=%d timeStamp=%d", deviceId, paramId, val, decimals, timestamp));
+						if (TelemetryData.log.isLoggable(Level.FINE) && deviceId == 188 && paramId == 1) //GPS-Logger Höhe
+							log.log(Level.OFF, String.format("TelemetryData: deviceId=%03d, paramId=%02d, value=%d, decimals=%d timeStamp=%d", deviceId, paramId, val, decimals, timestamp));
 						TelemetryItem item = new TelemetryItem(dataType, decimals, val, timestamp);
 
 						if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, "add sensor variable value " + par.name + "=" + item.value);
-//						if (deviceId == 200 && paramId == 01)
-//							log.log(Level.OFF, String.format("TelemetryData: deviceId=%03d, paramId=%02d, name= %s, untit='%s', value=%d, timeStamp=%d", deviceId, paramId, par.name, par.unit, val, timestamp));
+//						if (deviceId == 188 && paramId == 01)
+//							log.log(Level.OFF, String.format("TelemetryData: deviceId=%02d, paramId=%02d, name= %s, untit='%s', value=%d, timeStamp=%d", deviceId, paramId, par.name, par.unit, val, timestamp));
 						par.addItem(item, false);
 						if (this.startTimeStamp == 0) {
 							if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, "set startTimeStamp = " + timestamp);
