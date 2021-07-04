@@ -142,6 +142,7 @@ public class CoreDataReader {
 					int numberProcessedLogFiles = 1;
 					for (File logFile : logFiles) {
 						log.log(Level.OFF, logFile.getAbsolutePath());
+						line = 0;
 
 						FileInputStream fis = new FileInputStream(logFile);
 						InputStreamReader in = new InputStreamReader(fis, "ISO-8859-1"); //$NON-NLS-1$
@@ -253,10 +254,15 @@ public class CoreDataReader {
 										points = new int[recordNames.length];
 									}
 
-									startTime_ms = Long.parseLong(strLine.substring(8).trim(), 16) * 1000;
-									isSensorTable = false;
-									isStartLogEntries = true;
-									//log.log(Level.OFF, "Time = " + StringHelper.getFormatedTime("YYYY-MM-dd hh:mm:ss.SSS", startTime_ms));
+									try {
+										startTime_ms = Long.parseLong(strLine.substring(8).trim(), 16) * 1000;
+										isSensorTable = false;
+										isStartLogEntries = true;
+										//log.log(Level.OFF, "Time = " + StringHelper.getFormatedTime("YYYY-MM-dd hh:mm:ss.SSS", startTime_ms));
+									}
+									catch (Exception e) {
+										log.log(Level.SEVERE, logFile.getName() + " line # " + line + " failed parsing " + strLine.substring(8));
+									}
 								}
 								continue;
 							}
@@ -264,13 +270,18 @@ public class CoreDataReader {
 							if (isSensorTable) //patch time stamp 0 to enable adding sensor
 								strLine = "000000000;" + strLine;
 							else if (isStartLogEntries && strLine.startsWith(":")) {
-								long entryTime_ms = startTime_ms + Integer.parseInt(strLine.substring(1, 3)) * 1000;
-								strLine = String.format("%09d;%s", entryTime_ms, strLine.substring(4));
-								if (entryTime_ms > lastEntryTime_ms) {
-									//log.log(Level.OFF, "addPoints");
-									recordSet.addPoints(points, time_ms);
-									if (lastEntryTime_ms != 0) time_ms += entryTime_ms - lastEntryTime_ms;
-									lastEntryTime_ms = entryTime_ms;
+								try {
+									long entryTime_ms = startTime_ms + Integer.parseInt(strLine.substring(1, 3)) * 1000;
+									strLine = String.format("%09d;%s", entryTime_ms, strLine.substring(4));
+									if (entryTime_ms > lastEntryTime_ms) {
+										//log.log(Level.OFF, "addPoints");
+										recordSet.addPoints(points, time_ms);
+										if (lastEntryTime_ms != 0) time_ms += entryTime_ms - lastEntryTime_ms;
+										lastEntryTime_ms = entryTime_ms;
+									}
+								}
+								catch (Exception e) {
+									log.log(Level.SEVERE, logFile.getName() + " line # " + line + " failed parsing " + strLine);
 								}
 
 							}
@@ -280,13 +291,13 @@ public class CoreDataReader {
 							array.addAll(Arrays.asList(strLine.replace("|", ";").split(";")));
 							if (array != null && array.size() > 0) {
 								if (array.size() == 4) { //only sensors/variables may have 4 entries in array while missing a unit 
-									log.log(Level.WARNING, String.format("Sensor sensorData unknown! - %s", array));
+									//log.log(Level.WARNING, String.format("Sensor sensorData unknown! - %s", array));
 									array.add(GDE.STRING_EMPTY);
 									continue;
 								}
 								//if (!array.get(0).equals("000000000")) //print sensor measurements
 								//	log.log(Level.OFF, array.toString());
-								parseLineParams(array.toArray(new String[5]), recordSet, points);
+								parseLineParams(array.toArray(new String[5]), recordSet, points, logFile.getName(), line);
 							}
 						}
 						in.close();
@@ -323,6 +334,8 @@ public class CoreDataReader {
 				if (modelName.length() > 2) activeChannel.get(recordSetName)
 						.setRecordSetDescription(Messages.getString(gde.device.powerbox.MessageIds.GDE_MSGT2964, new String[] { activeChannel.get(recordSetName).getRecordSetDescription(), modelName }));
 
+				activeChannel.get(recordSetName).setRecordSetDescription(activeChannel.get(recordSetName).getRecordSetDescription() + GDE.STRING_NEW_LINE +
+						"#AppVer=" + appVer + " #TCfwVer=" + tcFwVer + " #SCfwVer=" + scFwVer);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				activeChannel.get(recordSetName).updateVisibleAndDisplayableRecordsForTable();
 				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
@@ -355,7 +368,7 @@ public class CoreDataReader {
 	/**
 	 * parse string array into parameter
 	 */
-	static void parseLineParams(String params[], RecordSet recordSet, int[] points) {
+	static void parseLineParams(String params[], RecordSet recordSet, int[] points, String fileName, int lineNumber) {
 		final int ST_TIME = 0;
 		final int ST_DEVICE_ID = 1;
 		final int ST_PARAM_NUM = 2;
@@ -379,111 +392,116 @@ public class CoreDataReader {
 			return;
 		}
 		for (String param : params) {
-			switch (state) {
-			case ST_TIME:
-				timestamp = Long.parseLong(param);
-				state = ST_DEVICE_ID;
-				break;
-			case ST_DEVICE_ID:
-				//device id sometimes ;42020    1; LiVa or | 0   0| Alarm: Cap..
-				try {
-					deviceId = Long.parseLong(!(param.startsWith(" ") && param.endsWith("0")) ? param.replace(' ', '0') : param);
-				}
-				catch (NumberFormatException e) {
-					log.log(Level.WARNING, "skip | param = " + param);
-				}
-				state = ST_PARAM_NUM;
-				break;
-			case ST_PARAM_NUM:
-				paramId = Integer.parseInt(param);
-				if (timestamp == 0) {
-					state = ST_SENSOR;
-				}
-				else {
-					state = ST_START_INDEX;
-				}
-				break;
-			case ST_SENSOR:
-				sensor = param;
-				//Insert a new sensor and exit the queue
-				if (timestamp == 0 && paramId == 0) {
-					if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, "adding sensor " + sensor);
-					TelemetrySensor telemetrySensor = new TelemetrySensor(deviceId, sensor);
-					CoreDataReader.sensorData.add(telemetrySensor);
-				}
-				//call the parameter label
-				state = ST_LABEL;
-				break;
-			case ST_LABEL:
-				label = param.trim();
-				//call the parameter unit
-				state = ST_UNIT;
-				break;
-			case ST_UNIT:
-				unit = param;
-				//call the parameter decimals
-				state = ST_DECIMALS;
-				break;
-			case ST_DECIMALS:
-				decimals = Integer.parseInt(param);
-				TelemetryVar var = new TelemetryVar(paramId, label, unit, decimals);
-				if (label.toLowerCase().startsWith("lon") || label.toLowerCase().startsWith("län") || label.toLowerCase().startsWith("lat") || label.toLowerCase().startsWith("brei"))
-					var.setDataType( TelemetryData.T_GPS);
-				TelemetrySensor s = CoreDataReader.getSensor(deviceId);
-				if (s != null) {
-					if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, String.format("%s %03d add variable %s[%s] ID=%d", s.getName(), deviceId, var.name, unit, paramId));
-					s.addVariable(var);
-				}
-				//no function
-				return;
-			case ST_START_INDEX:
-				state = ST_VALUES;
-				break;
-			case ST_VALUES:
-				int val = 0;
-				try {
-					if (param.startsWith("0x")) {
-						switch (param.length()) {
-						case 10: //GPS coordinate
-							//log.log(Level.OFF, paramId + " param = " + param);
-							dataType = TelemetryData.T_GPS;
-							val = Integer.parseInt(param.substring(2), 16);
-							break;
-
-						case 6: //GPS other value
-						default:
-							dataType = TelemetryData.T_DATA16;
-							val = Integer.valueOf(param.substring(2), 16).shortValue();
-							break;
+			try {
+				switch (state) {
+				case ST_TIME:
+					timestamp = Long.parseLong(param);
+					state = ST_DEVICE_ID;
+					break;
+				case ST_DEVICE_ID:
+					//device id sometimes ;42020    1; LiVa or | 0   0| Alarm: Cap..
+					try {
+						deviceId = Long.parseLong(!(param.startsWith(" ") && param.endsWith("0")) ? param.replace(' ', '0') : param);
+					}
+					catch (Exception e) {
+						log.log(Level.WARNING, "skip | param = " + param);
+					}
+					state = ST_PARAM_NUM;
+					break;
+				case ST_PARAM_NUM:
+					if (param != null) {
+						paramId = Integer.parseInt(param.trim());
+						if (timestamp == 0) {
+							state = ST_SENSOR;
+						}
+						else {
+							state = ST_START_INDEX;
 						}
 					}
-					else {
-						//paramId += 1;				//skip for first GOE coordinate
-						state = ST_VALUES;
-						break;
+					break;
+				case ST_SENSOR:
+					sensor = param;
+					//Insert a new sensor and exit the queue
+					if (timestamp == 0 && paramId == 0) {
+						if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, "adding sensor " + sensor);
+						TelemetrySensor telemetrySensor = new TelemetrySensor(deviceId, sensor);
+						CoreDataReader.sensorData.add(telemetrySensor);
 					}
-					TelemetryVar sensorVar = CoreDataReader.getSensor(deviceId).getVar(paramId);
-					if (sensorVar != null) {
-						int pontsIndex = recordSet.get(sensorVar.name).getOrdinal();
-						//log.log(Level.OFF, String.format("TelemetryData: deviceId=%03d, paramId=%02d, value=%d, decimals=%d timeStamp=%d ordinal=%d", deviceId, paramId, val, sensorVar.decimals, timestamp, pontsIndex));	
-						if (dataType == TelemetryData.T_GPS)
-							points[pontsIndex] = val;
-						else
-							points[pontsIndex] = val * 1000 / (int) Math.pow(10, sensorVar.decimals);
+					//call the parameter label
+					state = ST_LABEL;
+					break;
+				case ST_LABEL:
+					label = param.trim();
+					//call the parameter unit
+					state = ST_UNIT;
+					break;
+				case ST_UNIT:
+					unit = param;
+					//call the parameter decimals
+					state = ST_DECIMALS;
+					break;
+				case ST_DECIMALS:
+					decimals = Integer.parseInt(param);
+					TelemetryVar var = new TelemetryVar(paramId, label, unit, decimals);
+					if (label.toLowerCase().startsWith("lon") || label.toLowerCase().startsWith("län") || label.toLowerCase().startsWith("lat") || label.toLowerCase().startsWith("brei"))
+						var.setDataType( TelemetryData.T_GPS);
+					TelemetrySensor s = CoreDataReader.getSensor(deviceId);
+					if (s != null) {
+						if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, String.format("%s %03d add variable %s[%s] ID=%d", s.getName(), deviceId, var.name, unit, paramId));
+						s.addVariable(var);
 					}
+					//no function
+					return;
+				case ST_START_INDEX:
+					state = ST_VALUES;
+					break;
+				case ST_VALUES:
+					int val = 0;
+					try {
+						if (param.startsWith("0x")) {
+							switch (param.length()) {
+							case 10: //GPS coordinate
+								//log.log(Level.OFF, paramId + " param = " + param);
+								dataType = TelemetryData.T_GPS;
+								val = Integer.parseInt(param.substring(2), 16);
+								break;
+
+							case 6: //GPS other value
+							default:
+								dataType = TelemetryData.T_DATA16;
+								val = Integer.valueOf(param.substring(2), 16).shortValue();
+								break;
+							}
+						}
+						else {
+							//paramId += 1;				//skip for first GOE coordinate
+							state = ST_VALUES;
+							break;
+						}
+						TelemetryVar sensorVar = CoreDataReader.getSensor(deviceId).getVar(paramId);
+						if (sensorVar != null) {
+							int pontsIndex = recordSet.get(sensorVar.name).getOrdinal();
+							//log.log(Level.OFF, String.format("TelemetryData: deviceId=%03d, paramId=%02d, value=%d, decimals=%d timeStamp=%d ordinal=%d", deviceId, paramId, val, sensorVar.decimals, timestamp, pontsIndex));	
+							if (dataType == TelemetryData.T_GPS)
+								points[pontsIndex] = val;
+							else
+								points[pontsIndex] = val * 1000 / (int) Math.pow(10, sensorVar.decimals);
+						}
+					}
+					catch (Exception e) {
+						log.log(Level.SEVERE, fileName + " line # " + lineNumber + " failed parsing " + param);
+					}
+					if (startTimeStamp == 0) {
+						if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, "set startTimeStamp = " + timestamp);
+						startTimeStamp = timestamp;
+					}
+					paramId += dataType == TelemetryData.T_GPS ? 2 : 1;
+					state = ST_VALUES;
+					break;
 				}
-				catch (Exception e) {
-					log.log(java.util.logging.Level.SEVERE, e.getMessage(), e);
-					//TODO
-					log.log(Level.SEVERE, "Failed parsing " + param);
-				}
-				if (startTimeStamp == 0) {
-					if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, "set startTimeStamp = " + timestamp);
-					startTimeStamp = timestamp;
-				}
-				paramId += dataType == TelemetryData.T_GPS ? 2 : 1;
-				state = ST_VALUES;
-				break;
+			}
+			catch (NumberFormatException e) {
+				log.log(Level.SEVERE, fileName + " line # " + lineNumber + " failed parsing " + param);
 			}
 		}
 	}

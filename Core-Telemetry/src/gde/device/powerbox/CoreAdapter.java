@@ -456,8 +456,7 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 	 */
 	@Override
 	public void open_closeCommPort() {
-		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2950), new String[] { GDE.FILE_ENDING_STAR_LOG, GDE.FILE_ENDING_STAR_JML,
-				GDE.FILE_ENDING_STAR_STAR });
+		final FileDialog fd = FileUtils.getImportDirectoryFileDialog(this, Messages.getString(MessageIds.GDE_MSGT2950), new String[] { this.getDataBlockPreferredFileExtention() });
 
 		Thread reader = new Thread("reader") {
 			@Override
@@ -472,7 +471,7 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 						if (fd.getFileName().length() > 4) {
 							try {
 								Integer channelConfigNumber = CoreAdapter.this.dialog != null && !CoreAdapter.this.dialog.isDisposed() ? CoreAdapter.this.dialog.getTabFolderSelectionIndex() + 1 : 1;
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.indexOf(GDE.CHAR_UNDER_BAR) + 1, selectedImportFile.lastIndexOf(GDE.CHAR_UNDER_BAR) - 3);
+								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_UNDER_BAR) - 11, selectedImportFile.lastIndexOf(GDE.CHAR_UNDER_BAR) - 3);
 								CoreDataReader.read(selectedImportFile, CoreAdapter.this, recordNameExtend, channelConfigNumber, true);
 							}
 							catch (Throwable e) {
