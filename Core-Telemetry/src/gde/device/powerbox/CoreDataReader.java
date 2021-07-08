@@ -166,8 +166,8 @@ public class CoreDataReader {
 									tcFwVer = strLine.substring(9).trim();
 								else if (strLine.startsWith("#SCfwVer"))
 									scFwVer = strLine.substring(9).trim();
-								else if (strLine.startsWith("#Model")) {
-									modelName = strLine.substring(7).trim().split("@")[0];
+								else if (strLine.startsWith("#Model=")) {
+									modelName = strLine.substring(7, strLine.indexOf('@')).trim();
 								}
 								else if (strLine.startsWith("#SensorsTable")) {
 									isSensorTable = true;
@@ -338,8 +338,8 @@ public class CoreDataReader {
 						"#AppVer=" + appVer + " #TCfwVer=" + tcFwVer + " #SCfwVer=" + scFwVer);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
 				activeChannel.get(recordSetName).updateVisibleAndDisplayableRecordsForTable();
-				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
 				GDE.getUiNotification().setProgress(100);
+				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
 			}
 		}
 		catch (Exception e) {
@@ -349,6 +349,7 @@ public class CoreDataReader {
 				activeChannel.setActiveRecordSet(recordSetName);
 				device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 				activeChannel.get(recordSetName).checkAllDisplayable(); // raw import needs calculation of passive records
+				GDE.getUiNotification().setProgress(100);
 				if (GDE.isWithUi()) activeChannel.switchRecordSet(recordSetName);
 			}
 			// now display the error message

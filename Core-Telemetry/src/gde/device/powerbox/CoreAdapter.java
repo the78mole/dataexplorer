@@ -20,6 +20,8 @@ package gde.device.powerbox;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -463,16 +465,26 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 			public void run() {
 				try {
 					CoreAdapter.this.application.setPortConnected(true);
-					for (String tmpFileName : fd.getFileNames()) {
-						String selectedImportFile = (fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + tmpFileName).replace(GDE.STRING_FILE_SEPARATOR_WINDOWS, GDE.STRING_FILE_SEPARATOR_UNIX);
+					Set<String> filteredFileList = new HashSet<>();
+					for (String selectedFilename : fd.getFileNames()) {
+						String selectedImportFile = (fd.getFilterPath() + GDE.STRING_FILE_SEPARATOR_UNIX + selectedFilename).replace(GDE.STRING_FILE_SEPARATOR_WINDOWS, GDE.STRING_FILE_SEPARATOR_UNIX);
 						selectedImportFile = selectedImportFile.replace(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
-						log.log(Level.FINE, "selectedImportFile = " + selectedImportFile); //$NON-NLS-1$
+						if (selectedImportFile.endsWith("_Tele.log")) {
+							selectedImportFile = selectedImportFile.endsWith("00_Tele.log") ? selectedImportFile : selectedImportFile.replace(selectedImportFile.substring(selectedImportFile.lastIndexOf('_') - 2), "00_Tele.log");
+							filteredFileList.add(selectedImportFile);
+						}
+						else 
+							log.log(Level.WARNING, "No Core log file, ending with _Tele.log  " + selectedImportFile); //$NON-NLS-1$
 
-						if (fd.getFileName().length() > 4) {
+					}
+					for (String tmpFileName : filteredFileList) {
+						log.log(Level.OFF, "selectedImportFile = " + tmpFileName); //$NON-NLS-1$
+
+						if (tmpFileName.length() > 22) { //_13_38_39_00_Tele.log
 							try {
 								Integer channelConfigNumber = CoreAdapter.this.dialog != null && !CoreAdapter.this.dialog.isDisposed() ? CoreAdapter.this.dialog.getTabFolderSelectionIndex() + 1 : 1;
-								String recordNameExtend = selectedImportFile.substring(selectedImportFile.lastIndexOf(GDE.CHAR_UNDER_BAR) - 11, selectedImportFile.lastIndexOf(GDE.CHAR_UNDER_BAR) - 3);
-								CoreDataReader.read(selectedImportFile, CoreAdapter.this, recordNameExtend, channelConfigNumber, true);
+								String recordNameExtend = tmpFileName.substring(tmpFileName.lastIndexOf(GDE.CHAR_UNDER_BAR) - 11, tmpFileName.lastIndexOf(GDE.CHAR_UNDER_BAR) - 3);
+								CoreDataReader.read(tmpFileName, CoreAdapter.this, recordNameExtend, channelConfigNumber, true);
 							}
 							catch (Throwable e) {
 								log.log(Level.WARNING, e.getMessage(), e);
