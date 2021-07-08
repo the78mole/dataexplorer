@@ -29,6 +29,8 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ControlEditor;
 import org.eclipse.swt.custom.TableCursor;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -138,6 +140,16 @@ public class FileCommentWindow extends CTabItem {
 				if (FileCommentWindow.log.isLoggable(java.util.logging.Level.FINE)) FileCommentWindow.log.log(java.util.logging.Level.FINE, "commentMainComposite.paintControl, event=" + evt); //$NON-NLS-1$
 				if (isFileCommentChanged) setFileComment();
 				if (isRecordCommentChanged) updateRecordSetTable();
+			}
+		});
+		this.commentMainComposite.addControlListener(new ControlListener() {
+			public void controlResized(ControlEvent evt) {
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.controlResized evt=" + evt); //$NON-NLS-1$
+				updateRecordSetTable();
+			}
+
+			public void controlMoved(ControlEvent evt) {
+				if (log.isLoggable(Level.FINEST)) log.log(Level.FINEST, "composite.controlMoved evt=" + evt); //$NON-NLS-1$
 			}
 		});
 		this.commentMainComposite.addHelpListener(new HelpListener() {
@@ -448,7 +460,7 @@ public class FileCommentWindow extends CTabItem {
 	 * update the record set entry table
 	 */
 	synchronized void updateRecordSetTable() {
-		Point mainSize = FileCommentWindow.this.commentMainComposite.getSize();
+		Point mainSize = FileCommentWindow.this.getParent().getSize();
 		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "mainSize = " + mainSize.toString());
 		Rectangle bounds = new Rectangle(mainSize.x * 5 / 100, mainSize.y * 10 / 100, mainSize.x * 90 / 100, mainSize.y * 40 / 100);
 		//if (log.isLoggable(Level.FINE)) log.log(Level.FINE, "cover bounds = " + bounds.toString());
@@ -488,6 +500,7 @@ public class FileCommentWindow extends CTabItem {
 				}
 			}
 		}
+		FileCommentWindow.this.recordCommentTable.redraw();
 		this.isRecordCommentChanged = false;
 	}
 
