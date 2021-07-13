@@ -903,10 +903,21 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 						else 	if (this.deviceConfigurations.get(this.activeDeviceName).getUsbPortType() != null) {
 							this.portSelectCombo.setText("  USB"); //$NON-NLS-1$
 						}
+						else {
+							this.portSelectCombo.setText("  import"); //$NON-NLS-1$
+						}
 					}
 					else {
 						this.portSelectCombo.setItems(new String[0]);
-						this.portSelectCombo.setText(Messages.getString(MessageIds.GDE_MSGT0199));
+						if (this.deviceConfigurations.get(this.activeDeviceName).getSerialPortType() != null) {
+							this.portSelectCombo.setText(Messages.getString(MessageIds.GDE_MSGT0199));
+						}
+						else 	if (this.deviceConfigurations.get(this.activeDeviceName).getUsbPortType() != null) {
+							this.portSelectCombo.setText("  USB"); //$NON-NLS-1$
+						}
+						else {
+							this.portSelectCombo.setText("  import"); //$NON-NLS-1$
+						}
 					}
 
 					DeviceSelectionDialog.this.tableTabButton.setSelection(DeviceSelectionDialog.this.selectedActiveDeviceConfig.isTableTabRequested());
@@ -1148,11 +1159,21 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 												else 	if (DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDeviceName).getUsbPortType() != null) {
 													DeviceSelectionDialog.this.portSelectCombo.setText("  USB"); //$NON-NLS-1$
 												}
-
+												else {
+													DeviceSelectionDialog.this.portSelectCombo.setText("  import"); //$NON-NLS-1$
+												}
 											}
 											else {
 												DeviceSelectionDialog.this.portSelectCombo.setItems(new String[0]);
-												DeviceSelectionDialog.this.portSelectCombo.setText(Messages.getString(MessageIds.GDE_MSGT0198));
+												if (DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDeviceName).getSerialPortType() != null) {
+													DeviceSelectionDialog.this.portSelectCombo.setText(Messages.getString(MessageIds.GDE_MSGT0198));
+												}
+												else 	if (DeviceSelectionDialog.this.deviceConfigurations.get(DeviceSelectionDialog.this.activeDeviceName).getUsbPortType() != null) {
+													DeviceSelectionDialog.this.portSelectCombo.setText("  USB"); //$NON-NLS-1$
+												}
+												else {
+													DeviceSelectionDialog.this.portSelectCombo.setText("  import"); //$NON-NLS-1$
+												}
 											}
 										}
 									}
