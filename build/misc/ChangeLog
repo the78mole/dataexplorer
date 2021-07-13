@@ -4,6 +4,7 @@ Version 3.5.0 - xx yyy 2021
 Generic changes/fixes
 	* fix file comment tab update
 	* fix missing update device selection dialog, port selection combo
+	* fix missing hint for udev rule or dummy driver while using USB native communication
 	
 Device specific changes/fixes
 	* HitecX1Red - change voltage parsing to unsigned

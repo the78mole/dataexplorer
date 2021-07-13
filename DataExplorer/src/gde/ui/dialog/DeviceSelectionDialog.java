@@ -671,14 +671,16 @@ public class DeviceSelectionDialog extends org.eclipse.swt.widgets.Dialog {
 											}
 											if (DeviceSelectionDialog.this.deviceConfigurations.size() >= 1) {
 												DeviceSelectionDialog.this.selectedActiveDeviceConfig = DeviceSelectionDialog.this.deviceConfigurations.get(deviceName);
-												//open message box to hint dummy device driver or udev
-												if (deviceName.contains("MC3000") || deviceName.contains("Q200") || deviceName.contains("Hitec")) {
-													if (GDE.IS_LINUX)  	 application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0057));
-													else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0058));
-												}
-												else if (deviceName.contains("DUO") && deviceName.contains("iCharger")) {
-													if (GDE.IS_LINUX) 	 application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0060));
-													else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0061));
+												if (DeviceSelectionDialog.this.selectedActiveDeviceConfig.getUsbPortType() != null) { //device using native USB communication
+													//open message box to hint dummy device driver or udev
+													if (deviceName.startsWith("iCharger")) {
+														if (GDE.IS_LINUX)	application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0060));
+														else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0061));
+													}
+													else { //SkyRC device or SkyRC OEM device
+														if (GDE.IS_LINUX)	application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0057));
+														else if (GDE.IS_MAC) application.openMessageDialogAsync(GDE.shell, Messages.getString(MessageIds.GDE_MSGI0058));
+													} 
 												}
 											}
 										}
