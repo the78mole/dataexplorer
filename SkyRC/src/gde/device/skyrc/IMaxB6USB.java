@@ -860,11 +860,7 @@ public class IMaxB6USB extends MC3000 implements IDevice {
 								this.systemInfo[0] = new IMaxB6USB.SystemInfo(this.usbPort.getSystemInfo(this.dataGatherThread.getUsbInterface(), IMaxB6RDX1UsbPort.QuerySystemInfo.CHANNEL_A.value()));
 								this.systemSetting[0] = new IMaxB6USB.SystemSetting(this.usbPort.getSystemSetting(this.dataGatherThread.getUsbInterface(), IMaxB6RDX1UsbPort.QuerySystemSetting.CHANNEL_A.value()));
 
-								if (this.systemInfo[0].getFirmwareVersionAsInt() < 113) {
-									this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT3650, new String[] { this.systemInfo[0].getFirmwareVersion() }));
-								} else {					
-									WaitTimer.delay(100);
-								}
+								WaitTimer.delay(100);
 								this.dataGatherThread.start();
 							}
 						}
