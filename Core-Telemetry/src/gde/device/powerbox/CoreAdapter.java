@@ -18,6 +18,7 @@
 ****************************************************************************************/
 package gde.device.powerbox;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -471,7 +472,14 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 						selectedImportFile = selectedImportFile.replace(GDE.STRING_FILE_SEPARATOR_UNIX, GDE.FILE_SEPARATOR);
 						if (selectedImportFile.endsWith("_Tele.log")) {
 							selectedImportFile = selectedImportFile.endsWith("00_Tele.log") ? selectedImportFile : selectedImportFile.replace(selectedImportFile.substring(selectedImportFile.lastIndexOf('_') - 2), "00_Tele.log");
-							filteredFileList.add(selectedImportFile);
+							if (new File(selectedImportFile).exists())
+								filteredFileList.add(selectedImportFile);
+							else {
+								String message = "No Core log file available, ending with _00_Tele.log  " + selectedImportFile;
+								log.log(Level.WARNING, message); //$NON-NLS-1$
+								GDE.getUiNotification().setStatusMessage(message);
+
+							}						
 						}
 						else 
 							log.log(Level.WARNING, "No Core log file, ending with _Tele.log  " + selectedImportFile); //$NON-NLS-1$
