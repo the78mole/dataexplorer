@@ -10,6 +10,8 @@ Device specific changes/fixes
 	* HitecX1Red - change voltage parsing to unsigned
 	* iMAX BC6 - fix firmware message 
 	* Core-Telemetry - update log reader
+	* Modster200 - add initial support
+	* Modster600 - add initial support outlet A only
 
 Version 3.4.9 - 14 Jun 2021
 Generic changes/fixes

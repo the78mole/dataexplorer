@@ -48,7 +48,7 @@ import gde.utils.WaitTimer;
  */
 public class HitecX1Red extends MC3000 implements IDevice {
 	final static Logger				log					= Logger.getLogger(HitecX1Red.class.getName());
-	final ChargerDialog				dialog;
+	ChargerDialog							dialog;
 	HitecX1RedGathererThread	dataGatherThread;
 	IMaxB6RDX1UsbPort					usbPort;
 

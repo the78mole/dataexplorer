@@ -48,7 +48,7 @@ import gde.utils.WaitTimer;
  */
 public class IMaxB6USB extends MC3000 implements IDevice {
 	final static Logger				log					= Logger.getLogger(IMaxB6USB.class.getName());
-	final ChargerDialog				dialog;
+	final protected ChargerDialog				dialog;
 	ImaxB6GathererThread			dataGatherThread;
 	IMaxB6RDX1UsbPort					usbPort;
 
