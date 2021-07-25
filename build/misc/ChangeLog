@@ -5,6 +5,7 @@ Generic changes/fixes
 	* fix file comment tab update
 	* fix missing update device selection dialog, port selection combo
 	* fix missing hint for udev rule or dummy driver while using USB native communication
+	* fix DevicePropertiesEditor opening measurement item context menu
 	
 Device specific changes/fixes
 	* HitecX1Red - change voltage parsing to unsigned

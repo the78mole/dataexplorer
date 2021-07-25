@@ -1018,67 +1018,67 @@ public class DevicePropertiesEditor extends Composite {
 				//this.popupMenu = SWTResourceManager.getMenu("Contextmenu", this.tabFolder.getShell(), SWT.POP_UP);
 				this.contextMenu = new ContextMenu(this.popupMenu, this.tabFolder);
 				this.contextMenu.create();
+				if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0487))) { //Device
+					this.deviceComposite.setMenu(this.popupMenu);
+					this.deviceDescriptionlabel.setMenu(this.popupMenu);
+					this.deviceLabelComposite.setMenu(this.popupMenu);
+					this.deviceNameLabel.setMenu(this.popupMenu);
+					this.manufacturerLabel.setMenu(this.popupMenu);
+					this.manufURLabel.setMenu(this.popupMenu);
+					this.imageFileNameLabel.setMenu(this.popupMenu);
+					this.usageLabel.setMenu(this.popupMenu);
+					this.groupLabel.setMenu(this.popupMenu);
+					this.devicePropsComposite.setMenu(this.popupMenu);
+					//this.nameText.setMenu(this.popupMenu);
+					//this.manufacturerText.setMenu(this.popupMenu);
+					//this.manufURLText.setMenu(this.popupMenu);
+					//this.imageFileNameText.setMenu(this.popupMenu);
+					this.usageButton.setMenu(this.popupMenu);
+					//this.groupSelectionCombo.setMenu(this.popupMenu);
+				}
+				else if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0495))) { //Time base
+					this.timeBaseComposite.setMenu(this.popupMenu);
+					this.timeBaseDescriptionLabel.setMenu(this.popupMenu);
+					this.timeBaseNameLabel.setMenu(this.popupMenu);
+					this.timeBaseNameText.setMenu(this.popupMenu);
+					this.timeBaseSymbolLabel.setMenu(this.popupMenu);
+					this.timeBaseSymbolText.setMenu(this.popupMenu);
+					this.timeBaseUnitLabel.setMenu(this.popupMenu);
+					this.timeBaseUnitText.setMenu(this.popupMenu);
+					this.timeBaseTimeStepLabel.setMenu(this.popupMenu);
+					this.timeBaseTimeStepText.setMenu(this.popupMenu);
+				}
+				else if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0515))) { // Data block
+					this.dataBlockComposite.setMenu(this.popupMenu);
+					this.dataBlockDescriptionLabel.setMenu(this.popupMenu);
+					this.dataBlockRequiredGroup.setMenu(this.popupMenu);
+					this.dataBlockFormatLabel.setMenu(this.popupMenu);
+					this.dataBlockSizeLabel.setMenu(this.popupMenu);
+					this.dataBlockOptionalGroup.setMenu(this.popupMenu);
+					this.dataBlockCheckSumFormatButton.setMenu(this.popupMenu);
+					this.dataBlockCheckSumTypeLabel.setMenu(this.popupMenu);
+					this.dataBlockEndingLabel.setMenu(this.popupMenu);
+					this.preferredDataLocationButton.setMenu(this.popupMenu);
+					this.preferredFileExtensionButton.setMenu(this.popupMenu);
+				}
+				else if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0470))) { // State
+					this.stateComposite.setMenu(this.popupMenu);
+					this.stateDescriptionLabel.setMenu(this.popupMenu);
+				}
+				else if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0503))) { // Channel/Configuration
+					this.channelConfigComposite.setMenu(this.popupMenu);
+					this.channelConfigDescriptionLabel.setMenu(this.popupMenu);
+					this.channelConfigInnerTabFolder.setMenu(this.popupMenu);
+				}
+				else if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0505))) { // Desktop
+					this.desktopComposite.setMenu(this.popupMenu);
+					this.desktopDescriptionLabel.setMenu(this.popupMenu);
+				}
 			}
 			else if (this.popupMenu != null) {
 				this.popupMenu.dispose();
 				this.popupMenu = null;
 				this.contextMenu = null;
-			}
-			if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0487))) { //Device
-				this.deviceComposite.setMenu(this.popupMenu);
-				this.deviceDescriptionlabel.setMenu(this.popupMenu);
-				this.deviceLabelComposite.setMenu(this.popupMenu);
-				this.deviceNameLabel.setMenu(this.popupMenu);
-				this.manufacturerLabel.setMenu(this.popupMenu);
-				this.manufURLabel.setMenu(this.popupMenu);
-				this.imageFileNameLabel.setMenu(this.popupMenu);
-				this.usageLabel.setMenu(this.popupMenu);
-				this.groupLabel.setMenu(this.popupMenu);
-				this.devicePropsComposite.setMenu(this.popupMenu);
-				//this.nameText.setMenu(this.popupMenu);
-				//this.manufacturerText.setMenu(this.popupMenu);
-				//this.manufURLText.setMenu(this.popupMenu);
-				//this.imageFileNameText.setMenu(this.popupMenu);
-				this.usageButton.setMenu(this.popupMenu);
-				//this.groupSelectionCombo.setMenu(this.popupMenu);
-			}
-			else if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0495))) { //Time base
-				this.timeBaseComposite.setMenu(this.popupMenu);
-				this.timeBaseDescriptionLabel.setMenu(this.popupMenu);
-				this.timeBaseNameLabel.setMenu(this.popupMenu);
-				this.timeBaseNameText.setMenu(this.popupMenu);
-				this.timeBaseSymbolLabel.setMenu(this.popupMenu);
-				this.timeBaseSymbolText.setMenu(this.popupMenu);
-				this.timeBaseUnitLabel.setMenu(this.popupMenu);
-				this.timeBaseUnitText.setMenu(this.popupMenu);
-				this.timeBaseTimeStepLabel.setMenu(this.popupMenu);
-				this.timeBaseTimeStepText.setMenu(this.popupMenu);
-			}
-			else if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0515))) { // Data block
-				this.dataBlockComposite.setMenu(this.popupMenu);
-				this.dataBlockDescriptionLabel.setMenu(this.popupMenu);
-				this.dataBlockRequiredGroup.setMenu(this.popupMenu);
-				this.dataBlockFormatLabel.setMenu(this.popupMenu);
-				this.dataBlockSizeLabel.setMenu(this.popupMenu);
-				this.dataBlockOptionalGroup.setMenu(this.popupMenu);
-				this.dataBlockCheckSumFormatButton.setMenu(this.popupMenu);
-				this.dataBlockCheckSumTypeLabel.setMenu(this.popupMenu);
-				this.dataBlockEndingLabel.setMenu(this.popupMenu);
-				this.preferredDataLocationButton.setMenu(this.popupMenu);
-				this.preferredFileExtensionButton.setMenu(this.popupMenu);
-			}
-			else if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0470))) { // State
-				this.stateComposite.setMenu(this.popupMenu);
-				this.stateDescriptionLabel.setMenu(this.popupMenu);
-			}
-			else if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0503))) { // Channel/Configuration
-				this.channelConfigComposite.setMenu(this.popupMenu);
-				this.channelConfigDescriptionLabel.setMenu(this.popupMenu);
-				this.channelConfigInnerTabFolder.setMenu(this.popupMenu);
-			}
-			else if (tabItemName.equals(Messages.getString(MessageIds.GDE_MSGT0505))) { // Desktop
-				this.desktopComposite.setMenu(this.popupMenu);
-				this.desktopDescriptionLabel.setMenu(this.popupMenu);
 			}
 		}
 	}

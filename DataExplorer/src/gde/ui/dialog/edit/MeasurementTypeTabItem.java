@@ -481,20 +481,21 @@ public class MeasurementTypeTabItem extends CTabItem implements Cloneable {
 			//this.popupMenu = SWTResourceManager.getMenu("MeasurementContextMenu", this.channelConfigMeasurementPropertiesTabFolder.getShell(), SWT.POP_UP);
 			this.contextMenu = new MeasurementContextmenu(this.popupMenu, this, this.channelConfigMeasurementPropertiesTabFolder);
 			this.contextMenu.create();
+
+			this.measurementsComposite.setMenu(this.popupMenu);
+			this.measurementTypeLabel.setMenu(this.popupMenu);
+			this.measurementNameLabel.setMenu(this.popupMenu);
+			this.measurementSymbolLabel.setMenu(this.popupMenu);
+			this.measurementUnitLabel.setMenu(this.popupMenu);
+			this.measurementEnableLabel.setMenu(this.popupMenu);
+
+			this.channelConfigMeasurementPropertiesTabFolder.setMenu(this.popupMenu);
 		}
 		else if (!enable && this.popupMenu != null) {
 			this.popupMenu.dispose();
 			this.popupMenu = null;
 			this.contextMenu = null;
 		}
-		this.measurementsComposite.setMenu(this.popupMenu);
-		this.measurementTypeLabel.setMenu(this.popupMenu);
-		this.measurementNameLabel.setMenu(this.popupMenu);
-		this.measurementSymbolLabel.setMenu(this.popupMenu);
-		this.measurementUnitLabel.setMenu(this.popupMenu);
-		this.measurementEnableLabel.setMenu(this.popupMenu);
-
-		this.channelConfigMeasurementPropertiesTabFolder.setMenu(this.popupMenu);
 	}
 
 	/**

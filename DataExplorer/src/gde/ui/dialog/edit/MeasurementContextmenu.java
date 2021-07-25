@@ -56,7 +56,7 @@ public class MeasurementContextmenu {
 	MenuItem											numberMotorPropertyMenuItem, revolutionFactorPropertyMenuItem, prop100WPropertyMenuItem;
 	MenuItem											numberCellsPropertyMenuItem, invertCurrentPropertyMenuItem;
 	MenuItem 											scaleSyncRefOrdinal, googleEarthVelocityAvgLimitFactor, googleEarthVelocityLowerLimit, googleEarthVelocityUpperLimit;
-	MenuItem 											filterFactor, recordDataType, tolerateSignChange;
+	MenuItem 											filterFactor, recordDataType;
 
 
 	public MeasurementContextmenu(Menu useMenu, MeasurementTypeTabItem parent, CTabFolder useChannelConfigMeasurementPropertiesTabFolder) {
@@ -119,7 +119,6 @@ public class MeasurementContextmenu {
 				MeasurementContextmenu.this.googleEarthVelocityLowerLimit.setEnabled(true);
 				MeasurementContextmenu.this.googleEarthVelocityUpperLimit.setEnabled(true);
 				MeasurementContextmenu.this.filterFactor.setEnabled(true);
-				MeasurementContextmenu.this.tolerateSignChange.setEnabled(true);
 				MeasurementContextmenu.this.recordDataType.setEnabled(true);
 				MeasurementContextmenu.this.defaultPropertyMenuItem.setEnabled(true);
 				if (MeasurementContextmenu.this.measurementPropertiesTabFolder != null) {
@@ -345,14 +344,6 @@ public class MeasurementContextmenu {
 				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.FILTER_FACTOR.value());
 			}
 		});	
-//		this.tolerateSignChange = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
-//		this.tolerateSignChange.setText(MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value());
-//		this.tolerateSignChange.addListener(SWT.Selection, new Listener() {
-//			public void handleEvent(Event e) {
-//				log.log(java.util.logging.Level.FINEST, "tolerateSignChange action performed! " + e); //$NON-NLS-1$
-//				MeasurementContextmenu.this.measurementTypeTabItem.createMeasurementPropertyTabItem(MeasurementPropertyTypes.TOLERATE_SIGN_CHANGE.value());
-//			}
-//		});	
 		this.recordDataType = new MenuItem(this.addPropertyTypeMenu, SWT.PUSH);
 		this.recordDataType.setText(MeasurementPropertyTypes.DATA_TYPE.value());
 		this.recordDataType.addListener(SWT.Selection, new Listener() {
