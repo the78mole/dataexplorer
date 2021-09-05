@@ -210,7 +210,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 						case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 							if (HoTTbinReaderD.isSensorType[HoTTAdapter.Sensor.GPS.ordinal()]) {
 								bufCopier.copyToFreeBuffer();
-								if (bufCopier.is3BuffersFull()) {
+								if (bufCopier.is4BuffersFull()) {
 									parseGPS(HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 									bufCopier.clearBuffers();
 									isSensorData = true;
