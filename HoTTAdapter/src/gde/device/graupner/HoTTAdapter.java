@@ -2380,6 +2380,28 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 		}
 		return;
 	}
+	
+	/**
+	 * update the record set Vario dependent record meta data
+	 * @param version detected in byte buffer
+	 * @param device HoTTAdapter
+	 * @param tmpRecordSet the record set to be updated
+	 */
+	protected static void updateVarioTypeDependent(int version, IDevice device, RecordSet tmpRecordSet) {
+		if (version > 100 && version < 120) { //SM MicroVario
+			//8=accX 9=accY 10=accZ 11=reserved 12=version
+			tmpRecordSet.get(8).setName(device.getMeasurementReplacement("acceleration") + " X");
+			tmpRecordSet.get(8).setUnit("g");
+			tmpRecordSet.get(9).setName(device.getMeasurementReplacement("acceleration") + " Y");
+			tmpRecordSet.get(9).setUnit("g");
+			tmpRecordSet.get(9).createProperty(IDevice.SYNC_ORDINAL, DataTypes.INTEGER, 8); //$NON-NLS-1$
+			tmpRecordSet.get(10).setName(device.getMeasurementReplacement("acceleration") + " Z");
+			tmpRecordSet.get(10).setUnit("g");
+			tmpRecordSet.get(10).createProperty(IDevice.SYNC_ORDINAL, DataTypes.INTEGER, 8); //$NON-NLS-1$
+			tmpRecordSet.get(12).setName("Version");
+			tmpRecordSet.get(12).setUnit("");
+		}
+	}
 
 	/**
 	 * update the record set GPS dependent record meta data

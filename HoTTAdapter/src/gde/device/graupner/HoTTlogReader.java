@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import gde.GDE;
@@ -57,11 +58,11 @@ public class HoTTlogReader extends HoTTbinReader {
 		HoTTbinReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16 19=PowerOff 20=BattLow 21=Reset 22=Warning
 		HoTTbinReader.recordSetGAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetEAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Altitude, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
-		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
+		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx 7=Event 8=accX 9=accY 10=accZ 11=reserved 12=version
 		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 		HoTTbinReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperaure
 		HoTTbinReader.pointsReceiver = new int[10];
-		HoTTbinReader.pointsVario = new int[8];
+		HoTTbinReader.pointsVario = new int[13];
 		HoTTbinReader.pointsVario[2] = 100000;
 		HoTTbinReader.pointsGPS = new int[24];
 		HoTTbinReader.pointsGAM = new int[26];
@@ -76,6 +77,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		PackageLossDeque reverseChannelPackageLossCounter = new PackageLossDeque(logTimeStep);
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
+		boolean isVarioDetected = false;
 		boolean isGPSdetected = false;
 		int countPackageLoss = 0;
 		int logDataOffset = Integer.valueOf(fileInfoHeader.get("LOG DATA OFFSET"));
@@ -186,6 +188,10 @@ public class HoTTlogReader extends HoTTbinReader {
 								// recordSetVario initialized and ready to add data
 								parseVario(HoTTbinReader.buf, HoTTbinReader.pointsVario, false);
 								HoTTbinReader.recordSetVario.addPoints(HoTTbinReader.pointsVario, HoTTbinReader.timeStep_ms);
+								if (!isVarioDetected) {
+									HoTTAdapter.updateVarioTypeDependent((HoTTbinReader.buf[65] & 0xFF), device, HoTTbinReader.recordSetVario);
+									isVarioDetected = true;								
+								}
 								break;
 
 						case HoTTAdapter.ANSWER_SENSOR_GPS_19200:
@@ -454,6 +460,21 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[5] = (_buf[13] & 0xFF) * 1000;				//voltageRx
 		values[6] = (_buf[14] & 0xFF) * 1000;				//temperaturRx
 		values[7] = (_buf[27] & 0x3F) * 1000; 			//inverse event
+		
+		if ((HoTTbinReader.buf[65] & 0xFF) > 100 && (HoTTbinReader.buf[65] & 0xFF) < 120) { //SM MicroVario starts with FW version 1.00 -> 100
+			try {
+				values[8] = Integer.parseInt(String.format(Locale.ENGLISH, "%c%c%c%c%c0", _buf[40], _buf[41], _buf[42], _buf[44], _buf[45]).trim());
+				values[9] = Integer.parseInt(String.format(Locale.ENGLISH, "%c%c%c%c%c0", _buf[47], _buf[48], _buf[49], _buf[51], _buf[52]).trim());
+				values[10] = Integer.parseInt(String.format(Locale.ENGLISH, "%c%c%c%c%c0", _buf[54], _buf[55], _buf[56], _buf[58], _buf[59]).trim());
+			}
+			catch (NumberFormatException e) {
+				byte[] tmpArray = new byte[21];
+				System.arraycopy(_buf, 40, tmpArray, 0, tmpArray.length);
+				log.log(Level.WARNING, new String(tmpArray));
+			}
+			//values[11] = reserved for future usage;
+			values[12] = _buf[65] * 1000; //SM MicroVario starts with FW version 1.00 -> 100
+		}
 
 		if (log.isLoggable(Level.FINER)) {
 			printSensorValues(_buf, values, 8);

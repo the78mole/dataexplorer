@@ -35,6 +35,7 @@ import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
@@ -677,7 +678,7 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx 9=Event Rx
 		HoTTbinReader.recordSetGAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetEAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Altitude, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
-		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx 7=Event Vario
+		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx 7=Event 8=accX 9=accY 10=accZ 11=reserved 12=version
 		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 		HoTTbinReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16
 		HoTTbinReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperature
@@ -692,7 +693,7 @@ public class HoTTbinReader {
 		long[] timeSteps_ms = new long[] {0};
 		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, new int[10], timeSteps_ms, new byte[][] { buf });
 		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, new int[23], timeSteps_ms, new byte[][] { buf });
-		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, new int[8], timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, new int[13], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, new int[24], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, new int[26], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, new int[31], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
@@ -700,6 +701,7 @@ public class HoTTbinReader {
 		int version = -1;
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
+		boolean isVarioDetected = false;
 		boolean isGPSdetected = false;
 		boolean isWrongDataBlockNummerSignaled = false;
 		boolean isSdLogFormat = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT));
@@ -813,9 +815,13 @@ public class HoTTbinReader {
 									}
 									// recordSetVario initialized and ready to add data
 									bufCopier.copyToVarioBuffer();
-									if (bufCopier.is2BuffersFull()) {
-										version = parseAddVario(version, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
+									if (bufCopier.is4BuffersFull()) {
+										version = parseAddVario(version, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
 										bufCopier.clearBuffers();
+									}
+									if (!isVarioDetected) {
+										HoTTAdapter.updateVarioTypeDependent((HoTTbinReader.buf4[9] & 0xFF), device, HoTTbinReader.recordSetVario);
+										isVarioDetected = true;								
 									}
 								}
 								break;
@@ -1066,7 +1072,7 @@ public class HoTTbinReader {
 		HoTTbinReader.recordSetReceiver = null; // 0=RF_RXSQ, 1=RXSQ, 2=Strength, 3=PackageLoss, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=UminRx
 		HoTTbinReader.recordSetGAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6, 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
 		HoTTbinReader.recordSetEAM = null; // 0=RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 19=CellVoltage 14, 20=Altitude, 21=Climb 1, 22=Climb 3, 23=Voltage 1, 24=Voltage 2, 25=Temperature 1, 26=Temperature 2, 27=Revolution
-		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx
+		HoTTbinReader.recordSetVario = null; // 0=RXSQ, 1=Altitude, 2=Climb 1, 3=Climb 3, 4=Climb 10, 5=VoltageRx, 6=TemperatureRx 7=Event 8=accX 9=accY 10=accZ 11=reserved 12=version
 		HoTTbinReader.recordSetGPS = null; // 0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS 15=HomeDirection 16=Roll 17=Pitch 18=Yaw 19=GyroX 20=GyroY 21=GyroZ 22=Vibration 23=Version	
 		HoTTbinReader.recordSetChannel = null; // 0=FreCh, 1=Tx, 2=Rx, 3=Ch 1, 4=Ch 2 .. 18=Ch 16 19=PowerOff 20=BattLow 21=Reset 22=Warning
 		HoTTbinReader.recordSetESC = null; // 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Revolution, 6=Temperaure
@@ -1081,7 +1087,7 @@ public class HoTTbinReader {
 		long[] timeSteps_ms = new long[] {0};
 		HoTTbinReader.rcvBinParser = Sensor.RECEIVER.createBinParser(HoTTbinReader.pickerParameters, new int[10], timeSteps_ms, new byte[][] { buf });
 		HoTTbinReader.chnBinParser = Sensor.CHANNEL.createBinParser(HoTTbinReader.pickerParameters, new int[23], timeSteps_ms, new byte[][] { buf });
-		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, new int[8], timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+		HoTTbinReader.varBinParser = Sensor.VARIO.createBinParser(HoTTbinReader.pickerParameters, new int[13], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.gpsBinParser = Sensor.GPS.createBinParser(HoTTbinReader.pickerParameters, new int[24], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.gamBinParser = Sensor.GAM.createBinParser(HoTTbinReader.pickerParameters, new int[26], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		HoTTbinReader.eamBinParser = Sensor.EAM.createBinParser(HoTTbinReader.pickerParameters, new int[31], timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
@@ -1090,6 +1096,7 @@ public class HoTTbinReader {
 		int logCountVario = 0, logCountGPS = 0, logCountGeneral = 0, logCountElectric = 0, logCountSpeedControl = 0;
 		HoTTbinReader.isJustParsed = false;
 		HoTTbinReader.isTextModusSignaled = false;
+		boolean isVarioDetected = false;
 		boolean isGPSdetected = false;
 		boolean isSdLogFormat = Boolean.parseBoolean(header.get(HoTTAdapter.SD_FORMAT));
 		long numberDatablocks = isSdLogFormat ? fileSize - HoTTbinReaderX.headerSize - HoTTbinReaderX.footerSize : fileSize / HoTTbinReader.dataBlockSize;
@@ -1177,7 +1184,7 @@ public class HoTTbinReader {
 
 						if (actualSensor != lastSensor) {
 							// write data just after sensor switch
-							if (logCountVario >= 3 || logCountGPS >= 4 || logCountGeneral >= 5 || logCountElectric >= 5 || logCountSpeedControl >= 5) {
+							if (logCountVario >= 5 || logCountGPS >= 5 || logCountGeneral >= 5 || logCountElectric >= 5 || logCountSpeedControl >= 5) {
 								switch (lastSensor) {
 								case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 								case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
@@ -1200,7 +1207,11 @@ public class HoTTbinReader {
 											}
 										}
 										// recordSetVario initialized and ready to add data
-										parseAddVario(1, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2);
+										parseAddVario(1, HoTTbinReader.buf0, HoTTbinReader.buf1, HoTTbinReader.buf2, HoTTbinReader.buf3, HoTTbinReader.buf4);
+										if (!isVarioDetected) {
+											HoTTAdapter.updateVarioTypeDependent((HoTTbinReader.buf4[9] & 0xFF), device, HoTTbinReader.recordSetVario);
+											isVarioDetected = true;								
+										}
 									}
 									break;
 
@@ -1595,7 +1606,7 @@ public class HoTTbinReader {
 	 * @param _buf2
 	 * @throws DataInconsitsentException
 	 */
-	protected static int parseAddVario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2) throws DataInconsitsentException {
+	protected static int parseAddVario(int sdLogVersion, byte[] _buf0, byte[] _buf1, byte[] _buf2, byte[] _buf3, byte[] _buf4) throws DataInconsitsentException {
 		if (HoTTbinReader.varBinParser.parse()) {
 			HoTTbinReader.recordSetVario.addPoints(HoTTbinReader.varBinParser.getPoints(), HoTTbinReader.varBinParser.getTimeStep_ms());
 		}
@@ -1609,7 +1620,7 @@ public class HoTTbinReader {
 
 		protected VarBinParser(PickerParameters pickerParameters, int[] points, long[] timeSteps_ms, byte[][] buffers) {
 			super(pickerParameters, points, timeSteps_ms, buffers, Sensor.VARIO);
-			if (buffers.length != 3) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
+			if (buffers.length != 5) throw new InvalidParameterException("buffers mismatch: " + buffers.length);
 			points[2] = 100000;
 		}
 
@@ -1623,12 +1634,29 @@ public class HoTTbinReader {
 				this.points[1] = this.tmpHeight * 1000;
 				// pointsVarioMax = DataParser.parse2Short(buf1, 4) * 1000;
 				// pointsVarioMin = DataParser.parse2Short(buf1, 6) * 1000;
-				this.points[2] = DataParser.parse2UnsignedShort(_buf1, 8) * 1000;
+				this.points[2] = (DataParser.parse2UnsignedShort(_buf1, 8) - 30000) * 10;
 				this.points[3] = DataParser.parse2UnsignedShort(_buf2, 0) * 1000;
 				this.points[4] = this.tmpClimb10 * 1000;
 				this.points[5] = (_buf0[1] & 0xFF) * 1000;
 				this.points[6] = ((_buf0[2] & 0xFF) - 20) * 1000;
 				this.points[7] = (_buf1[1] & 0x3F) * 1000; // inverse event
+
+				if ((HoTTbinReader.buf4[9] & 0xFF) > 100 && (HoTTbinReader.buf4[9] & 0xFF) < 120) { //SM MicroVario starts with FW version 1.00 -> 100
+					try {
+						this.points[8] = Integer.parseInt(String.format(Locale.ENGLISH, "%c%c%c%c%c0", _buf2[4], _buf2[5], _buf2[6], _buf2[8], _buf2[9]).trim());
+						this.points[9] = Integer.parseInt(String.format(Locale.ENGLISH, "%c%c%c%c%c0", _buf3[1], _buf3[2], _buf3[3], _buf3[5], _buf3[6]).trim());
+						this.points[10] = Integer.parseInt(String.format(Locale.ENGLISH, "%c%c%c%c%c0", _buf3[8], _buf3[9], _buf4[0], _buf4[2], _buf4[3]).trim());
+					}
+					catch (NumberFormatException e) {
+						byte[] tmpArray = new byte[21];
+						System.arraycopy(_buf2, 4, tmpArray, 0, 6);
+						System.arraycopy(_buf3, 0, tmpArray, 6, 10);
+						System.arraycopy(_buf4, 0, tmpArray, 16, 5);
+						log.log(Level.WARNING, "'" + new String(tmpArray) + "'");
+					}
+					//values[11] = reserved for future usage;
+					this.points[12] =(_buf4[9] & 0xFF) * 10; //SM MicroVario starts with FW version 1.00 -> 100
+				}
 				return true;
 			}
 			this.points[7] = (_buf1[1] & 0x3F) * 1000; // inverse event

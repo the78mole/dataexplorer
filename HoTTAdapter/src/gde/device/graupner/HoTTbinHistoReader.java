@@ -254,7 +254,7 @@ public class HoTTbinHistoReader {
 		} else if (activeChannelNumber == Sensor.CHANNEL.getChannelNumber()) {
 			binParser = Sensor.CHANNEL.createBinParser(pickerParameters, points, timeSteps_ms, new byte[][] { buf });
 		} else if (activeChannelNumber == Sensor.VARIO.getChannelNumber()) {
-			binParser = Sensor.VARIO.createBinParser(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+			binParser = Sensor.VARIO.createBinParser(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		} else if (activeChannelNumber == Sensor.GPS.getChannelNumber()) {
 			binParser = Sensor.GPS.createBinParser(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		} else if (activeChannelNumber == Sensor.GAM.getChannelNumber()) {
@@ -330,7 +330,7 @@ public class HoTTbinHistoReader {
 					case HoTTAdapter.SENSOR_TYPE_VARIO_19200:
 						if (detectedSensors.contains(Sensor.VARIO)) {
 							bufCopier.copyToVarioBuffer();
-							if (bufCopier.is2BuffersFull()) {
+							if (bufCopier.is4BuffersFull()) {
 								if (binParser instanceof VarBinParser && binParser.parse()) pointsAdder.invoke();
 								isSensorData = true;
 								bufCopier.clearBuffers();
@@ -342,7 +342,7 @@ public class HoTTbinHistoReader {
 					case HoTTAdapter.SENSOR_TYPE_GPS_19200:
 						if (detectedSensors.contains(Sensor.GPS)) {
 							bufCopier.copyToFreeBuffer();
-							if (bufCopier.is3BuffersFull()) {
+							if (bufCopier.is4BuffersFull()) {
 								if (binParser instanceof GpsBinParser && binParser.parse()) pointsAdder.invoke();
 								isSensorData = true;
 								bufCopier.clearBuffers();
@@ -450,7 +450,7 @@ public class HoTTbinHistoReader {
 		} else if (activeChannelNumber == Sensor.CHANNEL.getChannelNumber()) {
 			binParser = Sensor.CHANNEL.createBinParser(pickerParameters, points, timeSteps_ms, new byte[][] { buf });
 		} else if (activeChannelNumber == Sensor.VARIO.getChannelNumber() && detectedSensors.contains(Sensor.VARIO)) {
-			binParser = Sensor.VARIO.createBinParser(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+			binParser = Sensor.VARIO.createBinParser(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		} else if (activeChannelNumber == Sensor.GPS.getChannelNumber() && detectedSensors.contains(Sensor.GPS)) {
 			binParser = Sensor.GPS.createBinParser(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		} else if (activeChannelNumber == Sensor.GAM.getChannelNumber() && detectedSensors.contains(Sensor.GAM)) {
@@ -515,7 +515,7 @@ public class HoTTbinHistoReader {
 
 					if (actualSensor != lastSensor) {
 						// write data just after sensor switch
-						if (logCountVario >= 3 || logCountGPS >= 4 || logCountGeneral >= 5 || logCountElectric >= 5 || logCountSpeedControl >= 5) {
+						if (logCountVario >= 5 || logCountGPS >= 5 || logCountGeneral >= 5 || logCountElectric >= 5 || logCountSpeedControl >= 4) {
 							switch (lastSensor) {
 							case HoTTAdapter.SENSOR_TYPE_VARIO_115200:
 							case HoTTAdapter.SENSOR_TYPE_VARIO_19200:

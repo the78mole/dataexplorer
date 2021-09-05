@@ -138,7 +138,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 			chnBinParser = Sensor.CHANNEL.createBinParser2(pickerParameters, points, timeSteps_ms, new byte[][] { buf });
 		}
 		if (detectedSensors.contains(Sensor.VARIO)) {
-			varBinParser = Sensor.VARIO.createBinParser2(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+			varBinParser = Sensor.VARIO.createBinParser2(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		}
 		if (detectedSensors.contains(Sensor.GPS)) {
 			gpsBinParser = Sensor.GPS.createBinParser2(pickerParameters, points, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
@@ -394,7 +394,7 @@ public class HoTTbinHistoReader2 extends HoTTbinHistoReader {
 		} else chnBinParser = null;
 		// use parser points objects
 		if (detectedSensors.contains(Sensor.VARIO)) {
-			varBinParser = Sensor.VARIO.createBinParser2(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2 });
+			varBinParser = Sensor.VARIO.createBinParser2(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
 		} else varBinParser = null;
 		if (detectedSensors.contains(Sensor.GPS)) {
 			gpsBinParser = Sensor.GPS.createBinParser2(pickerParameters, timeSteps_ms, new byte[][] { buf0, buf1, buf2, buf3, buf4 });
