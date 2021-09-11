@@ -66,6 +66,7 @@ public class NMEAParser implements IDataParser {
 	protected Vector<String>							missingImpleWarned				= new Vector<String>();
 	protected String 											deviceSerialNumber				= GDE.STRING_EMPTY;
 	protected String											firmwareVersion           = GDE.STRING_EMPTY;
+	protected boolean 										isGPS_Logger_FW_128				= false;
 	
 	protected int													recordSetNumberOffset			= 0;
 	protected int													timeResetCounter					= 0;
@@ -83,8 +84,8 @@ public class NMEAParser implements IDataParser {
 
 	public enum NMEA {
 		//NMEA sentences
-		GPRMC, GPGSA, GPGGA, GPVTG, GPGSV, GPRMB, GPGLL, GPZDA, 
-		GNRMC, GNGSA, GNGGA, GNVTG, GNGSV, GNRMB, GNGLL, GNZDA, 
+		GPRMC, GPGSA, GPGGA, GPGNS, GPVTG, GPGSV, GPRMB, GPGLL, GPZDA, 
+		GNRMC, GNGSA, GNGGA, GNGNS, GNVTG, GNGSV, GNRMB, GNGLL, GNZDA, 
 		//additional SM-Modellbau GPS-Logger NMEA sentences
 		GPSSETUP, SETUP, SMGPS, SMGPS2, MLINK, UNILOG, KOMMENTAR, COMMENT,
 		//additional SM-Modellbau UniLog2 sentences
@@ -213,8 +214,14 @@ public class NMEAParser implements IDataParser {
 				parseRMC(strValues);
 				break;
 			case GPGGA: //Global Positioning System Fix Data (GGA)				
-			case GNGGA: //Global Positioning System Fix Data (GGA)				
-				parseGGA(strValues);
+			case GNGGA: //Global Positioning System Fix Data (GGA)			
+				if (!this.isGPS_Logger_FW_128)
+					parseGGA(strValues);
+				break;
+			case GPGNS: //Global Positioning System Fix Data (GGA)				
+			case GNGNS: //Global Positioning System Fix Data (GGA)	
+				if (this.isGPS_Logger_FW_128)
+					parseGNS(strValues);
 				break;
 			case GPGSA: //Satellite status (GSA)
 			case GNGSA: //Satellite status (GSA)
@@ -270,6 +277,8 @@ public class NMEAParser implements IDataParser {
 					this.isAutoDstOffset = true;
 				}
 				this.firmwareVersion = String.format("%.2f", Integer.parseInt(strValues[54].trim(), 16)/100.0); //$NON-NLS-1$
+				this.isGPS_Logger_FW_128 = device.getName().contains("GPS-Logger") && Float.parseFloat(this.firmwareVersion) >= 1.28F;
+
 				break;
 			case SETUP: // setup SM GPS-Logger firmware 1.00
 //							try {
@@ -594,6 +603,141 @@ public class NMEAParser implements IDataParser {
 			
 			if (log.isLoggable(Level.FINE)) 
 				log.log(Level.FINE, "GGA " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
+			
+
+			int latitude, longitude, numSatelites, altitudeGPS;
+			if (this.lastTimeStamp == timeStamp) { // validate sentence  depends to same sentence set
+				try {
+					if (this.values[0] == 0) {
+						latitude = (int) (Double.valueOf(strValues[2].trim())*10000);
+						latitude = strValues[3].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude; //$NON-NLS-1$
+					} 
+					else
+						latitude = this.values[0];
+				}
+				catch (Exception e) {
+					latitude = this.values[0];
+				}
+				try {
+					if (this.values[1] == 0) {
+						longitude = (int) (Double.valueOf(strValues[4].trim())*10000);
+						longitude = strValues[5].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude; //$NON-NLS-1$
+					} 
+					else
+						longitude = this.values[1];
+				}
+				catch (Exception e) {
+					longitude = this.values[1];
+				}
+				try {
+					numSatelites = Integer.parseInt(strValues[7].trim()) * 1000;
+				}
+				catch (Exception e) {
+					numSatelites = this.values[3];
+				}
+				try {
+					altitudeGPS = (int) (Double.parseDouble(strValues[9].trim()) * 1000.0);
+				}
+				catch (Exception e) {
+					altitudeGPS = this.values[2];
+				}
+			}
+			else {
+				try {
+						latitude = (int) (Double.valueOf(strValues[2].trim())*10000);
+						latitude = strValues[3].trim().equalsIgnoreCase("N") ? latitude : -1 * latitude; //$NON-NLS-1$
+				}
+				catch (Exception e) {
+					latitude = this.values[0];
+				}
+				try {
+						longitude = (int) (Double.valueOf(strValues[4].trim())*10000);
+						longitude = strValues[5].trim().equalsIgnoreCase("E") ? longitude : -1 * longitude; //$NON-NLS-1$
+				}
+				catch (Exception e) {
+					longitude = this.values[1];
+				}
+				try {
+					numSatelites = Integer.parseInt(strValues[7].trim()) * 1000;
+				}
+				catch (Exception e) {
+					numSatelites = this.values[3];
+				}
+				try {
+					altitudeGPS = (int) (Double.parseDouble(strValues[9].trim()) * 1000.0);
+				}
+				catch (Exception e) {
+					altitudeGPS = this.values[2];
+				}
+			}
+
+			//GPS 
+			this.values[0] = latitude;
+			this.values[1] = longitude;
+			this.values[2] = altitudeGPS;
+			this.values[3] = numSatelites;
+			//this.values[4]  = PDOP (dilution of precision) 
+			//this.values[5]  = HDOP (horizontal dilution of precision) 
+			//this.values[6]  = VDOP (vertical dilution of precision)
+			//this.values[7]  = velocity;
+			//this.values[8]  = magneticVariation; // SM GPS-Logger -> altitudeRel;
+			if (log.isLoggable(Level.FINE))
+				log.log(Level.FINE, String.format("lat %9.6f, long %9.6f, alt %d, sats %d", latitude/1000000., longitude/1000000., altitudeGPS/10000, numSatelites/1000));
+		}
+	}
+
+	/**
+	 * parse the Global Navigation System Fix Data (GNS), use variable number of satellites systems
+	 * <ul>
+	 * $GNGNS,HHMMSS.ss,BBBB.BBBB,b,LLLLL.LLLL,l,c--c,NN,D.D,H.H,h,G.G,g,A.A,RRRR*PP
+	 * $GPGGA,132045.100,4752.4904,N,01106.7063,E,1,10,0.89,543.4,M,47.8,M,,*68
+	 * <li>
+	 * <li> GNS          Global Navigation System Fix Data
+	 * <li> 123519       Fix taken at 12:35:19 UTC
+	 * <li> 4807.038,N   Latitude 48 deg 07.038' N
+	 * <li> 01131.000,E  Longitude 11 deg 31.000' E
+	 * <li> ADDN         Mode indicator with variable  length. Characters  currently  defined GPS, GLONASS, Galileo other satellite systems in the future.  
+	 * <li>  						 N = No fix
+	 * <li>                           A = Autonomous mode
+	 * <li>                           D = Differential mode
+	 * <li>                           P = Precise mode
+	 * <li> 													R = Real Time Kinematic
+	 * <li> 													F = Float RTK
+	 * <li> 													E = Estimated (dead reckoning) mode
+	 * <li> 													M = Manual input mode
+	 * <li> 													S = Simulator mode
+	 * <li> 08           Number of satellites in use
+	 * <li> 0.9          Horizontal dilution of position
+	 * <li> 545.4,M      Altitude, Meters, above mean sea level
+	 * <li> 46.9,M       Geoidal Separation: the difference between the WGS-84 earth ellipsoid surface and mean-sea-level (geoid) surface; “-” = mean-sea-level surface below ellipsoid.
+	 * <li> A:A					 Age of differential data and Differential Reference Station ID
+	 * <li> RRRR  			 DGPS station ID number
+	 * <li> *47          the checksum data, always begins with *
+	 * </ul>
+	 * @param strValues
+	 */
+	void parseGNS(String[] strValues) {
+		String modeIndicator = strValues[6].trim();
+		if (modeIndicator.length() == 0 || modeIndicator.contains("A") || modeIndicator.contains("D") || modeIndicator.contains("P")) { //fix quality 
+			String strValueTime = strValues[1].trim();
+			long timeStamp = 0l;
+			if (strValueTime.length() < 9) return;
+			
+			int hour = Integer.parseInt(strValueTime.substring(0, 2)) + this.timeOffsetUTC;
+			int minute = Integer.parseInt(strValueTime.substring(2, 4));
+			int second = Integer.parseInt(strValueTime.substring(4, 6));
+			GregorianCalendar calendar = new GregorianCalendar(this.year, this.month - 1, this.day, hour, minute, second);
+			this.isNmeaSentenceTime = true;
+			if (this.isAutoDstOffset && this.dstOffset == Short.MIN_VALUE) {
+				this.correctDstOffset(calendar);
+			}
+			int indexAfterDot = strValueTime.indexOf(GDE.CHAR_DOT) + 1;
+			timeStamp = calendar.getTimeInMillis() + (indexAfterDot > 0  && strValueTime.length() >= indexAfterDot + 2 ? Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10 : 0);
+			if (log.isLoggable(Level.FINER))
+				log.log(Level.FINER, "GNS " + Integer.parseInt(strValueTime.substring(indexAfterDot, indexAfterDot + 2)) * 10); //$NON-NLS-1$);
+			
+			if (log.isLoggable(Level.FINE)) 
+				log.log(Level.FINE, "GNS " + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss.SSS").format(timeStamp)); //$NON-NLS-1$);
 			
 
 			int latitude, longitude, numSatelites, altitudeGPS;

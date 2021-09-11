@@ -14,6 +14,7 @@ Device specific changes/fixes
 	* Modster200 - add initial support
 	* Modster600 - add initial support outlet A only
 	* HoTTAdapter* - add SM MicroVario acceleration values
+	* GPS-Logger* - prepare GNS sentence for firmware >= 1.28
 
 Version 3.4.9 - 14 Jun 2021
 Generic changes/fixes
