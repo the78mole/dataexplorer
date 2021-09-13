@@ -1,6 +1,6 @@
 Development history / change log, please read from bottom up
 
-Version 3.5.0 - xx yyy 2021
+Version 3.5.0 - 13 Sep 2021
 Generic changes/fixes
 	* fix file comment tab update
 	* fix missing update device selection dialog, port selection combo
