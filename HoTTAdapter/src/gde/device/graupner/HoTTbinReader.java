@@ -1802,10 +1802,9 @@ public class HoTTbinReader {
 					this.points[22] = (_buf4[3] & 0xFF) * 1000;
 				}
 				else { //Graupner GPS need workaround to distinguish between different Graupner GPS with version #0
-					if (this.points[23] == 1000 || (_buf3[6] != 0 && _buf3[7] != 0 && _buf3[8] != 0))
-						_buf4[9] = 0x01;
+					int version = this.points[23] == 1000 || (_buf3[6] != 0 && _buf3[7] != 0 && _buf3[8] != 0) ? 1 : 0;
 						
-					if (_buf4[9] == 0) { //#0=GPS 33600
+					if (version == 0) { //#0=GPS 33600
 						//16=Roll 17=Pitch 18=Yaw 19=GPS time 20=? 21=MSL Altitude 22=Vibration
 						this.points[16] = _buf3[6] * 1000; 
 						this.points[17] = _buf3[7] * 1000; 
