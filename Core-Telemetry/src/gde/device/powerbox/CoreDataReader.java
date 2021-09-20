@@ -195,6 +195,7 @@ public class CoreDataReader {
 												String newRecordName = dataVar.getName().trim();
 												while (vecRecordNames.contains(newRecordName)) { //check for duplicated record names and update to make unique
 													newRecordName = String.format("%s %s", newRecordName, telemetrySensor.getName());
+													dataVar.setName(newRecordName);
 												}
 												vecRecordNames.add(newRecordName);
 												if (CoreDataReader.log.isLoggable(Level.OFF)) CoreDataReader.log.log(Level.OFF, String.format("add new record = %s [%s]", newRecordName, dataVar.getUnit()));
@@ -424,7 +425,7 @@ public class CoreDataReader {
 					sensor = param;
 					//Insert a new sensor and exit the queue
 					if (timestamp == 0 && paramId == 0) {
-						if (TelemetryData.log.isLoggable(Level.FINER)) TelemetryData.log.log(Level.FINER, "adding sensor " + sensor);
+						if (TelemetryData.log.isLoggable(Level.OFF)) TelemetryData.log.log(Level.OFF, "adding sensor " + sensor);
 						TelemetrySensor telemetrySensor = new TelemetrySensor(deviceId, sensor);
 						CoreDataReader.sensorData.add(telemetrySensor);
 					}

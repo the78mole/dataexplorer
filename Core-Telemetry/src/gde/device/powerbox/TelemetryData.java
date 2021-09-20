@@ -207,6 +207,13 @@ public class TelemetryData {
 		}
 
 		/**
+		 * set name of telemetry item, used in case of duplicate name found
+		 */
+		public void setName(String newRecordName) {
+			this.name = newRecordName.trim();
+		}
+
+		/**
 		 * @return translated telemetry item to string
 		 */
 		@Override

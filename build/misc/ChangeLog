@@ -7,6 +7,7 @@ Generic changes/fixes
 Device specific changes/fixes
 	* HoTTAdapter* - display always given GPS version value, even if this does not match known measurement placements
 	* HoTTAdapter* - evaluate byte, byte, byte, short, short, short, byte for unknown GPS (version 2,3,5 - 99)
+	*Core-Telemetry - fix assignment of parsed data with modified name (duplication)
 
 Version 3.5.0 - 13 Sep 2021
 Generic changes/fixes
