@@ -1178,29 +1178,41 @@ public class LogReader {
 				int logRecordCount = 0;
 				while (readByteCount < fileSize) {
 					LogReader.buf_length = new byte[4];
-					data_in.read(LogReader.buf_length);
-					final int logRecordLength = DataParser.parse2Int(LogReader.buf_length, 0);
-					if (LogReader.log.isLoggable(Level.FINEST)) System.out.println("logRecordLength = " + logRecordLength);
-					LogReader.buf_log_record = new byte[logRecordLength];
-					System.arraycopy(LogReader.buf_length, 0, LogReader.buf_log_record, 0, 4);
-					readByteCount += 4;
-					readByteCount += data_in.read(LogReader.buf_log_record, 4, logRecordLength - 4);
-					//CRC check should occur at first
-					//boolean isOK = Checksum.CRC16CCITT(buf_log_record, 0, buf_log_record.length-2) == DataParser.parse2UnsignedShort(buf_log_record, buf_log_record.length-2);
-					//System.out.println("CRC = " + isOK);
-					timeStamp = DataParser.parse2Long(LogReader.buf_log_record, 4);
-					//System.out.println(StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", timeStamp));
-					RecordType recordType = RecordType.values()[LogReader.buf_log_record[12]];
-					if (LogReader.startTimeStamp_ms == 0 && recordType == RecordType.DATA) LogReader.startTimeStamp_ms = timeStamp;
-
-					try {
-						logRecord = logReader.new LogRecord(LogReader.buf_log_record, (logRecord == null ? null : logRecord.getRecordHeader()));
+					int readSize = data_in.read(LogReader.buf_length);
+					if (readSize == 4) {
+						final int logRecordLength = DataParser.parse2Int(LogReader.buf_length, 0);
+						if (logRecordLength > 4) {
+							if (LogReader.log.isLoggable(Level.FINER)) log.log(Level.FINER, "logRecordLength = " + logRecordLength);
+							LogReader.buf_log_record = new byte[logRecordLength];
+							System.arraycopy(LogReader.buf_length, 0, LogReader.buf_log_record, 0, 4);
+							readByteCount += 4;
+							readByteCount += data_in.read(LogReader.buf_log_record, 4, logRecordLength - 4);
+							//CRC check should occur at first
+							//boolean isOK = Checksum.CRC16CCITT(buf_log_record, 0, buf_log_record.length-2) == DataParser.parse2UnsignedShort(buf_log_record, buf_log_record.length-2);
+							//System.out.println("CRC = " + isOK);
+							timeStamp = DataParser.parse2Long(LogReader.buf_log_record, 4);
+							//System.out.println(StringHelper.getFormatedTime("yyyy-MM-dd HH:mm:ss.SSS", timeStamp));
+							RecordType recordType = RecordType.values()[LogReader.buf_log_record[12]];
+							if (LogReader.startTimeStamp_ms == 0 && recordType == RecordType.DATA) LogReader.startTimeStamp_ms = timeStamp;
+		
+							try {
+								logRecord = logReader.new LogRecord(LogReader.buf_log_record, (logRecord == null ? null : logRecord.getRecordHeader()));
+							}
+							catch (DataInconsitsentException e) {
+								log.log(Level.SEVERE, e.getMessage());
+							}
+							GDE.getUiNotification().setProgress((int) (readByteCount * 100 / fileSize));
+							logRecordCount += 1;
+						}
+						else {
+							log.log(Level.WARNING, "logRecordLength = 0");
+							break;
+						}
 					}
-					catch (DataInconsitsentException e) {
-						log.log(Level.SEVERE, e.getMessage());
+					else {
+						log.log(Level.WARNING, "datain.read failed!");
+						break;
 					}
-					GDE.getUiNotification().setProgress((int) (readByteCount * 100 / fileSize));
-					logRecordCount += 1;
 				}
 
 				LogReader.recordSet.setStartTimeStamp(LogReader.startTimeStamp_ms);
