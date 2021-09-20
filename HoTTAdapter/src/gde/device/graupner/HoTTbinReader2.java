@@ -1054,7 +1054,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					this.points[36] = (_buf4[3] & 0xFF) * 1000;
 					//log.log(Level.OFF, StringHelper.byte2Hex2CharString(_buf4, _buf4.length));
 				}
-				else { //Graupner GPS need workaround to distinguish between different Graupner GPS with version #0
+				else if ((_buf4[9] & 0xFF) == 0 || (_buf4[9] & 0xFF) == 1) { //Graupner GPS need workaround to distinguish between different Graupner GPS version #0
 					int version = this.points[37] == 1000 || (_buf3[6] != 0 && _buf3[7] != 0 && _buf3[8] != 0) ? 1 : 0;
 						
 					if (version == 0) { //#0=GPS 33600
@@ -1080,6 +1080,16 @@ public class HoTTbinReader2 extends HoTTbinReader {
 						//61=Vibration 62-64=freeChars 65=Version
 						this.points[36] = (_buf4[5] & 0xFF) * 1000;
 					}
+				}
+				else { //unknown GPS
+					//16=Roll 17=Pitch 18=Yaw 19=GPS time1 20=GPS time2 21=AltitudeMSL 22=Vibration
+					this.points[30] = _buf3[6] * 1000; 
+					this.points[31] = _buf3[7] * 1000; 
+					this.points[32] = _buf3[8] * 1000; 
+					this.points[33] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
+					this.points[34] = DataParser.parse2Short(_buf4, 1) * 1000;
+					this.points[35] = DataParser.parse2Short(_buf4, 3) * 1000;
+					this.points[36] = (_buf4[5] & 0xFF) * 1000;
 				}
 				this.points[37] = _buf4[9] * 1000;
 				return true;

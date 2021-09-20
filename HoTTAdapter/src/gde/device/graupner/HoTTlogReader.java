@@ -569,7 +569,7 @@ public class HoTTlogReader extends HoTTbinReader {
 			//61=Vibration 62-64=freeChars 65=Version
 			values[22] = (_buf[59] & 0xFF) * 1000;
 		}
-		else { //Graupner GPS need workaround to distinguish between different Graupner GPS with version #0
+		else if ((_buf[65] & 0xFF) == 0 || (_buf[65] & 0xFF) == 1) { //Graupner GPS need workaround to distinguish between different Graupner GPS version #0
 			int version = values[23] == 1000 || (_buf[52] != 0 && _buf[53] != 0 && _buf[54] != 0) ? 1 : 0;
 				
 			if (version == 0) { //#0=GPS 33600
@@ -600,6 +600,16 @@ public class HoTTlogReader extends HoTTbinReader {
 				//61=Vibration 62-64=freeChars 65=Version
 				values[22] = (_buf[61] & 0xFF) * 1000;
 			}
+		}
+		else { //unknown GPS
+			//16=Roll 17=Pitch 18=Yaw 19=GPS time1 20=GPS time2 21=AltitudeMSL 22=Vibration
+			values[16] = _buf[52] * 1000;
+			values[17] = _buf[53] * 1000;
+			values[18] = _buf[54] * 1000; 
+			values[19] = DataParser.parse2Short(_buf, 55) * 1000;
+			values[20] = DataParser.parse2Short(_buf, 57) * 1000;
+			values[21] = DataParser.parse2Short(_buf, 59) * 1000;
+			values[22] = (_buf[61] & 0xFF) * 1000;
 		}
 		//three char
 		//23=Version

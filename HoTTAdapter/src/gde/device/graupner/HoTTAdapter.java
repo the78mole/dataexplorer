@@ -2476,7 +2476,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 				} 
 			}
 		}
-		else { //Graupner GPS #0=GPS #33600
+		else if (version == 0) { //Graupner GPS #0=GPS #33600
 			tmpRecordSet.get(19).setName(device.getMeasurementReplacement("time") + " GPS");
 			tmpRecordSet.get(19).setUnit("HH:mm:ss.SSS");
 			tmpRecordSet.get(19).setFactor(1.0);
@@ -2492,6 +2492,17 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 					recordSet.setStartTimeStamp(startTimeStamp_ms);
 				} 
 			}
+		}
+		else {
+			tmpRecordSet.get(16).setName("Byte GPS_1");
+			tmpRecordSet.get(17).setName("Byte GPS_2");
+			tmpRecordSet.get(18).setName("Byte GPS_3");
+
+			tmpRecordSet.get(19).setName("Short GPS_4");
+			tmpRecordSet.get(20).setName("Short GPS_5");
+			tmpRecordSet.get(21).setName("Short GPS_6");
+
+			tmpRecordSet.get(22).setName("Byte GPS_7");
 		}
 		return startTimeStamp_ms;
 	}

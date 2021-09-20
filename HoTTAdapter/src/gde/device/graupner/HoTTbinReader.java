@@ -1801,7 +1801,7 @@ public class HoTTbinReader {
 					this.points[21] = (DataParser.parse2Short(_buf3, 6) - 500) * 1000; //TODO remove offset 500 after correction
 					this.points[22] = (_buf4[3] & 0xFF) * 1000;
 				}
-				else { //Graupner GPS need workaround to distinguish between different Graupner GPS with version #0
+				else if ((_buf4[9] & 0xFF) == 0 || (_buf4[9] & 0xFF) == 1) { //Graupner GPS need workaround to distinguish between different Graupner GPS version #0
 					int version = this.points[23] == 1000 || (_buf3[6] != 0 && _buf3[7] != 0 && _buf3[8] != 0) ? 1 : 0;
 						
 					if (version == 0) { //#0=GPS 33600
@@ -1826,6 +1826,16 @@ public class HoTTbinReader {
 						//22=hAcc Horizontal accuracy estimate HDOP 			
 						this.points[22] = (_buf4[5] & 0xFF) * 1000;
 					}
+				}
+				else { //unknown GPS
+					//16=Roll 17=Pitch 18=Yaw 19=GPS time1 20=GPS time2 21=AltitudeMSL 22=Vibration
+					this.points[16] = _buf3[6] * 1000; 
+					this.points[17] = _buf3[7] * 1000; 
+					this.points[18] = _buf3[8] * 1000; 
+					this.points[19] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
+					this.points[20] = DataParser.parse2Short(_buf4, 1) * 1000;
+					this.points[21] = DataParser.parse2Short(_buf4, 3) * 1000;
+					this.points[22] = (_buf4[5] & 0xFF) * 1000;
 				}
 				//three char 23=Version		
 				this.points[23] = _buf4[9] * 1000;
