@@ -215,12 +215,12 @@ public class NMEAParser implements IDataParser {
 				break;
 			case GPGGA: //Global Positioning System Fix Data (GGA)				
 			case GNGGA: //Global Positioning System Fix Data (GGA)			
-				if (!this.isGPS_Logger_FW_128)
+				if (!this.isGPS_Logger_FW_128 || this.deviceName.startsWith("NMEA"))
 					parseGGA(strValues);
 				break;
 			case GPGNS: //Global Positioning System Fix Data (GGA)				
 			case GNGNS: //Global Positioning System Fix Data (GGA)	
-				if (this.isGPS_Logger_FW_128)
+				if (this.isGPS_Logger_FW_128 || this.deviceName.startsWith("NMEA"))
 					parseGNS(strValues);
 				break;
 			case GPGSA: //Satellite status (GSA)
@@ -277,7 +277,7 @@ public class NMEAParser implements IDataParser {
 					this.isAutoDstOffset = true;
 				}
 				this.firmwareVersion = String.format("%.2f", Integer.parseInt(strValues[54].trim(), 16)/100.0); //$NON-NLS-1$
-				this.isGPS_Logger_FW_128 = device.getName().contains("GPS-Logger") && Float.parseFloat(this.firmwareVersion) >= 1.28F;
+				this.isGPS_Logger_FW_128 = device.getName().contains("GPS-Logger") && Float.parseFloat(this.firmwareVersion.replace(GDE.CHAR_COMMA, GDE.CHAR_DOT)) >= 1.28F;
 
 				break;
 			case SETUP: // setup SM GPS-Logger firmware 1.00
