@@ -472,8 +472,8 @@ public class HoTTlogReader extends HoTTbinReader {
 				System.arraycopy(_buf, 40, tmpArray, 0, tmpArray.length);
 				log.log(Level.WARNING, new String(tmpArray));
 			}
-			//values[11] = reserved for future usage;
-			values[12] = _buf[65] * 1000; //SM MicroVario starts with FW version 1.00 -> 100
+			values[11] = (_buf[64] & 0xFF) * 1000; //AirSpped/2
+			values[12] = (_buf[65] & 0xFF) * 1000; //SM MicroVario starts with FW version 1.00 -> 100
 		}
 
 		if (log.isLoggable(Level.FINER)) {
@@ -541,10 +541,10 @@ public class HoTTlogReader extends HoTTbinReader {
 		//51=homeDirection 52=Roll 53=Pitch 54=Yaw
 		values[15] = (_buf[51] & 0xFF) * 1000; //15=HomeDirection		
 		if ((_buf[65] & 0xFF) > 100) { //SM GPS-Logger
-			//16=Roll 17=Pitch 18=Yaw
+			//52=Roll 53=Pitch 54=Yaw
+			//16=ServoPulse 17=AirSpeeed 18=n/a
 			values[16] = _buf[52] * 1000;
-			values[17] = _buf[53] * 1000;
-			values[18] = _buf[54] * 1000; 
+			values[17] = DataParser.parse2Short(_buf, 53) * 1000;
 			//19=GyroX 20=GyroY 21=GyroZ 	
 			//55,56=GyroX 57,58=GyroY 59,60=GyroZ
 			values[19] = DataParser.parse2Short(_buf, 55) * 1000;

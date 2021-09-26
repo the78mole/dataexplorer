@@ -1654,8 +1654,8 @@ public class HoTTbinReader {
 						System.arraycopy(_buf4, 0, tmpArray, 16, 5);
 						log.log(Level.WARNING, "'" + new String(tmpArray) + "'");
 					}
-					//values[11] = reserved for future usage;
-					this.points[12] =(_buf4[9] & 0xFF) * 10; //SM MicroVario starts with FW version 1.00 -> 100
+					this.points[11] = (_buf4[8] & 0xFF) * 1000; //AirSpeed/2
+					this.points[12] = (_buf4[9] & 0xFF) * 1000; //SM MicroVario starts with FW version 1.00 -> 100
 				}
 				return true;
 			}
@@ -1782,10 +1782,9 @@ public class HoTTbinReader {
 				this.points[14] = (_buf1[1] & 0x0F) * 1000; //14=inverse event
 				this.points[15] = (_buf3[5] & 0xFF) * 1000; //15=HomeDirection
 				if ((_buf4[9] & 0xFF) > 100) { //SM GPS-Logger
-					//16=servoPulse 17=n/a 18=n/a 19=GyroX 20=GyroY 21=GyroZ 22=ENL 23=Version	
+					//16=servoPulse 17=AirSpeed 18=n/a 19=GyroX 20=GyroY 21=GyroZ 22=ENL 23=Version	
 					this.points[16] = _buf3[6] * 1000; 
-					this.points[17] = _buf3[7] * 1000; 
-					this.points[18] = _buf3[8] * 1000; 
+					this.points[17] = DataParser.parse2Short(_buf3, 7) * 1000;
 					this.points[19] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
 					this.points[20] = DataParser.parse2Short(_buf4, 1) * 1000;
 					this.points[21] = DataParser.parse2Short(_buf4, 3) * 1000;

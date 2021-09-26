@@ -2263,6 +2263,9 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			tmpRecordSet.get(17).setName(device.getMeasurementReplacement("acceleration") + " Z Vario");
 			tmpRecordSet.get(17).setUnit("g");
 			tmpRecordSet.get(17).createProperty(IDevice.SYNC_ORDINAL, DataTypes.INTEGER, 15); //$NON-NLS-1$
+			tmpRecordSet.get(18).setName(device.getMeasurementReplacement("air_spped"));
+			tmpRecordSet.get(18).setUnit("km/h");
+			tmpRecordSet.get(18).setFactor(2.0);
 			tmpRecordSet.get(19).setName("Version Vario");
 			tmpRecordSet.get(19).setUnit("#");
 		}
@@ -2292,9 +2295,11 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		// 107=VoltageM, 108=CurrentM, 109=CapacityM, 110=PowerM, 111=RevolutionM, 112=TemperatureM 1, 113=TemperatureM 2 114=Voltage_min, 115=Current_max,
 		// 116=Revolution_max, 117=Temperature1_max, 118=Temperature2_max 119=Event M
 		if (version > 100) { //SM GPS-Logger
-			// 29=HomeDirection 30=Roll 31=n/a 32=n/a 33=GyroX 34=GyroY 35=GyroZ 36=ENL 37=Version	
+			// 29=HomeDirection 30=ServoPulse 31=AirSpeed 32=n/a 33=GyroX 34=GyroY 35=GyroZ 36=ENL 37=Version	
 			tmpRecordSet.get(30).setName(device.getMeasurementReplacement("servo_impulse") + " GPS");
 			tmpRecordSet.get(30).setUnit("");
+			tmpRecordSet.get(31).setName(device.getMeasurementReplacement("air_speed") + " GPS");
+			tmpRecordSet.get(31).setUnit("km/h");
 			tmpRecordSet.get(33).setName(device.getMeasurementReplacement("acceleration") + " X GPS");
 			tmpRecordSet.get(33).setUnit("g");
 			tmpRecordSet.get(33).setFactor(0.01);
