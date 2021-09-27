@@ -66,7 +66,6 @@ public class NMEAParser implements IDataParser {
 	protected Vector<String>							missingImpleWarned				= new Vector<String>();
 	protected String 											deviceSerialNumber				= GDE.STRING_EMPTY;
 	protected String											firmwareVersion           = GDE.STRING_EMPTY;
-	protected boolean 										isGPS_Logger_FW_128				= false;
 	
 	protected int													recordSetNumberOffset			= 0;
 	protected int													timeResetCounter					= 0;
@@ -215,13 +214,11 @@ public class NMEAParser implements IDataParser {
 				break;
 			case GPGGA: //Global Positioning System Fix Data (GGA)				
 			case GNGGA: //Global Positioning System Fix Data (GGA)			
-				if (!this.isGPS_Logger_FW_128 || this.deviceName.startsWith("NMEA"))
-					parseGGA(strValues);
+				parseGGA(strValues);
 				break;
-			case GPGNS: //Global Positioning System Fix Data (GGA)				
-			case GNGNS: //Global Positioning System Fix Data (GGA)	
-				if (this.isGPS_Logger_FW_128 || this.deviceName.startsWith("NMEA"))
-					parseGNS(strValues);
+			case GPGNS: //Global Navigation System Fix Data			
+			case GNGNS: //Global Navigation System Fix Data
+				parseGNS(strValues);
 				break;
 			case GPGSA: //Satellite status (GSA)
 			case GNGSA: //Satellite status (GSA)
@@ -277,7 +274,6 @@ public class NMEAParser implements IDataParser {
 					this.isAutoDstOffset = true;
 				}
 				this.firmwareVersion = String.format("%.2f", Integer.parseInt(strValues[54].trim(), 16)/100.0); //$NON-NLS-1$
-				this.isGPS_Logger_FW_128 = device.getName().contains("GPS-Logger") && Float.parseFloat(this.firmwareVersion.replace(GDE.CHAR_COMMA, GDE.CHAR_DOT)) >= 1.28F;
 
 				break;
 			case SETUP: // setup SM GPS-Logger firmware 1.00
