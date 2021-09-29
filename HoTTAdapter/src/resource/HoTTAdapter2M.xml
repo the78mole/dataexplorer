@@ -4111,7 +4111,7 @@
 				<unit>%</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 3</name>
@@ -4119,7 +4119,7 @@
 				<unit>%</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 4</name>
@@ -4127,7 +4127,7 @@
  				<unit>%</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 5</name>
@@ -4135,7 +4135,7 @@
 				<unit>%</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 6</name>
@@ -4143,7 +4143,7 @@
  				<unit>%</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 7</name>
@@ -4151,7 +4151,7 @@
 				<unit>%</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 8</name>
@@ -4159,7 +4159,7 @@
  				<unit>%</unit>
 				<active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 9</name>
@@ -4167,7 +4167,7 @@
 				<unit>%</unit>
                 <active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 10</name>
@@ -4175,7 +4175,7 @@
  				<unit>%</unit>
                 <active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 11</name>
@@ -4183,7 +4183,7 @@
 				<unit>%</unit>
                 <active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 12</name>
@@ -4191,7 +4191,7 @@
 				<unit>%</unit>
                 <active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 13</name>
@@ -4199,7 +4199,7 @@
 				<unit>%</unit>
                 <active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 14</name>
@@ -4207,7 +4207,7 @@
 				<unit>%</unit>
                 <active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 15</name>
@@ -4215,7 +4215,7 @@
  				<unit>%</unit>
                 <active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 16</name>
@@ -4223,7 +4223,7 @@
 				<unit>%</unit>
                 <active>true</active>
 				<statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Power Off</name>

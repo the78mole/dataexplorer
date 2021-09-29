@@ -9,7 +9,7 @@
         <usage>true</usage>
     </Device>
     <SerialPort>
-        <port></port>
+        <port>/dev/tty.usbmodem00000000001A1</port>
         <baudeRate>115200</baudeRate>
         <dataBits>DATABITS_8</dataBits>
         <stopBits>STOPBITS_1</stopBits>
@@ -31,7 +31,7 @@
         <timeUnit>msec</timeUnit>
         <leader>$</leader>
         <trailer>0D0A</trailer>
-        <preferredDataLocation>/Users/brueg/Documents/DataExplorer/HoTTAdapter_Problem/SM MicroVario/</preferredDataLocation>
+        <preferredDataLocation>/Users/brueg/Documents/DataExplorer/HoTTAdapter_Problem/GPS 23045</preferredDataLocation>
         <preferredFileExtention>*.bin;*.log</preferredFileExtention>
     </DataBlock>
     <State>
@@ -3213,7 +3213,7 @@
                     <MeasurementMapping measurementOrdinal="87"/>
                 </ReferenceGroup>
                 <ReferenceGroup referenceGroupId="2" referenceRule="sum" comment="current">
-                    <MeasurementMapping measurementOrdinal="87"/>
+                    <MeasurementMapping measurementOrdinal="88"/>
                 </ReferenceGroup>
             </ReferenceGroups>
             <TransitionGroups>
@@ -3227,12 +3227,12 @@
                 </TransitionGroup>
             </TransitionGroups>
             <Transitions>
-                <Transition transitionId="0" refOrdinal="87" classType="peak" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Dauer höchstens 15 Sekunden"/>
-                <Transition transitionId="1" refOrdinal="87" classType="peak" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromspitze mit mindestens dem 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Dauer höchstens 15 Sekunden"/>
-                <Transition transitionId="3" refOrdinal="87" classType="pulse" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Pulsdauer mindestens 1,5 Sekunden"/>
-                <Transition transitionId="4" refOrdinal="87" classType="pulse" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Pulsdauer mindestens 1,5 Sekunden"/>
-                <Transition transitionId="6" refOrdinal="87" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
-                <Transition transitionId="7" refOrdinal="87" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
+                <Transition transitionId="0" refOrdinal="88" classType="peak" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Dauer höchstens 15 Sekunden"/>
+                <Transition transitionId="1" refOrdinal="88" classType="peak" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="15000" peakMinimumTimeMsec="500" recoveryTimeMsec="1500" comment="Stromspitze mit mindestens dem 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Dauer höchstens 15 Sekunden"/>
+                <Transition transitionId="3" refOrdinal="88" classType="pulse" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel mit Wiederanstieg auf mindestens 90%; Pulsdauer mindestens 1,5 Sekunden"/>
+                <Transition transitionId="4" refOrdinal="88" classType="pulse" valueType="deltaFactor" thresholdValue="19.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" recoveryTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert mit Wiederabfall auf wenigstens den zweifachen Wert; Pulsdauer mindestens 1,5 Sekunden"/>
+                <Transition transitionId="6" refOrdinal="88" classType="slope" valueType="deltaFactor" thresholdValue="-0.95" recoveryValue="-0.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromeinbruch auf wenigstens ein Zwanzigstel; Einbruchschwellwert mindestens 1,5 Sekunden"/>
+                <Transition transitionId="7" refOrdinal="88" classType="slope" valueType="deltaFactor" thresholdValue="9.0" recoveryValue="1.05" referenceTimeMsec="1500" thresholdTimeMsec="1500" comment="Stromanstieg auf mindestens den 20-fachen Wert; Anstiegschwellwert mindestens 1,5 Sekunden"/>
             </Transitions>
             <ScoreGroups>
                 <Scoregroup scoregroupId="0">
@@ -4113,7 +4113,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 3</name>
@@ -4121,7 +4121,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 4</name>
@@ -4129,7 +4129,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 5</name>
@@ -4137,7 +4137,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 6</name>
@@ -4145,7 +4145,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 7</name>
@@ -4153,7 +4153,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 8</name>
@@ -4161,7 +4161,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 9</name>
@@ -4169,7 +4169,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 10</name>
@@ -4177,7 +4177,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 11</name>
@@ -4185,7 +4185,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 12</name>
@@ -4193,7 +4193,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 13</name>
@@ -4201,7 +4201,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 14</name>
@@ -4209,7 +4209,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 15</name>
@@ -4217,7 +4217,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Ch 16</name>
@@ -4225,7 +4225,7 @@
                 <unit>%</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false"/>
-                <property name="scale_sync_ref_ordinal" value="82" type="Integer"/>
+                <property name="scale_sync_ref_ordinal" value="87" type="Integer"/>
             </Measurement>
             <Measurement>
                 <name>Power Off</name>
