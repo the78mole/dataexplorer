@@ -11,6 +11,8 @@ Device specific changes/fixes
 	* HoTTAdapter2* - fix scale synchronization reference from 82 to 87
 	* Core-Telemetry - fix assignment of parsed data with modified name (duplication)
 	* Weatronic-Telemetry - add error handling for corrupt log files
+	* GPS-Logger3 - add HoTT speed type configuration
+	* GPS-Logger2/3 - take real GPS altitude from SMGPS instead of value from GNS/GGA
 
 Version 3.5.0 - 13 Sep 2021
 Generic changes/fixes

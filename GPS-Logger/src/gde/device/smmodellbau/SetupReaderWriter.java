@@ -93,7 +93,7 @@ public class SetupReaderWriter {
 	short								varioFilter									= 0;																										// 30 Vario filter
 	short								speedMinAlarm								= 30;																										// 31 10km/h --> 1000km/h
 	byte								language										= 0;																										// 32..
-	byte 								freeA												= 0;																										// ..32
+	byte 								hottSpeedType								= 0;																										// ..32 //0=auto, 1=GPS-Speed 2=AirSpeed
 	short								jetiExMask_UL								= 0;																										// 33
 	//short[] B = new short[4]; // 34-37
 	byte								mLinkAddressVario						= 0;																										// 38.. 0 - 15, "--"
@@ -196,7 +196,7 @@ public class SetupReaderWriter {
 				this.varioFilter 						= DataParser.parse2Short(buffer, 58); // 30 Vario filter
 				this.speedMinAlarm					= DataParser.parse2Short(buffer, 60);	// 31 10km/h --> 1000km/h
 				this.language								= buffer[62];													// 32.. 0= german, 1=english
-				this.freeA									= buffer[63];													// ..32
+				this.hottSpeedType					= buffer[63];													// ..32 speed type 0=auto, 1=GPS, 2=AirSpeed
 				this.jetiExMask_UL					= DataParser.parse2Short(buffer, 64);	// 33
 				//B[4]
 				this.mLinkAddressVario 				= buffer[74];		// 38..
@@ -319,7 +319,7 @@ public class SetupReaderWriter {
 				buffer[60] = (byte) (this.speedMinAlarm & 0x00FF);								// 31 10km/h --> 1000km/h
 				buffer[61] = (byte) ((this.speedMinAlarm & 0xFF00) >> 8);
 				buffer[62] = (byte) (this.language & 0x00FF);											// 32.. 0= german, 1=english
-				buffer[63] = this.freeA;																					// ..32
+				buffer[63] = (byte) (this.hottSpeedType	& 0x00FF);								// ..32 0=auto, 1=GPS, 2=AirSpeed
 				buffer[64] = (byte) (this.jetiExMask_UL & 0x00FF);								// 33
 				buffer[65] = (byte) ((this.jetiExMask_UL & 0xFF00) >> 8);
 				//B[4]

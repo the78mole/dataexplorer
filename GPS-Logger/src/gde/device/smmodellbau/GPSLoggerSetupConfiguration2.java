@@ -1504,7 +1504,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				FormData unilogTelemtryAlarmsGroupLData = new FormData();
 				unilogTelemtryAlarmsGroupLData.width = 290;
 				unilogTelemtryAlarmsGroupLData.height = 143;
-				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 450);
+				unilogTelemtryAlarmsGroupLData.top = new FormAttachment(0, 1000, 470);
 				unilogTelemtryAlarmsGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.unilogTelemtryAlarmsGroup.setLayoutData(unilogTelemtryAlarmsGroupLData);
 				this.unilogTelemtryAlarmsGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -2037,7 +2037,7 @@ public class GPSLoggerSetupConfiguration2 extends org.eclipse.swt.widgets.Compos
 				FormData fixGpsStartPositionGroupLData = new FormData();
 				fixGpsStartPositionGroupLData.width = 290;
 				fixGpsStartPositionGroupLData.height = 143;
-				fixGpsStartPositionGroupLData.top = new FormAttachment(0, 1000, 450);
+				fixGpsStartPositionGroupLData.top = new FormAttachment(0, 1000, 470);
 				fixGpsStartPositionGroupLData.left = new FormAttachment(0, 1000, 15);
 				this.fixGpsStartPositionGroup.setLayoutData(fixGpsStartPositionGroupLData);
 				this.fixGpsStartPositionGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));

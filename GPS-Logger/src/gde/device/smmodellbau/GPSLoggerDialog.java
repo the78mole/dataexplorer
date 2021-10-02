@@ -92,7 +92,7 @@ public class GPSLoggerDialog extends DeviceDialog {
 		this.device = useDevice;
 		this.settings = Settings.getInstance();
 		for (int i = 1; i <= this.device.getChannelCount(); i++) {
-			this.measurementsCount = 15; //15 measurements are displayed as maximum per visualization tab
+			this.measurementsCount = 16; //15 measurements are displayed as maximum per visualization tab
 		}
 	}
 

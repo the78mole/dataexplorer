@@ -65,9 +65,9 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 	Composite								fillerComposite, addonComposite;
 
 	Group										gpsLoggerGroup;
-	CLabel									serialNumberLabel,firmwareLabel,languageLabel,dataRateLabel,startModusLabel,stopModusLabel,timeZoneLabel,timeAutoLabel,varioLimitClimbLabel,varioLimitSinkLabel,varioTonLabel,timeZoneUnitLabel,varioLimitUnitLabel,smoothAltitudeLabel,modusIgcLabel,modusDistanceLabel,telemetryTypeLabel,varioFactorLabel,varioFilterLabel,minMaxRxLabel;
+	CLabel									serialNumberLabel,firmwareLabel,languageLabel,hottSpeedTypeLabel,dataRateLabel,startModusLabel,stopModusLabel,timeZoneLabel,timeAutoLabel,varioLimitClimbLabel,varioLimitSinkLabel,varioTonLabel,timeZoneUnitLabel,varioLimitUnitLabel,smoothAltitudeLabel,modusIgcLabel,modusDistanceLabel,telemetryTypeLabel,varioFactorLabel,varioFilterLabel,minMaxRxLabel;
 	Text										serialNumberText, firmwareText;
-	CCombo									languageCombo, dataRateCombo, startModusCombo, stopModusCombo, timeZoneCombo, timeAutoCombo, varioLimitClimbCombo, varioLimitSinkCombo, varioToneCombo, smoothAltitudeCombo, modusIgcCombo, modusDistanceCombo, telemetryTypeCombo, varioFactorCombo, varioFilterCombo, minMaxRxCombo;
+	CCombo									languageCombo, hottSpeedTypeCombo, dataRateCombo, startModusCombo, stopModusCombo, timeZoneCombo, timeAutoCombo, varioLimitClimbCombo, varioLimitSinkCombo, varioToneCombo, smoothAltitudeCombo, modusIgcCombo, modusDistanceCombo, telemetryTypeCombo, varioFactorCombo, varioFilterCombo, minMaxRxCombo;
 
 	Group										gpsTelemertieAlarmGroup;
 	Button									heightMaxAlarmButton, speedMaxAlarmButton, speedMinAlarmButton, distanceMaxButton, distanceMinButton, tripLengthButton, voltageRxButton;
@@ -81,6 +81,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 
 	final SetupReaderWriter	configuration;
 	final String[]					languageValues	= {"Deutsch", "English"};
+	final String[]					speedTypeValues	= {" auto", " GPS", "AirSpeed"};
 	final String[]					dataRateValues	= Messages.getString(MessageIds.GDE_MSGT2020).split(GDE.STRING_COMMA);
 	final String[]					startValues			= Messages.getString(MessageIds.GDE_MSGT2021).split(GDE.STRING_COMMA);
 	final String[]					stopValues			= Messages.getString(MessageIds.GDE_MSGT2072).split(GDE.STRING_COMMA);
@@ -137,6 +138,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 		this.firmwareText.setText(String.format(" %.2f", this.configuration.firmwareVersion / 100.0)); //$NON-NLS-1$
 
 		this.languageCombo.select(this.configuration.language);
+		this.hottSpeedTypeCombo.select(this.configuration.hottSpeedType);
 		this.dataRateCombo.select(this.configuration.datarate);
 		this.startModusCombo.select(this.configuration.startModus);
 		this.stopModusCombo.select(this.configuration.stopModus);
@@ -175,6 +177,8 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 	public void changeVisibility() {
 		this.frskyIdLabel.setVisible(false);
 		this.frskyIdCombo.setVisible(false);
+		this.hottSpeedTypeLabel.setVisible(false);
+		this.hottSpeedTypeCombo.setVisible(false);
 		this.fixSerialNumberButton.setVisible(false);
 		this.fixStartPositionButton.setVisible(false);
 		this.fixStartPositionButton.setSelection(false);
@@ -198,6 +202,10 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 		if (this.gpsLoggerGroup != null && !this.gpsLoggerGroup.isDisposed()) {
 		//0=invalid, 1=Futaba, 2=JR DMSS, 3=HoTT, 4=JetiDuplex, 5=M-Link, 6=FrSky 7=Spektrum 8=PowerBox
 			switch (this.telemetryTypeCombo.getSelectionIndex()) {
+			case 3: //HoTT
+				this.hottSpeedTypeLabel.setVisible(true);
+				this.hottSpeedTypeCombo.setVisible(true);
+				break;
 			case 7: //Spektrum
 				if (GPSLoggerSetupConfiguration2.spektrumAdapterGroupStatic != null && !GPSLoggerSetupConfiguration2.spektrumAdapterGroupStatic.isDisposed()) {
 					GPSLoggerSetupConfiguration2.spektrumAdapterGroupStatic.setVisible(true);
@@ -249,7 +257,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				gpsLoggerGroupLData.left = new FormAttachment(0, 1000, 10);
 				gpsLoggerGroupLData.top = new FormAttachment(0, 1000, 5);
 				gpsLoggerGroupLData.width = 290;
-				gpsLoggerGroupLData.height = GDE.IS_MAC ? 420 : 425;
+				gpsLoggerGroupLData.height = GDE.IS_MAC ? 440 : 445;
 				RowLayout gpsLoggerGroupLayout = new RowLayout(org.eclipse.swt.SWT.HORIZONTAL);
 				this.gpsLoggerGroup.setLayout(gpsLoggerGroupLayout);
 				this.gpsLoggerGroup.setLayoutData(gpsLoggerGroupLData);
@@ -462,8 +470,37 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 					this.languageCombo.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(SelectionEvent evt) {
-							log.log(Level.FINEST, "dataRateCCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							log.log(Level.FINEST, "languageCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
 							GPSLoggerSetupConfiguration1.this.configuration.language = (byte) GPSLoggerSetupConfiguration1.this.languageCombo.getSelectionIndex();
+							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
+						}
+					});
+				}
+				{
+					this.hottSpeedTypeLabel = new CLabel(this.gpsLoggerGroup, SWT.RIGHT);
+					RowData speedTypeLabelLData = new RowData();
+					speedTypeLabelLData.width = 130;
+					speedTypeLabelLData.height = 18;
+					this.hottSpeedTypeLabel.setLayoutData(speedTypeLabelLData);
+					this.hottSpeedTypeLabel.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.hottSpeedTypeLabel.setText(Messages.getString(MessageIds.GDE_MSGI2003));
+				}
+				{
+					this.hottSpeedTypeCombo = new CCombo(this.gpsLoggerGroup, SWT.BORDER);
+					RowData dataRateCComboLData = new RowData();
+					dataRateCComboLData.width = COMBO_WIDTH;
+					dataRateCComboLData.height = 17;
+					this.hottSpeedTypeCombo.setLayoutData(dataRateCComboLData);
+					this.hottSpeedTypeCombo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+					this.hottSpeedTypeCombo.setItems(this.speedTypeValues);
+					this.hottSpeedTypeCombo.select(this.configuration.hottSpeedType);
+					this.hottSpeedTypeCombo.setEditable(false);
+					this.hottSpeedTypeCombo.setBackground(this.application.COLOR_WHITE);
+					this.hottSpeedTypeCombo.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent evt) {
+							log.log(Level.FINEST, "hottSpeedTypeCombo.widgetSelected, event=" + evt); //$NON-NLS-1$
+							GPSLoggerSetupConfiguration1.this.configuration.hottSpeedType = (byte) GPSLoggerSetupConfiguration1.this.hottSpeedTypeCombo.getSelectionIndex();
 							GPSLoggerSetupConfiguration1.this.dialog.enableSaveConfigurationButton(true);
 						}
 					});
@@ -904,7 +941,7 @@ public class GPSLoggerSetupConfiguration1 extends Composite {
 				this.gpsTelemertieAlarmGroup = new Group(this, SWT.NONE);
 				FormData gpsTelemertieGroupLData = new FormData();
 				gpsTelemertieGroupLData.left = new FormAttachment(0, 1000, 10);
-				gpsTelemertieGroupLData.top = new FormAttachment(0, 1000, 450);
+				gpsTelemertieGroupLData.top = new FormAttachment(0, 1000, 470);
 				gpsTelemertieGroupLData.width = 290;
 				gpsTelemertieGroupLData.height = 155;
 				this.gpsTelemertieAlarmGroup.setLayoutData(gpsTelemertieGroupLData);

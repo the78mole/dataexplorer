@@ -1183,19 +1183,20 @@ public class NMEAParser implements IDataParser {
 	 * 6: Richtung vom Startpunkt
 	 * 7: Gleitzahl, in der Form „1:xx (yy.y km/h)“, dabei ist 1:xx die Gleitzahl, kein gültiger Wert ist „1:--“
 	 * 8: SpeedGleitzahl, in der Form „1:xx (yy.y km/h)“
+	 * 9: Höhe GPS, in der Form 498.3 m
 	 * @param strValues
 	 */
 	void parseSMGPS(String[] strValues) {
-		for (int i = 0; i < strValues.length - 1 && i < 7; i++) {
+		for (int i = 0; i < strValues.length - 1 && i < 8; i++) {
 			try {
 				String[] tmpValues = strValues[i + 1].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
-				if (i != 6) {
+				if (i < 6) {
 					this.values[8 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
 					if (!this.device.getMeasurement(this.channelConfigNumber, 8 + i).getUnit().startsWith(tmpValues[1].substring(0, 1))) {
 						this.device.getMeasurement(this.channelConfigNumber, 8 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
 					}
 				}
-				else {
+				else if (i == 6) { //Gleitzahl + SpeedGleitzahl
 					tmpValues = strValues[i + 1].replace("  ", " ").trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
 					if (!tmpValues[1].startsWith("-")) {
 						this.values[8 + i + 1] = (int) (Double.parseDouble(tmpValues[1]) * 1000.0);
@@ -1210,6 +1211,14 @@ public class NMEAParser implements IDataParser {
 					else {
 						this.values[8 + i + 1] = 0;
 						this.values[8 + i + 2] = 0;
+					}
+				}
+				else if(i == 7) {
+					try {
+						this.values[2]  = (int) (Double.parseDouble(tmpValues[0].split(GDE.STRING_COMMA)[0]) * 1000.0);
+					}
+					catch (Exception e) {
+						// ignore
 					}
 				}
 			}
@@ -1257,10 +1266,10 @@ public class NMEAParser implements IDataParser {
 		for (int i = 0; i < strValues.length - 1 && i < 9; i++) {
 			try {
 				String[] tmpValues = strValues[i + 1].trim().split(NMEAParser.STRING_SENTENCE_SPLITTER);
-					this.values[17 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
-					if (!this.device.getMeasurement(this.channelConfigNumber, 17 + i).getUnit().startsWith(tmpValues[1].substring(0, 1))) {
-						this.device.getMeasurement(this.channelConfigNumber, 17 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
-					}
+				this.values[17 + i] = (int) (Double.parseDouble(tmpValues[0]) * 1000.0);
+				if (!this.device.getMeasurement(this.channelConfigNumber, 17 + i).getUnit().startsWith(tmpValues[1].substring(0, 1))) {
+					this.device.getMeasurement(this.channelConfigNumber, 17 + i).setUnit(tmpValues[1].contains(GDE.STRING_STAR) ? tmpValues[1].substring(0, tmpValues[1].indexOf(GDE.CHAR_STAR)) : tmpValues[1]);
+				}
 			}
 			catch (Exception e) {
 				// ignore and leave value unchanged
