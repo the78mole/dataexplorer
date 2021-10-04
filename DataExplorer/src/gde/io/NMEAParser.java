@@ -459,7 +459,7 @@ public class NMEAParser implements IDataParser {
 	 * $GPRMC,132045.100,A,4752.4904,N,01106.7063,E,1.29,267.55,170910,,,A*60
 	 * <li> RMC          Recommended Minimum sentence C						</li>
 	 * <li> 123519       Fix taken at 12:35:19 UTC								</li>
-	 * <li> A            Status A=active or V=Void.								</li> 		
+	 * <li> A            Status A=active or V=invalid							</li> 		
 	 * <li> 4807.038,N   Latitude 48 deg 07.038' N								</li>
 	 * <li> 01131.000,E  Longitude 11 deg 31.000' E								</li>
 	 * <li> 022.4        Speed over the ground in knots						</li>
@@ -471,7 +471,7 @@ public class NMEAParser implements IDataParser {
 	 * @param strValues
 	 */
 	void parseRMC(String[] strValues) {
-		if (strValues[2].equals("A") || strValues[2].equals("V")) { //$NON-NLS-1$ //$NON-NLS-2$
+		if (strValues[2].equals("A")) { //$NON-NLS-1$ //$NON-NLS-2$
 			if (this.date == null) {
 				String strValueDate = strValues[9].trim();
 				if (strValueDate.length() < 6) return; //invalid values in RMC sentence

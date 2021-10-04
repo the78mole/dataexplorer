@@ -8,11 +8,12 @@ Device specific changes/fixes
 	* HoTTAdapter* - display always given GPS version value, even if this does not match known measurement placements
 	* HoTTAdapter* - evaluate byte, byte, byte, short, short, short, byte for unknown GPS (version 2,3,5 - 99)
 	* HoTTAdapter* - evaluate AirSpeed provided by SM MicroVario, SM GPS-Logger3
-	* HoTTAdapter2* - fix scale synchronization reference from 82 to 87
+	* HoTTAdapter2* - fix scale synchronization reference channels from 82 to 87
 	* Core-Telemetry - fix assignment of parsed data with modified name (duplication)
 	* Weatronic-Telemetry - add error handling for corrupt log files
 	* GPS-Logger3 - add HoTT speed type configuration
 	* GPS-Logger2/3 - take real GPS altitude from SMGPS instead of value from GNS/GGA
+	* GPS-Logger* - fix parsing RMC sentence while status V 
 	* Junsi DX6/8 - add initial support
 
 Version 3.5.0 - 13 Sep 2021
