@@ -9,6 +9,7 @@ Device specific changes/fixes
 	* HoTTAdapter* - evaluate byte, byte, byte, short, short, short, byte for unknown GPS (version 2,3,5 - 99)
 	* HoTTAdapter* - evaluate AirSpeed provided by SM MicroVario, SM GPS-Logger3
 	* HoTTAdapter2* - fix scale synchronization reference channels from 82 to 87
+	* HoTTAdapter2* - synchronize scale GPS-Speed and AirSpeed
 	* Core-Telemetry - fix assignment of parsed data with modified name (duplication)
 	* Weatronic-Telemetry - add error handling for corrupt log files
 	* GPS-Logger3 - add HoTT speed type configuration

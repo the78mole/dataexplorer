@@ -2300,6 +2300,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			tmpRecordSet.get(30).setUnit("");
 			tmpRecordSet.get(31).setName(device.getMeasurementReplacement("air_speed") + " GPS");
 			tmpRecordSet.get(31).setUnit("km/h");
+			tmpRecordSet.get(31).createProperty(IDevice.SYNC_ORDINAL, DataTypes.INTEGER, 22); //$NON-NLS-1$
 			tmpRecordSet.get(33).setName(device.getMeasurementReplacement("acceleration") + " X GPS");
 			tmpRecordSet.get(33).setUnit("g");
 			tmpRecordSet.get(33).setFactor(0.01);

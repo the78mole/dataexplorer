@@ -2421,6 +2421,7 @@ public class HoTTAdapter extends DeviceConfiguration implements IDevice, IHistoD
 			tmpRecordSet.get(16).setUnit("");
 			tmpRecordSet.get(17).setName(device.getMeasurementReplacement("air_speed"));
 			tmpRecordSet.get(17).setUnit("km/h");
+			tmpRecordSet.get(17).createProperty(IDevice.SYNC_ORDINAL, DataTypes.INTEGER, 6); //$NON-NLS-1$
 			tmpRecordSet.get(19).setName(device.getMeasurementReplacement("acceleration") + " X");
 			tmpRecordSet.get(19).setUnit("g");
 			tmpRecordSet.get(19).setFactor(0.01);
