@@ -965,8 +965,6 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			this.tmpClimb1 = (DataParser.parse2UnsignedShort(this._buf3, 0) - 30000);
 			this.tmpClimb3 = (this._buf3[2] & 0xFF) - 120;
 			this.tmpVelocity = DataParser.parse2UnsignedShort(this._buf1, 4) * 1000;
-			if (this.tmpVelocity < 0)
-				System.out.println();
 			if (isPointsValid()) {
 				this.points[22] = this.pickerParameters.isFilterEnabled && this.tmpVelocity > 500000 ? this.points[22] : this.tmpVelocity;
 
