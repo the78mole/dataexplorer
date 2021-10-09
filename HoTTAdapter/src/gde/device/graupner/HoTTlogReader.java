@@ -497,7 +497,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		HoTTbinReader.tmpHeight = isHoTTAdapter2 ? DataParser.parse2Short(_buf, 44) - 500 : DataParser.parse2Short(_buf, 44);
 		HoTTbinReader.tmpClimb1 = isHoTTAdapter2 ? (DataParser.parse2UnsignedShort(_buf, 46) - 30000) : DataParser.parse2UnsignedShort(_buf, 46);
 		HoTTbinReader.tmpClimb3 = isHoTTAdapter2 ? (_buf[48] & 0xFF) - 120 : (_buf[48] & 0xFF);
-		HoTTbinReader.tmpVelocity = DataParser.parse2Short(_buf, 30) * 1000;
+		HoTTbinReader.tmpVelocity = DataParser.parse2UnsignedShort(_buf, 30) * 1000;
 		values[6] = HoTTbinReader.tmpVelocity;
 		HoTTbinReader.tmpLatitude = DataParser.parse2Short(_buf, 33) * 10000 + DataParser.parse2Short(_buf, 35);
 		HoTTbinReader.tmpLatitude =  _buf[32] == 1 ? -1 * HoTTbinReader.tmpLatitude : HoTTbinReader.tmpLatitude;
@@ -508,7 +508,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		values[3] = HoTTbinReader.tmpHeight * 1000;		//altitude
 		values[4] = isHoTTAdapter2 ? HoTTbinReader.tmpClimb1 * 10 : HoTTbinReader.tmpClimb1 * 1000;			//climb1
 		values[5] = HoTTbinReader.tmpClimb3 * 1000;		//climb3
-		values[7] = DataParser.parse2Short(_buf, 42) * 1000;
+		values[7] = DataParser.parse2UnsignedShort(_buf, 42) * 1000;
 		values[8] = (_buf[51] & 0xFF) * 1000;
 		values[9] = 0; 																//trip length
 		values[10] = (_buf[13] & 0xFF) * 1000;				//voltageRx
@@ -544,7 +544,7 @@ public class HoTTlogReader extends HoTTbinReader {
 			//52=Roll 53=Pitch 54=Yaw
 			//16=ServoPulse 17=AirSpeeed 18=n/a
 			values[16] = _buf[52] * 1000;
-			values[17] = DataParser.parse2Short(_buf, 53) * 1000;
+			values[17] = DataParser.parse2UnsignedShort(_buf, 53) * 1000;
 			//19=GyroX 20=GyroY 21=GyroZ 	
 			//55,56=GyroX 57,58=GyroY 59,60=GyroZ
 			values[19] = DataParser.parse2Short(_buf, 55) * 1000;

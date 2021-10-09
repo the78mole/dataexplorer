@@ -1708,7 +1708,7 @@ public class HoTTbinReader {
 			this.tmpHeight = DataParser.parse2Short(_buf2, 8);
 			this.tmpClimb1 = DataParser.parse2UnsignedShort(_buf3, 0);
 			this.tmpClimb3 = (_buf3[2] & 0xFF);
-			this.tmpVelocity = DataParser.parse2Short(_buf1, 4) * 1000;
+			this.tmpVelocity = DataParser.parse2UnsignedShort(_buf1, 4) * 1000;
 			this.points[0] = (_buf0[4] & 0xFF) * 1000;
 			if (isPointsValid()) {
 				//0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb 1, 5=Climb 3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx 12=satellites 13=GPS-fix 14=EventGPS
@@ -1750,7 +1750,7 @@ public class HoTTbinReader {
 				this.points[3] = this.tmpHeight * 1000;
 				this.points[4] = this.tmpClimb1 * 1000;
 				this.points[5] = this.tmpClimb3 * 1000;
-				this.points[7] = DataParser.parse2Short(_buf2, 6) * 1000;
+				this.points[7] = DataParser.parse2UnsignedShort(_buf2, 6) * 1000;
 				this.points[8] = (_buf1[3] & 0xFF) * 1000;
 				this.points[9] = 0;
 				this.points[10] = (_buf0[1] & 0xFF) * 1000;
@@ -1784,7 +1784,7 @@ public class HoTTbinReader {
 				if ((_buf4[9] & 0xFF) > 100) { //SM GPS-Logger
 					//16=servoPulse 17=AirSpeed 18=n/a 19=GyroX 20=GyroY 21=GyroZ 22=ENL 23=Version	
 					this.points[16] = _buf3[6] * 1000; 
-					this.points[17] = DataParser.parse2Short(_buf3, 7) * 1000;
+					this.points[17] = DataParser.parse2UnsignedShort(_buf3, 7) * 1000;
 					this.points[19] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
 					this.points[20] = DataParser.parse2Short(_buf4, 1) * 1000;
 					this.points[21] = DataParser.parse2Short(_buf4, 3) * 1000;

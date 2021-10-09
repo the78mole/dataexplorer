@@ -964,7 +964,9 @@ public class HoTTbinReader2 extends HoTTbinReader {
 			this.tmpHeight = DataParser.parse2Short(this._buf2, 8) - 500;
 			this.tmpClimb1 = (DataParser.parse2UnsignedShort(this._buf3, 0) - 30000);
 			this.tmpClimb3 = (this._buf3[2] & 0xFF) - 120;
-			this.tmpVelocity = DataParser.parse2Short(this._buf1, 4) * 1000;
+			this.tmpVelocity = DataParser.parse2UnsignedShort(this._buf1, 4) * 1000;
+			if (this.tmpVelocity < 0)
+				System.out.println();
 			if (isPointsValid()) {
 				this.points[22] = this.pickerParameters.isFilterEnabled && this.tmpVelocity > 500000 ? this.points[22] : this.tmpVelocity;
 
@@ -1003,7 +1005,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					this.points[11] = this.tmpClimb1 * 10;
 					this.points[12] = this.tmpClimb3 * 1000;
 				}
-				this.points[23] = DataParser.parse2Short(this._buf2, 6) * 1000;
+				this.points[23] = DataParser.parse2UnsignedShort(this._buf2, 6) * 1000;
 				this.points[24] = (this._buf1[3] & 0xFF) * 1000;
 				this.points[25] = 0;
 				this.points[26] = (this._buf3[3] & 0xFF) * 1000;
@@ -1036,7 +1038,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				if ((_buf4[9] & 0xFF) > 100) { //SM GPS-Logger
 					//25=servoPulse 26=AirSpeed 27=n/a 28=GyroX 29=GyroY 30=GyroZ 31=ENL 32=Version	
 					this.points[30] = _buf3[6] * 1000; 
-					this.points[31] = DataParser.parse2Short(_buf3, 7) * 1000;
+					this.points[31] = DataParser.parse2UnsignedShort(_buf3, 7) * 1000;
 					this.points[33] = DataParser.parse2Short(_buf3[9], _buf4[0]) * 1000;
 					this.points[34] = DataParser.parse2Short(_buf4, 1) * 1000;
 					this.points[35] = DataParser.parse2Short(_buf4, 3) * 1000;

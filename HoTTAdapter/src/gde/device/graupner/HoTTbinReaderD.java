@@ -882,7 +882,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		HoTTbinReader.tmpHeight = DataParser.parse2Short(_buf2, 8) - 500;
 		HoTTbinReader.tmpClimb1 = (DataParser.parse2UnsignedShort(_buf3, 0) - 30000);
 		HoTTbinReader.tmpClimb3 = (_buf3[2] & 0xFF) - 120;
-		HoTTbinReader.tmpVelocity = DataParser.parse2Short(_buf1, 4) * 1000;
+		HoTTbinReader.tmpVelocity = DataParser.parse2UnsignedShort(_buf1, 4) * 1000;
 		if (!pickerParameters.isFilterEnabled || (HoTTbinReader.tmpClimb1 > -20000 && HoTTbinReader.tmpClimb3 > -90 && HoTTbinReader.tmpHeight >= -490 && HoTTbinReader.tmpHeight < 4500)) {
 			//0=RXSQ, 1=Latitude, 2=Longitude, 3=Altitude, 4=Climb1, 5=Climb3, 6=Velocity, 7=Distance, 8=Direction, 9=TripLength, 10=VoltageRx, 11=TemperatureRx
 			//8=Altitude, 9=Climb1, 10=Climb3
@@ -926,7 +926,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 			HoTTbinReader.pointsGPS[8] = HoTTbinReader.tmpHeight * 1000;
 			HoTTbinReader.pointsGPS[9] = HoTTbinReader.tmpClimb1 * 10;
 			HoTTbinReader.pointsGPS[10] = HoTTbinReader.tmpClimb3 * 1000;
-			HoTTbinReader.pointsGPS[15] = DataParser.parse2Short(_buf2, 6) * 1000;
+			HoTTbinReader.pointsGPS[15] = DataParser.parse2UnsignedShort(_buf2, 6) * 1000;
 			HoTTbinReader.pointsGPS[16] = (_buf1[3] & 0xFF) * 1000;
 			HoTTbinReader.pointsGPS[17] = 0;
 			//18=Satellites 19=Fix 
