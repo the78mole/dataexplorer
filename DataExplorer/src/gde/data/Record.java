@@ -955,7 +955,7 @@ public class Record extends AbstractRecord implements IRecord {
 								if (point < this.minValueTriggered) this.minValueTriggered = point;
 							}
 						} else {
-							if (this.triggerRanges != null) {
+							if (this.triggerRanges != null && this.tmpTriggerRange != null) {
 								this.tmpTriggerRange.setOut(i);
 								this.triggerRanges.add(this.tmpTriggerRange);
 								this.tmpTriggerRange = null;
