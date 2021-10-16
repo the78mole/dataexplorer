@@ -3,7 +3,9 @@ Development history / change log, please read from bottom up
 Version 3.5.1 - xx yyy 2021
 Generic changes/fixes
 	* adapt NMNEA parsing supporting GNS sentence
-	* fix average calculation using trigger smaller as a value
+	* fix trigger calculation using trigger smaller as a value
+	* enhance trigger capabilities to AND or OR trigger ranges
+	* enhance trigger referencing primary and secondary trigger 
 	
 Device specific changes/fixes
 	* HoTTAdapter* - display always given GPS version value, even if this does not match known measurement placements

@@ -103,7 +103,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 	String												triggerComment, sumTriggerComment, sumTriggerTimeComment, countByTriggerComment, ratioComment, triggerRefOrdinalComment;
 	Boolean												isGreater, isSumTriggerTime, isCountByTrigger, isRatioRefOrdinal, isIntegrateByTrigger;
 	Integer												triggerLevel, minTimeSec, ratioRefOrdinal;
-	Integer												triggerRefOrdinal, sumByTriggerRefOrdinal, sumBySecondaryTriggerRefOrdinal;																																																											// must be equal !!!
+	Integer												triggerRefOrdinal, triggerSecondaryRefOrdinal, sumByTriggerRefOrdinal, sumBySecondaryTriggerRefOrdinal;																																																											// must be equal !!!
 	boolean												isSomeTriggerDefined					= false;
 	String[]											measurementReferenceItems;
 
@@ -559,6 +559,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 									StatisticsTypeTabItem.this.statisticsType.setCountTriggerText(StatisticsTypeTabItem.this.countByTriggerComment);
 
 									StatisticsTypeTabItem.this.statisticsType.setTriggerRefOrdinal(null);
+									StatisticsTypeTabItem.this.statisticsType.setTriggerSecondaryRefOrdinal(null);
 									StatisticsTypeTabItem.this.statisticsType.setSumByTriggerRefOrdinal(null);
 									StatisticsTypeTabItem.this.statisticsType.setSumTriggerText(null);
 									StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(null);
@@ -585,6 +586,7 @@ public class StatisticsTypeTabItem extends CTabItem implements Cloneable {
 
 								StatisticsTypeTabItem.this.statisticsType.setCountByTrigger(StatisticsTypeTabItem.this.isCountByTrigger);
 								StatisticsTypeTabItem.this.statisticsType.setTriggerRefOrdinal(StatisticsTypeTabItem.this.triggerRefOrdinal);
+								StatisticsTypeTabItem.this.statisticsType.setTriggerSecondaryRefOrdinal(StatisticsTypeTabItem.this.triggerSecondaryRefOrdinal);
 								StatisticsTypeTabItem.this.statisticsType.setSumByTriggerRefOrdinal(StatisticsTypeTabItem.this.sumByTriggerRefOrdinal);
 								StatisticsTypeTabItem.this.statisticsType.setSumTriggerText(StatisticsTypeTabItem.this.sumTriggerComment);
 								StatisticsTypeTabItem.this.statisticsType.setRatioRefOrdinal(StatisticsTypeTabItem.this.ratioRefOrdinal);

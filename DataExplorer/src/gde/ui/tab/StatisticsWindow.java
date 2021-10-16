@@ -314,17 +314,14 @@ public class StatisticsWindow extends CTabItem {
 						if (measurementStatistics != null) {
 							sb = new StringBuilder();
 							int triggerRefOrdinal = getTriggerReferenceOrdinal(activeRecordSet, measurementStatistics);
-							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("updating record = %s ref ordinal = %d", recordName, triggerRefOrdinal));
-							boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
+							int triggerSecondaryRefOrdinal = getTriggerSecondaryReferenceOrdinal(activeRecordSet, measurementStatistics);
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, String.format("updating record = %s trigger ref ordinal = %d trigger secondary ref ordinal = %d", recordName, triggerRefOrdinal, triggerSecondaryRefOrdinal));
 							sb.append(record.getName()).append(DELIMITER);
 							sb.append("[").append(record.getUnit()).append("]").append(DELIMITER); //$NON-NLS-1$ //$NON-NLS-2$
 
 							if (measurementStatistics.isMin()) {
-								if (isTriggerLevel)
-									if (record.getMinValueTriggered() != Integer.MAX_VALUE)
-										sb.append(record.getFormattedStatisticsValue(record.getMinValueTriggered() / 1000.0));
-									else
-										sb.append(NO_VALUE).append(DELIMITER).append(NO_VALUE);
+								if (triggerRefOrdinal >= 0 && triggerSecondaryRefOrdinal >= 0)
+									sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getMinValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
 								else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
@@ -338,11 +335,8 @@ public class StatisticsWindow extends CTabItem {
 							sb.append(DELIMITER);
 
 							if (measurementStatistics.isAvg())
-								if (isTriggerLevel)
-									if (record.getAvgValueTriggered() != Integer.MIN_VALUE)
-										sb.append(formatOutput(record.getFormattedStatisticsValue(record.getAvgValueTriggered() / 1000.0)));
-									else
-										sb.append(NO_VALUE);
+								if (triggerRefOrdinal >= 0 && triggerSecondaryRefOrdinal >= 0)
+									sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getAvgValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
 								else if (triggerRefOrdinal < 0 || record.getAvgValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0)));
 							else
@@ -350,11 +344,8 @@ public class StatisticsWindow extends CTabItem {
 							sb.append(DELIMITER);
 
 							if (measurementStatistics.isMax()) {
-								if (isTriggerLevel)
-									if (record.getMaxValueTriggered() != Integer.MIN_VALUE)
-										sb.append(record.getFormattedStatisticsValue(record.getMaxValueTriggered() / 1000.0));
-									else
-										sb.append(NO_VALUE).append(DELIMITER).append(NO_VALUE);
+								if (triggerRefOrdinal >= 0 && triggerSecondaryRefOrdinal >= 0)
+									sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getMaxValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
 								else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
@@ -369,13 +360,12 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isSigma()) {
 								DecimalFormat cdf = new DecimalFormat("0.000"); //$NON-NLS-1$
-								if (isTriggerLevel) 
-									if (record.getSigmaValueTriggered() != Integer.MIN_VALUE)
-										sb.append(formatOutput(cdf.format(device.translateValue(record, record.getSigmaValueTriggered() / 1000.0))));
-									else
-										sb.append(NO_VALUE);
-								else
+								if (triggerRefOrdinal >= 0 && triggerSecondaryRefOrdinal >= 0)
+									sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getSigmaValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
+								else if (triggerRefOrdinal < 0 || record.getSigmaValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
 									sb.append(formatOutput(cdf.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getSigmaValue() : record.getSigmaValueTriggered(triggerRefOrdinal)) / 1000.0))));
+								else
+									sb.append(NO_VALUE).append(DELIMITER).append(NO_VALUE);
 							}
 							else
 								sb.append(NO_VALUE);
@@ -391,17 +381,16 @@ public class StatisticsWindow extends CTabItem {
 							if (measurementStatistics.getSumByTriggerRefOrdinal() != null) {
 								if (measurementStatistics.getSumTriggerText() != null && measurementStatistics.getSumTriggerText().length() > 1) {
 									sb.append(xmlResource.getReplacement(measurementStatistics.getSumTriggerText())).append(" = "); //$NON-NLS-1$
+									boolean isTriggerLevel = measurementStatistics.getTrigger() != null;
 									if (isTriggerLevel)
 										sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getSumTriggeredRange() / 1000.)));
-									else {
-										if (measurementStatistics.getSumBySecondaryTriggerRefOrdinal() != null) {
+									else 
+										if (measurementStatistics.getSumBySecondaryTriggerRefOrdinal() != null)
 											sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue(), measurementStatistics.getSumBySecondaryTriggerRefOrdinal().intValue()) / 1000.)));
-										}
-										else {
+										else 
 											sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getSumTriggeredRange(measurementStatistics.getSumByTriggerRefOrdinal().intValue()) / 1000.)));
-										}
-										sb.append(" [").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
-									}
+									
+									sb.append(" [").append(record.getUnit()).append("]; "); //$NON-NLS-1$ //$NON-NLS-2$
 								}
 
 								// append ratio text + ratio value
@@ -492,10 +481,10 @@ public class StatisticsWindow extends CTabItem {
 	}
 
 	/**
-	 * get the trigger refernce ordinal value while checking the referenced record is in state displayable
+	 * get the trigger reference ordinal value while checking the referenced record is in state displayable
 	 * @param recordSet
 	 * @param measurementStatistics
-	 * @return -1 if referenced record does not fullfill the criterias required, else the ordinal of the referenced record
+	 * @return -1 if referenced record does not fulfill the criteria required, else the ordinal of the referenced record
 	 */
 	int getTriggerReferenceOrdinal(RecordSet recordSet, StatisticsType measurementStatistics) {
 		int triggerRefOrdinal = -1;
@@ -507,6 +496,24 @@ public class StatisticsWindow extends CTabItem {
 			}
 		}
 		return triggerRefOrdinal;
+	}
+
+	/**
+	 * get the trigger secondary reference ordinal value while checking the referenced record is in state displayable
+	 * @param recordSet
+	 * @param measurementStatistics
+	 * @return -1 if referenced record does not fulfill the criteria required, else the ordinal of the referenced record
+	 */
+	int getTriggerSecondaryReferenceOrdinal(RecordSet recordSet, StatisticsType measurementStatistics) {
+		int triggerSecondaryRefOrdinal = -1;
+		if (measurementStatistics.getTriggerSecondaryRefOrdinal() != null && recordSet != null) {
+			int tmpOrdinal = measurementStatistics.getTriggerSecondaryRefOrdinal().intValue();
+			Record record = recordSet.get(tmpOrdinal);
+			if (record != null && record.isDisplayable()) {
+				triggerSecondaryRefOrdinal = tmpOrdinal;
+			}
+		}
+		return triggerSecondaryRefOrdinal;
 	}
 
 	/**

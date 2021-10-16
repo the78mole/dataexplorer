@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="avg" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="sigma" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="triggerRefOrdinal" type="{http://www.w3.org/2001/XMLSchema}integer" />
+ *       &lt;attribute name="triggerSecondaryRefOrdinal" type="{http://www.w3.org/2001/XMLSchema}integer" />
  *       &lt;attribute name="sumByTriggerRefOrdinal" type="{http://www.w3.org/2001/XMLSchema}integer" />
  *       &lt;attribute name="sumBySecondaryTriggerRefOrdinal" type="{http://www.w3.org/2001/XMLSchema}integer" />
  *       &lt;attribute name="integrateByTrigger" type="{http://www.w3.org/2001/XMLSchema}boolean" />
@@ -64,6 +65,8 @@ public class StatisticsType implements Cloneable {
 	protected boolean									sigma;
 	@XmlAttribute
 	protected Integer									triggerRefOrdinal;
+	@XmlAttribute
+	protected Integer									triggerSecondaryRefOrdinal;
 	@XmlAttribute
 	protected Integer									sumByTriggerRefOrdinal;
 	@XmlAttribute
@@ -103,6 +106,7 @@ public class StatisticsType implements Cloneable {
 		this.avg = statistics.avg;
 		this.sigma = statistics.sigma;
 		this.triggerRefOrdinal = statistics.triggerRefOrdinal;
+		this.triggerSecondaryRefOrdinal = statistics.triggerSecondaryRefOrdinal;
 		this.integrateByTrigger = statistics.integrateByTrigger;
 		this.sumByTriggerRefOrdinal = statistics.sumByTriggerRefOrdinal;
 		this.sumTriggerText = statistics.sumTriggerText;
@@ -245,6 +249,30 @@ public class StatisticsType implements Cloneable {
 	 */
 	public void setTriggerRefOrdinal(Integer value) {
 		this.triggerRefOrdinal = value;
+	}
+
+	/**
+	 * Gets the value of the triggerRefOrdinal property.
+	 * 
+	 * @return
+	 *     possible object is
+	 *     {@link Integer }
+	 *     
+	 */
+	public Integer getTriggerSecondaryRefOrdinal() {
+		return this.triggerSecondaryRefOrdinal;
+	}
+
+	/**
+	 * Sets the value of the triggerRefOrdinal property.
+	 * 
+	 * @param value
+	 *     allowed object is
+	 *     {@link Integer }
+	 *     
+	 */
+	public void setTriggerSecondaryRefOrdinal(Integer value) {
+		this.triggerSecondaryRefOrdinal = value;
 	}
 
 	/**
@@ -489,6 +517,7 @@ public class StatisticsType implements Cloneable {
 //<trigger level="3000" isGreater="true" minTimeSec="10" comment="Motorstromtrigger: &gt;3A, &gt;10 Sekunden"/>
 		sb.append(String.format("statistics min=%b max=%b avg=%b sigma=%b", this.min, this.max, this.avg, this.sigma));
 		if (triggerRefOrdinal != null) sb.append(String.format(" triggerRefOrdinal=%d", this.triggerRefOrdinal));
+		if (triggerSecondaryRefOrdinal != null) sb.append(String.format(" triggerSecondaryRefOrdinal=%d", this.triggerSecondaryRefOrdinal));
 		if (sumByTriggerRefOrdinal != null) sb.append(String.format(" sumByTriggerRefOrdinal=%d", this.sumByTriggerRefOrdinal));
 		if (sumBySecondaryTriggerRefOrdinal != null) sb.append(String.format(" sumBySecondaryTriggerRefOrdinal=%d", this.sumBySecondaryTriggerRefOrdinal));
 		if (sumTriggerText != null) sb.append(String.format(" sumTriggerText=%s", this.sumTriggerText.replace(GDE.CHAR_BLANK, GDE.CHAR_UNDER_BAR)));
@@ -539,6 +568,7 @@ public class StatisticsType implements Cloneable {
 				else if (props[0].equals("avg")) statistics.avg = Boolean.valueOf(props[1]);
 				else if (props[0].equals("sigma")) statistics.sigma = Boolean.valueOf(props[1]);
 				else if (props[0].equals("triggerRefOrdinal")) statistics.triggerRefOrdinal = Integer.valueOf(props[1]);
+				else if (props[0].equals("triggerSecondaryRefOrdinal")) statistics.triggerSecondaryRefOrdinal = Integer.valueOf(props[1]);
 				else if (props[0].equals("sumByTriggerRefOrdinal")) statistics.sumByTriggerRefOrdinal = Integer.valueOf(props[1]);
 				else if (props[0].equals("sumTriggerText")) statistics.sumTriggerText = props[1].replace(GDE.CHAR_UNDER_BAR, GDE.CHAR_BLANK);
 				else if (props[0].equals("countByTrigger")) statistics.countByTrigger = Boolean.valueOf(props[1]);
