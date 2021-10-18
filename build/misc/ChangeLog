@@ -16,6 +16,7 @@ Device specific changes/fixes
 	* Core-Telemetry - fix assignment of parsed data with modified name (duplication)
 	* Weatronic-Telemetry - add error handling for corrupt log files
 	* GPS-Logger3 - add HoTT speed type configuration
+	* GPS-Logger3 - calculate pressure delta TEC instead of pressure TEC
 	* GPS-Logger2/3 - take real GPS altitude from SMGPS instead of value from GNS/GGA
 	* GPS-Logger* - fix parsing RMC sentence while status V 
 	* Junsi DX6/8 - add initial support

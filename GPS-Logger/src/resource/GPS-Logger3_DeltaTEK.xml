@@ -178,7 +178,7 @@
                 <unit>ENL</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false">
-                    <trigger level="150000" isGreater="false" minTimeSec="1" comment="Trigger &lt; 150 " isSecondary="true"/>
+                    <trigger level="200000" isGreater="false" minTimeSec="5" comment="Trigger &lt; 200 " isSecondary="true"/>
                 </statistics>
             </Measurement>
             <Measurement>
@@ -201,15 +201,14 @@
                 <symbol></symbol>
                 <unit>hPa</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="7" triggerSecondaryRefOrdinal="20" comment="referenzing Speed+ENL trigger"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>pressure TEK</name>
+                <name>pressure ∆TEK</name>
                 <symbol></symbol>
                 <unit>hPa</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="7" triggerSecondaryRefOrdinal="20" comment="referenzing Speed+ENL trigger"/>
-                <property name="scale_sync_ref_ordinal" value="23" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="7" triggerSecondaryRefOrdinal="20" comment="referenzing Speed+ENL trigger"/>
             </Measurement>
             <Measurement>
                 <name>climb TEK</name>
@@ -552,7 +551,7 @@
                 <unit>ENL</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true">
-                    <trigger level="150000" isGreater="false" minTimeSec="1" comment="Trigger &lt; 150 " isSecondary="true"/>
+                    <trigger level="200000" isGreater="false" minTimeSec="5" comment="Trigger &lt; 200 " isSecondary="true"/>
                 </statistics>
             </Measurement>
             <Measurement>
@@ -575,15 +574,14 @@
                 <symbol></symbol>
                 <unit>hPa</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="7" triggerSecondaryRefOrdinal="20" comment="referenzing Speed+ENL trigger"/>
+                <statistics min="true" max="true" avg="true" sigma="false"/>
             </Measurement>
             <Measurement>
-                <name>pressure TEK</name>
+                <name>pressure ∆TEK</name>
                 <symbol></symbol>
                 <unit>hPa</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="7" triggerSecondaryRefOrdinal="20" comment="referenzing Speed+ENL trigger"/>
-                <property name="scale_sync_ref_ordinal" value="23" type="Integer" description="Skalasynchronisations Messwertreferenz als Zahl"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="7" triggerSecondaryRefOrdinal="20" comment="referenzing Speed+ENL trigger"/>
             </Measurement>
             <Measurement>
                 <name>climb TEK</name>

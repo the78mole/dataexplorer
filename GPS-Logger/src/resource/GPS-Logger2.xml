@@ -203,12 +203,11 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>pressure TEK</name>
+                <name>pressure ∆TEK</name>
                 <symbol></symbol>
                 <unit>hPa</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property  type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>climb TEK</name>
@@ -579,12 +578,11 @@
                 <statistics sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
-                <name>pressure TEK</name>
+                <name>pressure ∆TEK</name>
                 <symbol></symbol>
                 <unit>hPa</unit>
                 <active>true</active>
                 <statistics sigma="false" avg="true" max="true" min="true"/>
-                <property  type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>climb TEK</name>
