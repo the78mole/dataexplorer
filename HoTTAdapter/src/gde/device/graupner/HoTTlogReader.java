@@ -613,7 +613,7 @@ public class HoTTlogReader extends HoTTbinReader {
 		}
 		//three char
 		//23=Version
-		values[23] = _buf[65] * 1000;
+		values[23] = (_buf[65] & 0xFF) * 1000;
 
 		if (log.isLoggable(Level.FINER)) {
 			printSensorValues(_buf, values, 23);

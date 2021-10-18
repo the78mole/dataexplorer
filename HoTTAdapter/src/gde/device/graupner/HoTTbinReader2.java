@@ -891,7 +891,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 				}
 				this.points[14] = (this._buf1[1] & 0x3F) * 1000; // inverse event
 				
-				if ((HoTTbinReader.buf4[9] & 0xFF) > 100 && (HoTTbinReader.buf4[9] & 0xFF) < 120) { //SM MicroVario starts with FW version 1.00 -> 100
+				if ((_buf4[9] & 0xFF) > 100 && (_buf4[9] & 0xFF) < 120) { //SM MicroVario starts with FW version 1.00 -> 100
 					try {
 						this.points[15] = Integer.parseInt(String.format(Locale.ENGLISH, "%c%c%c%c%c0", _buf2[4], _buf2[5], _buf2[6], _buf2[8], _buf2[9]).trim());
 						this.points[16] = Integer.parseInt(String.format(Locale.ENGLISH, "%c%c%c%c%c0", _buf3[1], _buf3[2], _buf3[3], _buf3[5], _buf3[6]).trim());
@@ -1090,7 +1090,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					this.points[35] = DataParser.parse2Short(_buf4, 3) * 1000;
 					this.points[36] = (_buf4[5] & 0xFF) * 1000;
 				}
-				this.points[37] = _buf4[9] * 1000;
+				this.points[37] = (_buf4[9] & 0xFF) * 1000;
 				return true;
 			}
 			this.points[28] = (this._buf1[1] & 0x0F) * 1000; // inverse event
