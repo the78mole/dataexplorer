@@ -2492,7 +2492,7 @@ public class Record extends AbstractRecord implements IRecord {
 		Vector<TriggerRange> primaryTriggerRanges = this.parent.get(referencedMeasurementOrdinal).getTriggerRanges();
 		if (primaryTriggerRanges != null && !this.parent.get(referencedMeasurementOrdinal).isMerged()) {
 			Vector<TriggerRange> secondaryTriggerRanges = this.parent.get(referencedSecondaryMeasurementOrdinal).getTriggerRanges();
-			if (log.isLoggable(Level.FINE)) {
+			if (log.isLoggable(Level.OFF)) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(String.format("primaryTriggerRanges for %s\n", this.parent.get(referencedMeasurementOrdinal).name));
 				for (TriggerRange range : primaryTriggerRanges) {
@@ -2502,7 +2502,7 @@ public class Record extends AbstractRecord implements IRecord {
 				for (TriggerRange range : secondaryTriggerRanges) {
 					sb.append(String.format("range in %d, out %d\n", range.in, range.out));					
 				}
-				log.log(Level.FINE, sb.toString());
+				log.log(Level.OFF, sb.toString());
 			}
 			this.triggerRanges = new Vector<TriggerRange>();
 			boolean isGreaterSecondary = this.parent.get(referencedSecondaryMeasurementOrdinal).getTriggerIsGreater();
@@ -2518,15 +2518,16 @@ public class Record extends AbstractRecord implements IRecord {
 				if (isGreaterSecondary) { //OR
 					while (!isMatchRanges && secondaryIterator.hasNext()) {
 						secondaryRange = (TriggerRange) secondaryIterator.next();
-						if (secondaryRange.in >= primaryRange.in 
+						if ((secondaryRange.in + 10) >= primaryRange.in //+10 tolerance
 								&& secondaryRange.in < primaryRange.out 
-								&& secondaryRange.out > primaryRange.out
-								&& secondaryRange.out < (primaryRange.out + (primaryRange.out - primaryRange.in))) {
+								&& secondaryRange.out >= primaryRange.out
+								&& secondaryRange.out <= (primaryRange.out + (primaryRange.out - primaryRange.in))) {
 							this.triggerRanges.add(new TriggerRange(primaryRange.in, secondaryRange.out));
 							isMatchRanges = true;
 						}
 					}
-					if (!isMatchRanges) this.triggerRanges.add(primaryRange);
+					if (!isMatchRanges) 
+						this.triggerRanges.add(primaryRange);
 				}
 				else { //AND
 					while (secondaryIterator.hasNext()) {
@@ -2548,13 +2549,13 @@ public class Record extends AbstractRecord implements IRecord {
 					}
 				}
 			}
-			if (log.isLoggable(Level.FINE)) {
+			if (log.isLoggable(Level.OFF)) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(String.format("trigger rages merged for %s and %s\n", this.parent.get(referencedMeasurementOrdinal).name, this.parent.get(referencedSecondaryMeasurementOrdinal).name));
 				for (TriggerRange range : this.triggerRanges) {
 					sb.append(String.format("range in %d, out %d\n", range.in, range.out));					
 				}
-				log.log(Level.FINE, sb.toString());
+				log.log(Level.OFF, sb.toString());
 			}
 			//this.triggerRanges = this.parent.get(referencedMeasurementOrdinal).getTriggerRanges();
 			this.parent.get(referencedMeasurementOrdinal).setIsMerged();
