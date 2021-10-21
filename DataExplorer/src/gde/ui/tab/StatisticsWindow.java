@@ -417,7 +417,12 @@ public class StatisticsWindow extends CTabItem {
 
 							// append global comment
 							if (measurementStatistics.getComment() != null && measurementStatistics.getComment().length() > 1)
-								sb.append("(").append(xmlResource.getReplacement(measurementStatistics.getComment())).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
+								if (triggerRefOrdinal >= 0 && triggerSecondaryRefOrdinal >= 0)
+									sb.append(String.format("(%s %s+%s) ", xmlResource.getReplacement(measurementStatistics.getComment()), activeRecordSet.get(triggerRefOrdinal).getName(), activeRecordSet.get(triggerSecondaryRefOrdinal).getName()));
+								else if (triggerRefOrdinal >= 0)
+									sb.append(String.format("(%s %s) ", xmlResource.getReplacement(measurementStatistics.getComment()), activeRecordSet.get(triggerRefOrdinal).getName()));
+								else
+									sb.append(String.format("%s) ", xmlResource.getReplacement(measurementStatistics.getComment()))); //$NON-NLS-1$ //$NON-NLS-2$
 							
 							//evaluate integrated value by trigger range
 							if (triggerRefOrdinal >= 0 && measurementStatistics.isIntegrateByTrigger()) {
@@ -427,9 +432,12 @@ public class StatisticsWindow extends CTabItem {
 
 							// append trigger + comment
 							if (measurementStatistics.getTrigger() != null && measurementStatistics.getSumTriggerTimeText() != null && measurementStatistics.getSumTriggerTimeText().length() > 1) {
-								sb.append("(").append(String.format(xmlResource.getReplacement(measurementStatistics.getTrigger().getComment()), measurementStatistics.getTrigger().getLevel()/1000.0, measurementStatistics.getTrigger().getMinTimeSec())).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
+								sb.append("(").append(String.format(xmlResource.getReplacement(measurementStatistics.getTrigger().getComment()), recordName, measurementStatistics.getTrigger().getLevel()/1000.0, activeRecordSet.get(recordName).getUnit(), measurementStatistics.getTrigger().getMinTimeSec())).append(") "); //$NON-NLS-1$ //$NON-NLS-2$
 								if (!measurementStatistics.getTrigger().isSecondary())
 									this.tabelItemText.set(0, this.tabelItemText.get(0) + (activeRecordSet.isTimeStepConstant() ? ", " : GDE.STRING_EMPTY) + xmlResource.getReplacement(xmlResource.getReplacement(measurementStatistics.getSumTriggerTimeText())) + " = " + record.getTimeSumTriggeredRange());
+							}
+							else if (measurementStatistics.getSumTriggerTimeText() == null && measurementStatistics.getTrigger() != null && measurementStatistics.getTrigger().getComment() != null && measurementStatistics.getTrigger().getComment().length() > 1 ) {
+								sb.append("(").append(String.format(xmlResource.getReplacement(measurementStatistics.getTrigger().getComment()), recordName, measurementStatistics.getTrigger().getLevel()/1000.0, activeRecordSet.get(recordName).getUnit(), measurementStatistics.getTrigger().getMinTimeSec())).append(") "); //$NON-NLS-1$ //$NON-NLS-2$								
 							}
 
 							GC displayGC = new GC(this.dataTable.getDisplay());

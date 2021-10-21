@@ -81,7 +81,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics sumTriggerTimeText="text_trigger_time_sum" countTriggerText="text_trigger_count" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
-                    <trigger comment="comment_trigger_current_def" minTimeSec="5" isGreater="true" level="2000"/>
+                    <trigger comment="comment_trigger_gt_def" minTimeSec="5" isGreater="true" level="2000"/>
                 </statistics>
                 <property description="Factor applied to measurement value" type="Double" value="0.1" name="factor"/>
             </Measurement>
@@ -114,21 +114,21 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RPM Rotor</name>
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>RPM Motor</name>
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="6" sigma="false" avg="true" max="true" min="true"/>
                 <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -174,14 +174,14 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>power max</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -189,7 +189,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="18" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -224,7 +224,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
                  <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
@@ -233,7 +233,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
                 <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>
@@ -242,7 +242,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="6" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="11" name="scale_sync_ref_ordinal"/>
                 <property name="factor" value="0.1" type="Double" description="Factor applied to measurement value"/>
             </Measurement>

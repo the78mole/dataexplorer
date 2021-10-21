@@ -238,7 +238,7 @@
 				<unit>m/s</unit>
 				<active>true</active>
 				<statistics sumTriggerTimeText="text_trigger_time_sum" countTriggerText="text_trigger_count" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
-					<trigger comment="comment_trigger_current_def" minTimeSec="15" isGreater="true" level="1000"/>
+					<trigger comment="comment_trigger_gt_def" minTimeSec="15" isGreater="true" level="1000"/>
 				</statistics>
 				<property type="Double" value="0.02" name="factor"/>
 			</Measurement>
@@ -301,7 +301,7 @@
 				<unit>A</unit>
 				<active>true</active>
 				<statistics sumTriggerTimeText="text_trigger_time_sum" countTriggerText="text_trigger_count" countByTrigger="true" sigma="false" avg="false" max="true" min="true">
-					<trigger comment="comment_trigger_current_def" minTimeSec="5" isGreater="true" level="3000"/>
+					<trigger comment="comment_trigger_gt_def" minTimeSec="5" isGreater="true" level="3000"/>
 				</statistics>
 			</Measurement>
 			<Measurement>
@@ -309,7 +309,7 @@
 				<symbol>U</symbol>
 				<unit>V</unit>
 				<active>true</active>
-				<statistics comment="comment_trigger_current" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
+				<statistics comment="comment_trigger_ref" triggerRefOrdinal="2" sigma="false" avg="false" max="true" min="true"/>
 				<property description="mV -&gt; V" type="Double" value="0.001" name="factor"/>
 			</Measurement>
 			<Measurement>
@@ -324,7 +324,7 @@
 				<symbol>V</symbol>
 				<unit>km/h</unit>
 				<active>true</active>
-				<statistics comment="comment_trigger_current" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+				<statistics comment="comment_trigger_ref" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
 			</Measurement>
 			<Measurement>
 				<name>temperature</name>
@@ -357,7 +357,7 @@
 				<symbol>V</symbol>
 				<unit>km/h</unit>
 				<active>true</active>
-				<statistics comment="comment_trigger_current" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+				<statistics comment="comment_trigger_ref" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
 	            <property description="Google Earth untere Geschwindigkeitsgrenze" type="Integer" value="20" name="google_earth_velocity_lower_limit"/>
 	            <property description="Google Earth obere Geschwindigkeitsgrenze" type="Integer" value="100" name="google_earth_velocity_upper_limit"/>
 			</Measurement>
@@ -366,7 +366,7 @@
 				<symbol>Vs</symbol>
 				<unit>m/s</unit>
 				<active>true</active>
-				<statistics comment="comment_trigger_current" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
+				<statistics comment="comment_trigger_ref" triggerRefOrdinal="2" sigma="false" avg="true" max="true" min="true"/>
 				<property type="Double" value="0.02" name="factor"/>
 			</Measurement>
 			<Measurement>

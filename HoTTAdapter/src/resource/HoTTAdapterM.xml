@@ -273,7 +273,7 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics min="false" max="true" avg="false" sigma="false" countByTrigger="true" countTriggerText="text_trigger_count">
-                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_climb_def" isSecondary="false"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_gt_def" isSecondary="false"/>
                 </statistics>
                 <label>label_climb_1</label>
             </Measurement>
@@ -414,7 +414,7 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics min="false" max="true" avg="false" sigma="false" countByTrigger="true" countTriggerText="text_trigger_count">
-                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_climb_def" isSecondary="false"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_gt_def" isSecondary="false"/>
                 </statistics>
                 <property name="reduction" value="30000.0" type="Double" description="reduction of measurement value before apply offset and factor"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
@@ -598,7 +598,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_voltage GAM</label>
             </Measurement>
@@ -608,7 +608,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="text_trigger_count" sumTriggerTimeText="text_trigger_time_sum">
-                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_current_def" isSecondary="false"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_gt_def" isSecondary="false"/>
                 </statistics>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_current GAM</label>
@@ -618,7 +618,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_capacity GAM</label>
             </Measurement>
@@ -627,7 +627,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <label>label_power GAM</label>
             </Measurement>
@@ -704,7 +704,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_rpm GAM</label>
             </Measurement>
@@ -1035,7 +1035,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="false" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="false" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_voltage EAM</label>
             </Measurement>
@@ -1045,7 +1045,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="text_trigger_count" sumTriggerTimeText="text_trigger_time_sum">
-                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_current_def" isSecondary="false"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_gt_def" isSecondary="false"/>
                 </statistics>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_current EAM</label>
@@ -1055,7 +1055,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="false" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="false" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_capacity EAM</label>
             </Measurement>
@@ -1064,7 +1064,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <label>label_power EAM</label>
             </Measurement>
@@ -1285,7 +1285,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_rpm EAM</label>
             </Measurement>
@@ -1848,7 +1848,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_voltage ESC</label>
             </Measurement>
@@ -1858,7 +1858,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="text_trigger_count" sumTriggerTimeText="text_trigger_time_sum">
-                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_current_def" isSecondary="false"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_gt_def" isSecondary="false"/>
                 </statistics>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_current ESC</label>
@@ -1868,7 +1868,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_capacity ESC</label>
             </Measurement>
@@ -1877,7 +1877,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <label>label_power ESC</label>
             </Measurement>
@@ -1886,7 +1886,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="2" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_rpm ESC</label>
             </Measurement>

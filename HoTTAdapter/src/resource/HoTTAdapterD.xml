@@ -110,7 +110,7 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="false" sigma="false" countByTrigger="true" countTriggerText="text_trigger_count">
-                    <trigger level="1500" isGreater="true" minTimeSec="10" comment="comment_trigger_climb_def"/>
+                    <trigger level="1500" isGreater="true" minTimeSec="10" comment="comment_trigger_gt_def"/>
                 </statistics>
             </Measurement>
             <Measurement>

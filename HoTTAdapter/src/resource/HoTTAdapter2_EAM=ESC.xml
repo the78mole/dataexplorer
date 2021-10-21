@@ -1211,7 +1211,7 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics min="false" max="true" avg="true" sigma="false" countByTrigger="true" countTriggerText="text_trigger_count_secondary" sumTriggerTimeText="text_trigger_time_sum">
-                    <trigger level="3000" isGreater="true" minTimeSec="4" comment="comment_trigger_climb_def" isSecondary="true"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="4" comment="comment_trigger_gt_def" isSecondary="true"/>
                 </statistics>
                 <label>label_climb_1</label>
             </Measurement>
@@ -1437,7 +1437,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="39" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="39" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_voltage GAM</label>
             </Measurement>
@@ -1447,7 +1447,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="text_trigger_count" sumTriggerTimeText="text_trigger_time_sum">
-                    <trigger level="3000" isGreater="true" minTimeSec="4" comment="comment_trigger_current_def" isSecondary="false"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="4" comment="comment_trigger_gt_def" isSecondary="false"/>
                 </statistics>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <label>label_current GAM</label>
@@ -1457,7 +1457,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="39" sumByTriggerRefOrdinal="39" sumTriggerText="comment_motor_used_capacity" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="39" sumByTriggerRefOrdinal="39" sumTriggerText="comment_motor_used_capacity" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_capacity GAM</label>
             </Measurement>
@@ -1466,7 +1466,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="39" integrateByTrigger="true" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="39" integrateByTrigger="true" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <label>label_power GAM</label>
             </Measurement>
@@ -1543,7 +1543,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="39" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="39" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <label>label_rpm GAM</label>
             </Measurement>
@@ -2331,7 +2331,7 @@
                 <symbol>vh</symbol>
                 <unit>m/sec</unit>
                 <active>true</active>
-                <statistics min="false" max="false" avg="true" sigma="false" triggerRefOrdinal="88" comment="Werte bezogen auf Stromtriggerbereich"/>
+                <statistics min="false" max="false" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_ref"/>
                 <label>label_climb_1</label>
             </Measurement>
             <Measurement>
@@ -2426,7 +2426,7 @@
                 <symbol>v</symbol>
                 <unit>km/h</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="Werte bezogen auf Stromtriggerbereich"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_ref"/>
                 <label>label_velocity</label>
             </Measurement>
             <Measurement>
@@ -3037,7 +3037,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="38" type="Integer"/>
                 <label>label_voltage ESC</label>
@@ -3048,7 +3048,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="text_trigger_count" sumTriggerTimeText="text_trigger_time_sum">
-                    <trigger level="3000" isGreater="true" minTimeSec="4" comment="comment_trigger_current_def" isSecondary="false"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="4" comment="comment_trigger_gt_def" isSecondary="false"/>
                 </statistics>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="39" type="Integer"/>
@@ -3059,7 +3059,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="88" sumByTriggerRefOrdinal="83" sumTriggerText="comment_motor_used_capacity" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="88" sumByTriggerRefOrdinal="83" sumTriggerText="comment_motor_used_capacity" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="40" type="Integer"/>
                 <label>label_capacity ESC</label>
@@ -3069,7 +3069,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="41" type="Integer"/>
                 <label>label_power ESC</label>
@@ -3079,7 +3079,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="49" type="Integer"/>
                 <label>label_rpm ESC</label>
@@ -4509,7 +4509,7 @@
                 <unit>m/sec</unit>
                 <active>true</active>
                 <statistics min="false" max="true" avg="true" sigma="false" countByTrigger="true" countTriggerText="text_trigger_count_secondary" sumTriggerTimeText="text_trigger_time_sum">
-                    <trigger level="3000" isGreater="true" minTimeSec="4" comment="comment_trigger_climb_def" isSecondary="true"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="4" comment="comment_trigger_gt_def" isSecondary="true"/>
                 </statistics>
                 <label>label_climb_1</label>
             </Measurement>
@@ -4605,7 +4605,7 @@
                 <symbol>v</symbol>
                 <unit>km/h</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="Werte bezogen auf Stromtriggerbereich"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_ref"/>
             </Measurement>
             <Measurement>
                 <name>distance_start</name>
@@ -5213,7 +5213,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="38" type="Integer"/>
                 <label>label_voltage ESC</label>
@@ -5224,7 +5224,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="text_trigger_count" sumTriggerTimeText="text_trigger_time_sum">
-                    <trigger level="3000" isGreater="true" minTimeSec="4" comment="comment_trigger_current_def" isSecondary="false"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="4" comment="comment_trigger_gt_def" isSecondary="false"/>
                 </statistics>
                 <property name="factor" value="0.1" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="39" type="Integer"/>
@@ -5235,7 +5235,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="88" sumByTriggerRefOrdinal="88" sumTriggerText="comment_motor_used_capacity" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="false" sigma="false" triggerRefOrdinal="88" sumByTriggerRefOrdinal="88" sumTriggerText="comment_motor_used_capacity" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="40" type="Integer"/>
                 <label>label_capacity ESC</label>
@@ -5245,7 +5245,7 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_ref"/>
                 <property name="factor" value="0.01" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="41" type="Integer"/>
                 <label>label_power ESC</label>
@@ -5255,7 +5255,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="88" comment="comment_trigger_ref"/>
                 <property name="factor" value="10.0" type="Double" description="factor to measurement value"/>
                 <property name="scale_sync_ref_ordinal" value="49" type="Integer"/>
                 <label>label_rpm ESC</label>

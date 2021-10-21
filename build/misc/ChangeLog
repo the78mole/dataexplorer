@@ -7,6 +7,7 @@ Generic changes/fixes
 	* enhance trigger capabilities to AND or OR trigger ranges
 	* enhance trigger referencing primary and secondary trigger 
 	* make merge ranges merge results visible in trace log
+	* enhance filling out trigger comments
 	
 Device specific changes/fixes
 	* HoTTAdapter* - display always given GPS version value, even if this does not match known measurement placements

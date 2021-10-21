@@ -2532,20 +2532,34 @@ public class Record extends AbstractRecord implements IRecord {
 				else { //AND
 					while (secondaryIterator.hasNext()) {
 						secondaryRange = (TriggerRange) secondaryIterator.next();
-						if ((secondaryRange.in >= primaryRange.in 
+						if (secondaryRange.in > primaryRange.out) {
+							break;
+						}
+						if (primaryRange.in >= secondaryRange.out) {
+							continue;
+						}
+						else if ((secondaryRange.in >= primaryRange.in 
 								&& secondaryRange.in < primaryRange.out 
-								&& secondaryRange.out > primaryRange.in)
-								|| secondaryRange.out >= primaryRange.out
+								&& secondaryRange.out > primaryRange.in
+								&& secondaryRange.out < primaryRange.out)
 								) {
 							this.triggerRanges.add(new TriggerRange(secondaryRange.in, secondaryRange.out));
 						}
 						else if ((secondaryRange.in < primaryRange.in 
 								&& secondaryRange.in < primaryRange.out 
-								&& secondaryRange.out > primaryRange.in)
+								&& secondaryRange.out > primaryRange.in
+								&& secondaryRange.out < primaryRange.out)
 							  || secondaryRange.out == primaryRange.out //end condition p.e. right cut
 								) {
 							this.triggerRanges.add(new TriggerRange(primaryRange.in, secondaryRange.out));
 						}
+						else if (secondaryRange.in < primaryRange.in) {
+							this.triggerRanges.add(new TriggerRange(primaryRange.in, primaryRange.out));
+						}
+						else {
+							this.triggerRanges.add(new TriggerRange(secondaryRange.in, primaryRange.out));
+						}
+					
 					}
 				}
 			}

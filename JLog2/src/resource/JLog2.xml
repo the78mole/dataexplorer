@@ -68,7 +68,7 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics sumTriggerTimeText="text_trigger_time_sum" countTriggerText="text_trigger_count" countByTrigger="true" sigma="true" avg="true" max="true" min="true">
-                    <trigger comment="comment_trigger_current_def" minTimeSec="5" isGreater="true" level="3000"/>
+                    <trigger comment="comment_trigger_gt_def" minTimeSec="5" isGreater="true" level="3000"/>
                 </statistics>
                 <property description="factor to measurement value" type="Double" value="0.1" name="factor"/>
             </Measurement>
@@ -93,14 +93,14 @@
                 <symbol></symbol>
                 <unit>%</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute Uni</name>
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
                 <property description="factor to measurement value" type="Double" value="10.0" name="factor"/>
             </Measurement>
             <Measurement>
@@ -108,7 +108,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
                 <property description="factor to measurement value" type="Double" value="10.0" name="factor"/>
                 <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
@@ -117,7 +117,7 @@
                 <symbol>C</symbol>
                 <unit>mAh</unit>
                 <active>true</active>
-                 <statistics comment="comment_trigger_current" triggerRefOrdinal="3" sigma="false" avg="false" max="true" min="true"/>
+                 <statistics comment="comment_trigger_ref" triggerRefOrdinal="3" sigma="false" avg="false" max="true" min="true"/>
            </Measurement>
             <Measurement>
                 <name>temperature FET</name>
@@ -139,14 +139,14 @@
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>power_integriated</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="12" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
@@ -193,7 +193,7 @@
                 <symbol>U</symbol>
                 <unit></unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="3" sigma="false" avg="true" max="true" min="true"/>
             </Measurement>
             <Measurement>
                 <name>alarm_temperature_extern 1</name>
@@ -283,7 +283,7 @@
                 <symbol>rpm</symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics comment="comment_trigger_current" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
+                <statistics comment="comment_trigger_ref" triggerRefOrdinal="3" sigma="true" avg="true" max="true" min="true"/>
                 <property type="Integer" value="7" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>

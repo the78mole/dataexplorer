@@ -53,7 +53,7 @@
                 <symbol>V</symbol>
                 <unit>m/s</unit>
                 <statistics min="false" max="true" avg="true" sigma="true" countByTrigger="true" countTriggerText="text_trigger_count">
-                    <trigger level="1000" isGreater="true" minTimeSec="15" comment="comment_trigger_climb_def"/>
+                    <trigger level="1000" isGreater="true" minTimeSec="15" comment="comment_trigger_gt_def"/>
                 </statistics>
             </Measurement>
             <Measurement>
@@ -129,7 +129,7 @@
                 <symbol>h</symbol>
                 <unit>m</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" sumByTriggerRefOrdinal="5" sumTriggerText="text_trigger_motor_sum" comment="comment_trigger_current" ratioRefOrdinal="6" ratioText="text_trigger_ratio_capacity_per_height"/>
+                <statistics min="true" max="true" avg="true" sigma="false" sumByTriggerRefOrdinal="5" sumTriggerText="text_trigger_motor_sum" comment="comment_trigger_ref" ratioRefOrdinal="6" ratioText="text_trigger_ratio_capacity_per_height"/>
                 <property name="do_subtract_first" value="true" type="Boolean" description="subtract first measurement value from all successors"/>
             </Measurement>
             <Measurement>
@@ -187,7 +187,7 @@
                 <symbol>U</symbol>
                 <unit>V</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="5" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="false" triggerRefOrdinal="5" comment="comment_trigger_ref"/>
             </Measurement>
             <Measurement>
                 <name>current</name>
@@ -195,27 +195,27 @@
                 <unit>A</unit>
                 <active>true</active>
                 <statistics min="true" max="true" avg="true" sigma="false" countByTrigger="true" countTriggerText="text_trigger_count">
-                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_current_def"/>
+                    <trigger level="3000" isGreater="true" minTimeSec="5" comment="comment_trigger_gt_def"/>
                 </statistics>
             </Measurement>
             <Measurement>
                 <name>capacity</name>
                 <symbol>c</symbol>
                 <unit>mAh</unit>
-                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="5" comment="comment_trigger_climb" ratioText="comment_trigger_climb_def"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="5" comment="comment_trigger_ref" ratioText="comment_trigger_gt_def"/>
             </Measurement>
             <Measurement>
                 <name>power</name>
                 <symbol>P</symbol>
                 <unit>W</unit>
-                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="5" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="5" comment="comment_trigger_ref"/>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute</name>
                 <symbol></symbol>
                 <unit>1/min</unit>
                 <active>true</active>
-                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="5" comment="comment_trigger_current"/>
+                <statistics min="true" max="true" avg="true" sigma="true" triggerRefOrdinal="5" comment="comment_trigger_ref"/>
             </Measurement>
             <Measurement>
                 <name>temperature</name>
