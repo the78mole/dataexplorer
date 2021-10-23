@@ -21,6 +21,7 @@ Device specific changes/fixes
 	* GPS-Logger3 - calculate pressure delta TEC instead of pressure TEC
 	* GPS-Logger2/3 - take real GPS altitude from SMGPS instead of value from GNS/GGA
 	* GPS-Logger* - fix parsing RMC sentence while status V 
+	* Junsi iChargerUSB* - fix time stamp error while opening OSD with time span of > 3 days
 	* Junsi DX6/8 - add initial support
 
 Version 3.5.0 - 13 Sep 2021

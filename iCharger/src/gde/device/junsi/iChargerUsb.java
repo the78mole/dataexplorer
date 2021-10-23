@@ -556,8 +556,8 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 						//System.out.println(String.format("points[%d] k=%d..%d <- %d", (j+riRecordOffset), (k+24), (k+27), points[j+riRecordOffset]));
 					}
 				}
-	
-				actualTime_ms = (((dataBuffer[0 + (i * 4)] & 0xff) << 24) + ((dataBuffer[1 + (i * 4)] & 0xff) << 16) + ((dataBuffer[2 + (i * 4)] & 0xff) << 8) + ((dataBuffer[3 + (i * 4)] & 0xff))) / 10.0;
+				
+				actualTime_ms = ((((long)(dataBuffer[0 + (i * 4)] & 0xff)) << 24) + (((long)(dataBuffer[1 + (i * 4)] & 0xff)) << 16) + (((long)(dataBuffer[2 + (i * 4)] & 0xff)) << 8) + ((long)(dataBuffer[3 + (i * 4)] & 0xff))) / 10.0;
 				timeStep_h = (actualTime_ms - lastTime_ms) / 1000.0 / 3600.0;
 				if (i != 0)
 					energy += points[4] * timeStep_h;  //energy = energy + (timeDelta * power)
