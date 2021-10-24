@@ -90,6 +90,9 @@ public class TestOsdReaderWriter extends TestSuperClass {
 									activeChannel.getActiveRecordSet().updateVisibleAndDisplayableRecordsForTable();
 									//device.makeInActiveDisplayable(recordSet);
 									drawCurves(recordSet, 1024, 768);
+									
+									if (recordSet.getDisplayRecords().size() > 0 && recordSet.getRecordDataSize(true) > 2 && (recordSet.getTime_ms(0) > recordSet.getMaxTime_ms() || recordSet.getAverageTimeStep_ms() <= 0))
+										throw new Exception("time error reading recordSet " + recordSet.getName());
 								}
 							}
 
@@ -182,6 +185,9 @@ public class TestOsdReaderWriter extends TestSuperClass {
 										//	System.out.println(recordSet.get(8).getName() + " isActive = " + recordSet.get(8).isActive());
 									}
 									drawCurves(recordSet, 1024, 768);
+									
+									if (recordSet.getDisplayRecords().size() > 0 && recordSet.getRecordDataSize(true) > 2 && (recordSet.getTime_ms(0) > recordSet.getMaxTime_ms() || recordSet.getAverageTimeStep_ms() <= 0))
+										throw new Exception("time error reading recordSet " + recordSet.getName());
 								}
 							}
 
@@ -260,6 +266,9 @@ public class TestOsdReaderWriter extends TestSuperClass {
 										System.out.println(recordSet.get(8).getName() + " isActive = " + recordSet.get(8).isActive());
 								}
 								drawCurves(recordSet, 1024, 768);
+								
+								if (recordSet.getDisplayRecords().size() > 0 && recordSet.getRecordDataSize(true) > 2 && (recordSet.getTime_ms(0) > recordSet.getMaxTime_ms() || recordSet.getAverageTimeStep_ms() <= 0))
+									throw new Exception("time error reading recordSet " + recordSet.getName());
 							}
 						}
 
