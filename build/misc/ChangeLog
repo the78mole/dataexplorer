@@ -1,5 +1,13 @@
 Development history / change log, please read from bottom up
 
+Version 3.5.2 - xx yyy 2021
+Generic changes/fixes
+	* correct statistic value formating while two triggers are defined
+	
+Device specific changes/fixes
+	*
+
+
 Version 3.5.1 - 25 Oct 2021
 Generic changes/fixes
 	* adapt NMNEA parsing supporting GNS sentence

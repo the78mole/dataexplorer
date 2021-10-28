@@ -321,7 +321,7 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isMin()) {
 								if (triggerRefOrdinal >= 0 && triggerSecondaryRefOrdinal >= 0)
-									sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getMinValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
+									sb.append(formatOutput(record.getFormattedStatisticsValue(record.getMinValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
 								else if (triggerRefOrdinal < 0 || record.getMinValueTriggered(triggerRefOrdinal) != Integer.MAX_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMinValue() : record.getMinValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
@@ -336,7 +336,7 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isAvg())
 								if (triggerRefOrdinal >= 0 && triggerSecondaryRefOrdinal >= 0)
-									sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getAvgValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
+									sb.append(formatOutput(record.getFormattedStatisticsValue(record.getAvgValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
 								else if (triggerRefOrdinal < 0 || record.getAvgValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getAvgValue() : record.getAvgValueTriggered(triggerRefOrdinal)) / 1000.0)));
 							else
@@ -345,7 +345,7 @@ public class StatisticsWindow extends CTabItem {
 
 							if (measurementStatistics.isMax()) {
 								if (triggerRefOrdinal >= 0 && triggerSecondaryRefOrdinal >= 0)
-									sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getMaxValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
+									sb.append(formatOutput(record.getFormattedStatisticsValue(record.getMaxValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
 								else if (triggerRefOrdinal < 0 || record.getMaxValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
 									sb.append(formatOutput(record.getFormattedStatisticsValue((triggerRefOrdinal < 0 ? record.getRealMaxValue() : record.getMaxValueTriggered(triggerRefOrdinal)) / 1000.0)));
 								else
@@ -361,7 +361,7 @@ public class StatisticsWindow extends CTabItem {
 							if (measurementStatistics.isSigma()) {
 								DecimalFormat cdf = new DecimalFormat("0.000"); //$NON-NLS-1$
 								if (triggerRefOrdinal >= 0 && triggerSecondaryRefOrdinal >= 0)
-									sb.append(String.format("%.1f", device.translateDeltaValue(record, record.getSigmaValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
+									sb.append(formatOutput(record.getFormattedStatisticsValue(record.getSigmaValueTriggered(triggerRefOrdinal, triggerSecondaryRefOrdinal) / 1000.)));
 								else if (triggerRefOrdinal < 0 || record.getSigmaValueTriggered(triggerRefOrdinal) != Integer.MIN_VALUE)
 									sb.append(formatOutput(cdf.format(device.translateValue(record, (triggerRefOrdinal < 0 ? record.getSigmaValue() : record.getSigmaValueTriggered(triggerRefOrdinal)) / 1000.0))));
 								else
