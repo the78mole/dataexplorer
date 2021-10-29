@@ -79,7 +79,7 @@ public class iChargerDX8 extends iChargerUsb {
 	 */
 	@Override
 	public int getDcInputCurrentMax() {
-		return 450; //*0.1 A
+		return 650; //*0.1 A
 	}
 	
 	/**
@@ -103,7 +103,7 @@ public class iChargerDX8 extends iChargerUsb {
 	 */
 	@Override
 	public int getChargeCurrentMax() {
-		return 320; //*0.1 A
+		return 500; //*0.1 A
 	}
 
 	/**
