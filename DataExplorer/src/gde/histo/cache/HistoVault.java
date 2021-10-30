@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.stream.IntStream;
 
 import javax.xml.bind.JAXBContext;
@@ -43,6 +44,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import com.sun.istack.Nullable;
 
 import gde.GDE;
+import gde.log.Logger;
 
 /**
  * aggregated history recordset data related to measurements, settlements and
@@ -954,7 +956,15 @@ public class HistoVault {
 	 * @return null in case of unavailable score
 	 */
 	public Integer getScorePoint(int scoreLabelOrdinal) {
-		return this.getScores().get(scoreLabelOrdinal).getValue();
+		try {
+			return this.getScores().get(scoreLabelOrdinal).getValue();
+		}
+		catch (Exception e) {
+			Logger log = Logger.getLogger(HistoVault.class.getName());
+			log.log(Level.WARNING, this.getLogFilePath());
+			log.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return 0;
 	}
 
 	@Override
