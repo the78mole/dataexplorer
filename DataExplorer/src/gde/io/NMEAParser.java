@@ -66,6 +66,9 @@ public class NMEAParser implements IDataParser {
 	protected Vector<String>							missingImpleWarned				= new Vector<String>();
 	protected String 											deviceSerialNumber				= GDE.STRING_EMPTY;
 	protected String											firmwareVersion           = GDE.STRING_EMPTY;
+	protected int													pressureOffset						= 0;
+	protected int													pressureOffsetCount				= 0;
+	protected double											rho												= 0;
 	
 	protected int													recordSetNumberOffset			= 0;
 	protected int													timeResetCounter					= 0;
@@ -111,6 +114,7 @@ public class NMEAParser implements IDataParser {
 		this.deviceName = this.device.getName();
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.timeOffsetUTC = useTimeOffsetUTC;
+		this.pressureOffset	= 0;
 	}
 	
 	/**
@@ -1304,7 +1308,27 @@ public class NMEAParser implements IDataParser {
 		//this.values[22] = Airspeed [km/h];
 		//this.values[23] = static Airpressure [hPa];
 		//this.values[24] = Airpressure TEK [hPa];
-		this.values[24] = this.values[24]-this.values[23];
+		if (this.values[22] == 0) {
+			++pressureOffsetCount;
+			pressureOffset += this.values[23]-this.values[24];
+			this.values[24] = 0;
+			//log.log(Level.OFF, String.format("offset = %d/%d = %d", pressureOffset, pressureOffsetCount, pressureOffset/pressureOffsetCount));
+			
+			//uncomment if own airspeed should be calculated and replace Impulse values
+//			this.values[21] = this.values[7]; 
+		}
+		else {
+			//log.log(Level.OFF, "offset = " + pressureOffset);
+			this.values[24] = this.values[23] - this.values[24] - pressureOffset/pressureOffsetCount;
+			
+			//uncomment if own airspeed should be calculated and replace Impulse values
+//			if (this.values[7] > 10000) {
+//				rho = this.values[23] / (287.058 * (20 + 273.15)) / 10;
+//				this.values[21] = (int) (Math.sqrt( 2.0 * this.values[24]/1000 / rho ) * 36000);
+//			}
+//			else 
+//				this.values[21] = this.values[7];
+		}
 		//this.values[25] = Vario TEK [m/s];
 	}
 
