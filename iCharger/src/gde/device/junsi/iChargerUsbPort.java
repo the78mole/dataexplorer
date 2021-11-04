@@ -118,7 +118,7 @@ public class iChargerUsbPort extends DeviceCommPort implements IDeviceCommPort {
 		
 		if (log.isLoggable(Level.FINE)) {
 			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(data, data.length));
-			log.logp(Level.FINE, $CLASS_NAME, $METHOD_NAME, DataParser.parse2Int(data, 3)/1000/60 + " min " + (DataParser.parse2Int(data, 3)/1000)%60 + " sec run time");
+			log.logp(Level.FINER, $CLASS_NAME, $METHOD_NAME, DataParser.getUInt32(data, 3)/1000/60 + " min " + (DataParser.getUInt32(data, 3)/1000)%60 + " sec run time");
 		}
 		return data;
 	}

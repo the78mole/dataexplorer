@@ -558,6 +558,15 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 				}
 				
 				actualTime_ms = ((((long)(dataBuffer[0 + (i * 4)] & 0xff)) << 24) + (((long)(dataBuffer[1 + (i * 4)] & 0xff)) << 16) + (((long)(dataBuffer[2 + (i * 4)] & 0xff)) << 8) + ((long)(dataBuffer[3 + (i * 4)] & 0xff))) / 10.0;
+				
+				//workaround while time stamp is reset, use constant time step as before
+				if (actualTime_ms < lastTime_ms) {
+					actualTime_ms = lastTime_ms + (recordSet.getTime_ms(recordSet.getRecordDataSize(true) - 2) - recordSet.getTime_ms(recordSet.getRecordDataSize(true) - 1));
+				}
+				
+				if (points[3] == 0) //reset energy, only required for continuous recording, requires at least a short delay between charge and discharge
+					energy = 0;
+				
 				timeStep_h = (actualTime_ms - lastTime_ms) / 1000.0 / 3600.0;
 				if (i != 0)
 					energy += points[4] * timeStep_h;  //energy = energy + (timeDelta * power)
@@ -773,7 +782,6 @@ public abstract class iChargerUsb extends iCharger implements IDevice {
 	}
 	
 	public long getTimeStamp(final byte[] buffer) {
-		//DataParser.parse2Int(buffer, 3)/1000/60 + " min " + (DataParser.parse2Int(buffer, 3)/1000)%60 + " sec run time");
 		log.finest(() -> StringHelper.byte2Hex2CharString(buffer, 3, 4));
 		return DataParser.getUInt32(buffer, 3);
 	}
