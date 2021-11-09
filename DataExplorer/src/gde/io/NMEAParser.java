@@ -69,6 +69,10 @@ public class NMEAParser implements IDataParser {
 	protected int													pressureOffset						= 0;
 	protected int													pressureOffsetCount				= 0;
 	protected double											rho												= 0;
+	protected int 												avgAirSpeed								= 0;
+	protected int 												avgPressureDeltaTec				= 0;
+	protected int													countAvg 									= 0;
+
 	
 	protected int													recordSetNumberOffset			= 0;
 	protected int													timeResetCounter					= 0;
@@ -1328,6 +1332,12 @@ public class NMEAParser implements IDataParser {
 //			}
 //			else 
 //				this.values[21] = this.values[7];
+		}
+		//build sum of AirSpeed values beween 39,5 and 40,5 km/h as well as sum of matching ∆TEC pressure
+		if (this.values[22] >= 39500 && this.values[22] <= 40500) {
+			avgAirSpeed += this.values[22];
+			avgPressureDeltaTec += this.values[24];
+			countAvg += 1;
 		}
 		//this.values[25] = Vario TEK [m/s];
 	}

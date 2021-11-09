@@ -283,6 +283,7 @@ public class NMEAReaderWriter {
 
 				//write filename after import to record description
 				activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)+1));
+				log.log(Level.OFF, String.format("%s - avgAirSpeed = %.1f avgPressure ∆TEK = %.2f", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR)+1), data.avgAirSpeed/data.countAvg/1000., data.avgPressureDeltaTec/data.countAvg/1000.));
 			}
 		}
 		catch (FileNotFoundException e) {
