@@ -682,6 +682,7 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		}
 		//GPSHelper.calculateSpeed2D(this, recordSet, 0, 1, 7);
 		//GPSHelper.calculateSpeed3D(this, recordSet, 0, 1, 8, 7);
+    //GPSHelper.calculateTripLength(this, recordSet, 0, 1, 8, 0, 11);
 
 		this.application.updateStatisticsData();
 	}

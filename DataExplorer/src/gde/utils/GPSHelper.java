@@ -295,11 +295,10 @@ public class GPSHelper {
 	 * @param recordOrdinalLongitude - input, will be checked for reasonable data
 	 * @param recordOrdinalAltitude - input, might contain zero values, which result in zero values for relative altitude and climb/slope values
 	 * @param startAltitude - input, needed to calculate the distance from start point 
-	 * @param recordOrdinalDistance - input, needed to start of movement 
 	 * @param recordOrdinalTripLength - output, depends on input latitude, longitude and altitude
 	 */
 	public static synchronized void calculateTripLength(IDevice device, RecordSet recordSet, int recordOrdinalLatitude, int recordOrdinalLongitude, int recordOrdinalAltitude, int startAltitude,
-			int recordOrdinalDistance, int recordOrdinalTripLength) {
+			int recordOrdinalTripLength) {
 		double lastTripLength = 0;
 		long startTime = new Date().getTime();
 
@@ -357,7 +356,7 @@ public class GPSHelper {
 
 						double powDeltaHeight = Math.pow((recordAlitude.get(i - 1) - recordAlitude.get(i)) / 1000.0, 2);
 						double powOrthodrome = Math.pow((zeta * (40041000.0 / 360.0)), 2);
-						double deltaTrip = Math.sqrt(powOrthodrome + powDeltaHeight) * 0.942;
+						double deltaTrip = Math.sqrt(powOrthodrome + powDeltaHeight);
 						recordTripLength.add((int) (lastTripLength + deltaTrip));//[km}];
 
 						//powDeltaHeight = Math.pow((recordAlitude.get(i) - startAltitude) / 1000.0, 2); // alternatively the relative altitude could be used here
