@@ -1062,7 +1062,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 		// 87=Ch 1, 88=Ch 2, 89=Ch 3 .. 102=Ch 16, 103=PowerOff, 104=BatterieLow, 105=Reset, 106=reserve
 		// 107=VoltageM, 108=CurrentM, 109=CapacityM, 110=PowerM, 111=RevolutionM, 112=TemperatureM 1, 113=TemperatureM 2 114=Voltage_min, 115=Current_max,
 		// 116=Revolution_max, 117=Temperature1_max, 118=Temperature2_max 119=Event M
-		final int latOrdinal = 20, lonOrdinal = 21, altOrdinal = 10, distOrdinal = 23, tripOrdinal = 25;
+		final int latOrdinal = 20, lonOrdinal = 21, altOrdinal = 10, tripOrdinal = 25;
 		Record recordLatitude = recordSet.get(latOrdinal);
 		Record recordLongitude = recordSet.get(lonOrdinal);
 		Record recordAlitude = recordSet.get(altOrdinal);
@@ -1082,7 +1082,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			}
 			startAltitude = recordAlitude.get(indexGPS); // set initial altitude to enable absolute altitude calculation
 
-			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, distOrdinal, tripOrdinal);
+			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, tripOrdinal);
 		}
 	}
 

@@ -512,7 +512,7 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 		// 73=Ch 1, 74=Ch 2, 75=Ch 3 .. 88=Ch 16, 89=PowerOff, 90=BatterieLow, 91=Reset, 92=reserve
 		// 93=VoltageM, 94=CurrentM, 95=CapacityM, 96=PowerM, 97=RevolutionM, 98=TemperatureM 1, 99=TemperatureM 2 100=Voltage_min, 101=Current_max,
 		// 102=Revolution_max, 103=Temperature1_max, 104=Temperature2_max 105=Event M
-		final int latOrdinal = 15, lonOrdinal = 16, altOrdinal = 10, distOrdinal = 18, tripOrdinal = 20;
+		final int latOrdinal = 15, lonOrdinal = 16, altOrdinal = 10, tripOrdinal = 20;
 		Record recordLatitude = recordSet.get(latOrdinal);
 		Record recordLongitude = recordSet.get(lonOrdinal);
 		Record recordAlitude = recordSet.get(altOrdinal);
@@ -532,7 +532,7 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 			}
 			startAltitude = recordAlitude.get(indexGPS); // set initial altitude to enable absolute altitude calculation
 
-			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, distOrdinal, tripOrdinal);
+			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, startAltitude, tripOrdinal);
 			// GPSHelper.calculateLabs(this, recordSet, latOrdinal, lonOrdinal, distOrdinal, tripOrdinal, 15);
 		}
 	}
@@ -557,7 +557,7 @@ public class SpektrumAdapter extends DeviceConfiguration implements IDevice {
 			//GForce 56=X GF, 57=Y GF, 58=Z GF, 59=Xmax GF, 60=Ymax GF, 61=Zmax GF, 62=Zmin GF
 			//Channel 63=Ch 1, ..., 70=Ch 8, ..., 82=Ch 20]
 			final int latOrdinal = 21, lonOrdinal = 22, altOrdinal = 20, tripOrdinal = 28;
-			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, -1, -1, tripOrdinal);
+			GPSHelper.calculateTripLength(this, recordSet, latOrdinal, lonOrdinal, altOrdinal, 0, tripOrdinal);
 
 			recordSet.syncScaleOfSyncableRecords();
 			this.updateVisibilityStatus(recordSet, true);
