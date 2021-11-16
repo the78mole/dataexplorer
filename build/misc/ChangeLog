@@ -4,6 +4,7 @@ Version 3.5.2 - xx yyy 2021
 Generic changes/fixes
 	* correct statistic value formating while two triggers are defined
 	* correct average calculation while two triggers are defined
+	* update jSerialComm to version 2.7.0 to support MAC OS X ARM architecture
 	
 Device specific changes/fixes
 	* Junsi iCHargerUSB - correct power calculation for continuous recorded data while loading from OSD

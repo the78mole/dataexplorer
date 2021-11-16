@@ -2,10 +2,10 @@
  * SerialPort.java
  *
  *       Created on:  Feb 25, 2012
- *  Last Updated on:  Apr 29, 2020
+ *  Last Updated on:  Apr 14, 2021
  *           Author:  Will Hedgecock
  *
- * Copyright (C) 2012-2020 Fazecast, Inc.
+ * Copyright (C) 2012-2021 Fazecast, Inc.
  *
  * This file is part of jSerialComm.
  *
@@ -43,14 +43,14 @@ import java.util.Date;
  * This class provides native access to serial ports and devices without requiring external libraries or tools.
  *
  * @author Will Hedgecock &lt;will.hedgecock@fazecast.com&gt;
- * @version 2.6.2
+ * @version 2.7.0
  * @see java.io.InputStream
  * @see java.io.OutputStream
  */
 public final class SerialPort
 {
 	// Static initializer loads correct native library for this machine
-	private static final String versionString = "2.6.2";
+	private static final String versionString = "2.7.0";
 	private static volatile boolean isAndroid = false;
 	private static volatile boolean isUnixBased = false;
 	private static volatile boolean isWindows = false;
@@ -105,7 +105,9 @@ public final class SerialPort
 		}
 		else if (OS.indexOf("mac") >= 0)
 		{
-			if (System.getProperty("os.arch").indexOf("64") >= 0)
+			if (System.getProperty("os.arch").equals("aarch64")) 
+				libraryPath = "OSX/aarch64";
+			else if (System.getProperty("os.arch").indexOf("64") >= 0)
 				libraryPath = "OSX/x86_64";
 			else
 				libraryPath = "OSX/x86";
@@ -194,6 +196,8 @@ public final class SerialPort
 				libraryPath = "Linux/armv8_32";
 			else if (System.getProperty("os.arch").indexOf("aarch64") >= 0)
 				libraryPath = "Linux/armv8_64";
+			else if (System.getProperty("os.arch").indexOf("ppc64le") >= 0)
+				libraryPath = "Linux/ppc64le";
 			else if (System.getProperty("os.arch").indexOf("64") >= 0)
 				libraryPath = "Linux/x86_64";
 			else
@@ -325,10 +329,17 @@ public final class SerialPort
 				portDescriptor = "\\\\.\\" + portDescriptor.substring(portDescriptor.lastIndexOf('\\')+1);
 			else if (isSymbolicLink(new File(portDescriptor)))
 				portDescriptor = (new File(portDescriptor)).getCanonicalPath();
-			else if (portDescriptor.contains("/pts/"))
-				portDescriptor = "/dev/pts/" + portDescriptor.substring(portDescriptor.lastIndexOf('/')+1);
 			else if (!((new File(portDescriptor)).exists()))
-				portDescriptor = "/dev/" + portDescriptor.substring(portDescriptor.lastIndexOf('/')+1);
+			{
+				// Attempt to locate the correct port descriptor
+				portDescriptor = "/dev/" + portDescriptor;
+				if (!((new File(portDescriptor)).exists()))
+					portDescriptor = "/dev/" + portDescriptor.substring(portDescriptor.lastIndexOf('/')+1);
+
+				// Check if the updated port descriptor exists
+				if (!((new File(portDescriptor)).exists()))
+					throw new IOException();
+			}
 		}
 		catch (Exception e) { throw new SerialPortInvalidPortException("Unable to create a serial port object from the invalid port descriptor: " + portDescriptor, e); }
 
@@ -384,8 +395,8 @@ public final class SerialPort
 	private volatile String comPort, friendlyName, portDescription;
 	private volatile boolean eventListenerRunning = false, disableConfig = false, rs485Mode = false;
 	private volatile boolean rs485ActiveHigh = true, isRtsEnabled = true, isDtrEnabled = true;
-	private final SerialPortInputStream inputStream = new SerialPortInputStream();
-	private final SerialPortOutputStream outputStream = new SerialPortOutputStream();
+	private SerialPortInputStream inputStream = null;
+	private SerialPortOutputStream outputStream = null;
 
 	/**
 	 * Opens this serial port for reading and writing with an optional delay time and user-specified device buffer size.
@@ -805,14 +816,44 @@ public final class SerialPort
 	 * @return An {@link java.io.InputStream} object associated with this serial port.
 	 * @see java.io.InputStream
 	 */
-	public final InputStream getInputStream() { return inputStream; }
+	public final InputStream getInputStream()
+	{
+		inputStream = new SerialPortInputStream(false);
+		return inputStream;
+	}
+
+	/**
+	 * Returns an {@link java.io.InputStream} object associated with this serial port, with read timeout exceptions
+	 * completely suppressed.
+	 * <p>
+	 * Allows for easier read access of the underlying data stream and abstracts away many low-level read details.
+	 * <p>
+	 * Note that any time a method is marked as throwable for an {@link java.io.IOException} in the official Java
+	 * {@link java.io.InputStream} documentation, you can catch this exception directly, or you can choose to catch
+	 * either a {@link SerialPortIOException} or a {@link SerialPortTimeoutException} (or both) which may make it
+	 * easier for your code to determine why the exception was thrown. In general, a {@link SerialPortIOException}
+	 * means that the port is having connectivity issues, while a {@link SerialPortTimeoutException} indicates that
+	 * a user timeout has been reached before valid data was able to be returned (as specified in the
+	 * {@link #setComPortTimeouts(int, int, int)} method). When an {@link java.io.InputStream} is returned using
+	 * this method, a {@link SerialPortTimeoutException} will never be thrown.
+	 * <p>
+	 * Make sure to call the {@link java.io.InputStream#close()} method when you are done using this stream.
+	 *
+	 * @return An {@link java.io.InputStream} object associated with this serial port.
+	 * @see java.io.InputStream
+	 */
+	public final InputStream getInputStreamWithSuppressedTimeoutExceptions()
+	{
+		inputStream = new SerialPortInputStream(true);
+		return inputStream;
+	}
 
 	/**
 	 * Returns an {@link java.io.OutputStream} object associated with this serial port.
 	 * <p>
 	 * Allows for easier write access to the underlying data stream and abstracts away many low-level writing details.
 	 * <p>
-	 * Note that any time a method is marked as throwable for an {@link java.io.IOException} in the official Java 
+	 * Note that any time a method is marked as throwable for an {@link java.io.IOException} in the official Java
 	 * {@link java.io.InputStream} documentation, you can catch this exception directly, or you can choose to catch
 	 * either a {@link SerialPortIOException} or a {@link SerialPortTimeoutException} (or both) which may make it
 	 * easier for your code to determine why the exception was thrown. In general, a {@link SerialPortIOException}
@@ -825,7 +866,11 @@ public final class SerialPort
 	 * @return An {@link java.io.OutputStream} object associated with this serial port.
 	 * @see java.io.OutputStream
 	 */
-	public final OutputStream getOutputStream() { return outputStream; }
+	public final OutputStream getOutputStream()
+	{
+		outputStream = new SerialPortOutputStream();
+		return outputStream;
+	}
 
 	/**
 	 * Sets all serial port parameters at one time.
@@ -1425,9 +1470,13 @@ public final class SerialPort
 	// InputStream interface class
 	private final class SerialPortInputStream extends InputStream
 	{
+		private final boolean timeoutExceptionsSuppressed;
 		private byte[] byteBuffer = new byte[1];
 
-		public SerialPortInputStream() {}
+		public SerialPortInputStream(boolean suppressReadTimeoutExceptions)
+		{
+			timeoutExceptionsSuppressed = suppressReadTimeoutExceptions;
+		}
 
 		@Override
 		public final int available() throws SerialPortIOException
@@ -1447,7 +1496,12 @@ public final class SerialPort
 			// Read from the serial port
 			int numRead = readBytes(portHandle, byteBuffer, 1L, 0);
 			if (numRead == 0)
-				throw new SerialPortTimeoutException("The read operation timed out before any data was returned.");
+			{
+				if (timeoutExceptionsSuppressed)
+					return -1;
+				else
+					throw new SerialPortTimeoutException("The read operation timed out before any data was returned.");
+			}
 			return (numRead < 0) ? -1 : ((int)byteBuffer[0] & 0xFF);
 		}
 
@@ -1464,7 +1518,7 @@ public final class SerialPort
 
 			// Read from the serial port
 			int numRead = readBytes(portHandle, b, b.length, 0);
-			if (numRead == 0)
+			if ((numRead == 0) && !timeoutExceptionsSuppressed)
 				throw new SerialPortTimeoutException("The read operation timed out before any data was returned.");
 			return numRead;
 		}
@@ -1484,7 +1538,7 @@ public final class SerialPort
 
 			// Read from the serial port
 			int numRead = readBytes(portHandle, b, len, off);
-			if (numRead == 0)
+			if ((numRead == 0) && !timeoutExceptionsSuppressed)
 				throw new SerialPortTimeoutException("The read operation timed out before any data was returned.");
 			return numRead;
 		}
