@@ -3,12 +3,13 @@ Development history / change log, please read from bottom up
 Version 3.5.2 - xx yyy 2021
 Generic changes/fixes
 	* correct statistic value formating while two triggers are defined
+	* correct average calculation while two triggers are defined
 	
 Device specific changes/fixes
 	* Junsi iCHargerUSB - correct power calculation for continuous recorded data while loading from OSD
 	* Junsi DX* - correct input power values
 	* GPS-Logger3 - calculate offset of both pressure sensors while calculating pressure ∆TEC
-	* GPS-Logger3 - calculate average AirSpeed between 39,5 and 40,5 km/h and average pressure ∆TEC
+	* GPS-Logger3 - calculate average pressure ∆TEC for 40 km/h and 70 km/h and average AirSpeed for pressure ∆TEC 1,0 hPa
 	* HoTTAdapter2 - update graphics template files to have voltage in blue, current in red, ...
 
 

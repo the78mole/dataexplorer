@@ -69,9 +69,15 @@ public class NMEAParser implements IDataParser {
 	protected int													pressureOffset						= 0;
 	protected int													pressureOffsetCount				= 0;
 	protected double											rho												= 0;
-	protected int 												avgAirSpeed								= 0;
-	protected int 												avgPressureDeltaTec				= 0;
-	protected int													countAvg 									= 0;
+	protected int 												avgAirSpeed40							= 0;
+	protected int 												avgPressureDeltaTec40			= 0;
+	protected int													countAvg40 								= 0;
+	protected int 												avgAirSpeed70							= 0;
+	protected int 												avgPressureDeltaTec70			= 0;
+	protected int													countAvg70 								= 0;
+	protected int 												avgAirSpeedDp1						= 0;
+	protected int 												avgPressureDeltaTecDp1		= 0;
+	protected int													countAvgDp1 							= 0;
 
 	
 	protected int													recordSetNumberOffset			= 0;
@@ -1323,7 +1329,7 @@ public class NMEAParser implements IDataParser {
 		}
 		else {
 			//log.log(Level.OFF, "offset = " + pressureOffset);
-			this.values[24] = this.values[23] - this.values[24] - pressureOffset/pressureOffsetCount;
+			this.values[24] = this.values[23] - this.values[24] - (pressureOffsetCount > 0 ? pressureOffset/pressureOffsetCount : pressureOffset);
 			
 			//uncomment if own airspeed should be calculated and replace Impulse values
 //			if (this.values[7] > 10000) {
@@ -1333,11 +1339,23 @@ public class NMEAParser implements IDataParser {
 //			else 
 //				this.values[21] = this.values[7];
 		}
-		//build sum of AirSpeed values beween 39,5 and 40,5 km/h as well as sum of matching ∆TEC pressure
+		//build sum of AirSpeed values between 39,5 and 40,5 km/h as well as sum of matching ∆TEC pressure
 		if (this.values[22] >= 39500 && this.values[22] <= 40500) {
-			avgAirSpeed += this.values[22];
-			avgPressureDeltaTec += this.values[24];
-			countAvg += 1;
+			avgAirSpeed40 += this.values[22];
+			avgPressureDeltaTec40 += this.values[24];
+			countAvg40 += 1;
+		}
+		//build sum of ∆TEC pressure values between 0,95 and 1,05 km/h as well as sum of matching ∆TEC pressure
+		if (this.values[24] >= 950 && this.values[24] <= 1050) {
+			avgAirSpeedDp1 += this.values[22];
+			avgPressureDeltaTecDp1 += this.values[24];
+			countAvgDp1 += 1;
+		}
+		//build sum of AirSpeed values between 69,5 and 70,5 km/h as well as sum of matching ∆TEC pressure
+		if (this.values[22] >= 69500 && this.values[22] <= 70500) {
+			avgAirSpeed70 += this.values[22];
+			avgPressureDeltaTec70 += this.values[24];
+			countAvg70 += 1;
 		}
 		//this.values[25] = Vario TEK [m/s];
 	}
