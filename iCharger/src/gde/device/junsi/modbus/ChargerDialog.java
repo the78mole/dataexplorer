@@ -956,7 +956,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		try {
 			this.usbPort.masterWrite(Register.REG_SEL_MEM.value, (short) 1, index);
-			WaitTimer.delay(100);
+			
 			this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
 			this.selectedProgramMemory = new ChargerMemory(memoryBuffer, this.isDuo);
 			if (ChargerDialog.log.isLoggable(Level.FINE)) ChargerDialog.log.log(Level.FINE, this.selectedProgramMemory.toString(this.isDuo));
