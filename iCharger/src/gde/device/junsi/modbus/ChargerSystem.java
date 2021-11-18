@@ -27,6 +27,7 @@ public class ChargerSystem {
 	short								tempFansOn;
 	short								tempReduce;
 	short								fansSpeed;														//DUO only
+	short								usbPdEnable;													//DX only
 	short								fansOffDelay;
 	short								lcdContraste;
 	short								lightValue;
@@ -54,21 +55,24 @@ public class ChargerSystem {
 	short								proPower;
 	short[]							monitorLogInterval	= new short[2];
 	short[]							monitorLogSaveToSD	= new short[2];
+	short								modBusMode;
+	short								serialModBusAddr;
+	short								serialModBusBaudeRate;
+	short								serialModBusParity;
 	//end DUO only section
 	
-	//begin X only section
+	//begin DX/X/S only section
 	InputSource[]				xInputSources = new InputSource[4]; //X 0-3
 	short								xDischargePower;
 	short								xMonitorLogInterval;
 	short								xMonitorLogSaveToSD;
-	//end X only section
+	//end DX/X/S only section
 	short								servoType;
 	short								servoUserCenter;
 	short								servoUserRate;
 	short								servoUserOpAngle;
+	short								servoSpeedVolt; 	//DX only
 
-	short								modBusMode;
-	short								modBusAddr;
 
 	short[]							dump;
 	
@@ -215,7 +219,7 @@ public class ChargerSystem {
 	}
 
 	//construct System data using received data array
-	ChargerSystem(final byte[] readSystemData, final boolean isDuo) {
+	ChargerSystem(final byte[] readSystemData, final boolean isDuo, final boolean isDx) {
 		this.index = 0;
 		this.tempUnit = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 		this.tempStop = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
@@ -224,6 +228,8 @@ public class ChargerSystem {
 		
 		if (isDuo)
 			this.fansSpeed = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+		if (isDx)
+			this.usbPdEnable = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 
 		this.fansOffDelay = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 		this.lcdContraste = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
@@ -275,9 +281,11 @@ public class ChargerSystem {
 			this.servoUserOpAngle = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 	
 			this.modBusMode = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
-			this.modBusAddr = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.serialModBusAddr = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.serialModBusBaudeRate = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.serialModBusParity = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 	
-			this.dump	= new short[10];
+			this.dump	= new short[8];
 			this.dump[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[2] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
@@ -286,8 +294,6 @@ public class ChargerSystem {
 			this.dump[5] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[6] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[7] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
-			this.dump[8] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
-			this.dump[9] = DataParser.parse2Short(readSystemData[index++], readSystemData[index]);
 		}
 		else {			
 			this.xInputSources[0] = new InputSource(readSystemData, index);
@@ -298,19 +304,35 @@ public class ChargerSystem {
 			index += this.xInputSources[0].getSize();
 			this.xInputSources[3] = new InputSource(readSystemData, index);
 			index += this.xInputSources[0].getSize();
-			this.xDischargePower = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
-			this.xMonitorLogInterval = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
-			this.xMonitorLogSaveToSD = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			if (isDx) {
+				this.chargePower[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.chargePower[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.dischargePower[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.dischargePower[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.proPower = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.monitorLogInterval[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.monitorLogInterval[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.monitorLogSaveToSD[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.monitorLogSaveToSD[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);				
+			}
+			else {
+				this.xDischargePower = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.xMonitorLogInterval = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.xMonitorLogSaveToSD = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			}
 	
 			this.servoType = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.servoUserCenter = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.servoUserRate = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.servoUserOpAngle = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			if (isDx)
+				this.servoSpeedVolt = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 	
-			this.modBusMode = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
-			this.modBusAddr = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
-	
-			this.dump	= new short[10];
+			if (isDx) 
+				this.dump	= new short[16];
+			else
+				this.dump	= new short[12];
+
 			this.dump[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[2] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
@@ -321,11 +343,19 @@ public class ChargerSystem {
 			this.dump[7] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[8] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[9] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[10] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			this.dump[11] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			if (isDx) {
+				this.dump[12] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.dump[13] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);		
+				this.dump[14] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+				this.dump[15] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
+			}
 		}
 	}
 
-	public byte[] getAsByteArray(boolean isDuo) {
-		byte[] memoryBuffer = new byte[(ChargerSystem.getSize(isDuo) + 1) / 2 * 2];
+	public byte[] getAsByteArray(final boolean isDuo, final boolean isDx) {
+		byte[] memoryBuffer = new byte[(ChargerSystem.getSize(isDuo, isDx) + 1) / 2 * 2];
 
 		index = 0;
 		if (isDuo) {
@@ -443,8 +473,12 @@ public class ChargerSystem {
 
 			memoryBuffer[index++] = (byte) (this.modBusMode & 0xFF);
 			memoryBuffer[index++] = (byte) (this.modBusMode >> 8);
-			memoryBuffer[index++] = (byte) (this.modBusAddr & 0xFF);
-			memoryBuffer[index++] = (byte) (this.modBusAddr >> 8);
+			memoryBuffer[index++] = (byte) (this.serialModBusAddr & 0xFF);
+			memoryBuffer[index++] = (byte) (this.serialModBusAddr >> 8);
+			memoryBuffer[index++] = (byte) (this.serialModBusBaudeRate & 0xFF);
+			memoryBuffer[index++] = (byte) (this.serialModBusBaudeRate >> 8);
+			memoryBuffer[index++] = (byte) (this.serialModBusParity & 0xFF);
+			memoryBuffer[index++] = (byte) (this.serialModBusParity >> 8);
 
 			memoryBuffer[index++] = (byte) (this.dump[0] & 0xFF);
 			memoryBuffer[index++] = (byte) (this.dump[0] >> 8);
@@ -462,10 +496,6 @@ public class ChargerSystem {
 			memoryBuffer[index++] = (byte) (this.dump[6] >> 8);
 			memoryBuffer[index++] = (byte) (this.dump[7] & 0xFF);
 			memoryBuffer[index++] = (byte) (this.dump[7] >> 8);
-			memoryBuffer[index++] = (byte) (this.dump[8] & 0xFF);
-			memoryBuffer[index++] = (byte) (this.dump[8] >> 8);
-			memoryBuffer[index++] = (byte) (this.dump[9] & 0xFF);
-			memoryBuffer[index++] = (byte) (this.dump[9] >> 8);
 		}
 		else {
 			memoryBuffer[index++] = (byte) (this.tempUnit & 0xFF);
@@ -476,6 +506,12 @@ public class ChargerSystem {
 			memoryBuffer[index++] = (byte) (this.tempFansOn >> 8);
 			memoryBuffer[index++] = (byte) (this.tempReduce & 0xFF);
 			memoryBuffer[index++] = (byte) (this.tempReduce >> 8);
+			
+			if (isDx) {
+				memoryBuffer[index++] = (byte) (this.usbPdEnable & 0xFF);
+				memoryBuffer[index++] = (byte) (this.usbPdEnable >> 8);
+			}
+			
 			memoryBuffer[index++] = (byte) (this.fansOffDelay & 0xFF);
 			memoryBuffer[index++] = (byte) (this.fansOffDelay >> 8);
 	
@@ -598,13 +634,39 @@ public class ChargerSystem {
 			memoryBuffer[index++] = (byte) ((this.xInputSources[3].regCapLimit & 0x00FF0000) >> 16);
 			memoryBuffer[index++] = (byte) (this.xInputSources[3].regCapLimit >> 24);
 			
-			memoryBuffer[index++] = (byte) (this.xDischargePower & 0xFF);
-			memoryBuffer[index++] = (byte) (this.xDischargePower >> 8);
-			memoryBuffer[index++] = (byte) (this.xMonitorLogInterval & 0xFF);
-			memoryBuffer[index++] = (byte) (this.xMonitorLogInterval >> 8);
-			memoryBuffer[index++] = (byte) (this.xMonitorLogSaveToSD & 0xFF);
-			memoryBuffer[index++] = (byte) (this.xMonitorLogSaveToSD >> 8);
+			if (isDx) {
+				memoryBuffer[index++] = (byte) (this.chargePower[0] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.chargePower[0] >> 8);
+				memoryBuffer[index++] = (byte) (this.chargePower[1] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.chargePower[1] >> 8);
+				
+				memoryBuffer[index++] = (byte) (this.dischargePower[0] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.dischargePower[0] >> 8);
+				memoryBuffer[index++] = (byte) (this.dischargePower[1] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.dischargePower[1] >> 8);
+				
+				memoryBuffer[index++] = (byte) (this.proPower & 0xFF);
+				memoryBuffer[index++] = (byte) (this.proPower >> 8);
 
+				memoryBuffer[index++] = (byte) (this.monitorLogInterval[0] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.monitorLogInterval[0] >> 8);
+				memoryBuffer[index++] = (byte) (this.monitorLogInterval[1] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.monitorLogInterval[1] >> 8);
+
+				memoryBuffer[index++] = (byte) (this.monitorLogSaveToSD[0] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.monitorLogSaveToSD[0] >> 8);
+				memoryBuffer[index++] = (byte) (this.monitorLogSaveToSD[1] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.monitorLogSaveToSD[1] >> 8);
+			}
+			else {
+				memoryBuffer[index++] = (byte) (this.xDischargePower & 0xFF);
+				memoryBuffer[index++] = (byte) (this.xDischargePower >> 8);
+				memoryBuffer[index++] = (byte) (this.xMonitorLogInterval & 0xFF);
+				memoryBuffer[index++] = (byte) (this.xMonitorLogInterval >> 8);
+				memoryBuffer[index++] = (byte) (this.xMonitorLogSaveToSD & 0xFF);
+				memoryBuffer[index++] = (byte) (this.xMonitorLogSaveToSD >> 8);
+			}
+			
 			memoryBuffer[index++] = (byte) (this.servoType & 0xFF);
 			memoryBuffer[index++] = (byte) (this.servoType >> 8);
 			memoryBuffer[index++] = (byte) (this.servoUserCenter & 0xFF);
@@ -613,11 +675,11 @@ public class ChargerSystem {
 			memoryBuffer[index++] = (byte) (this.servoUserRate >> 8);
 			memoryBuffer[index++] = (byte) (this.servoUserOpAngle & 0xFF);
 			memoryBuffer[index++] = (byte) (this.servoUserOpAngle >> 8);
-
-			memoryBuffer[index++] = (byte) (this.modBusMode & 0xFF);
-			memoryBuffer[index++] = (byte) (this.modBusMode >> 8);
-			memoryBuffer[index++] = (byte) (this.modBusAddr & 0xFF);
-			memoryBuffer[index++] = (byte) (this.modBusAddr >> 8);
+			
+			if (isDx) {
+				memoryBuffer[index++] = (byte) (this.servoSpeedVolt & 0xFF);
+				memoryBuffer[index++] = (byte) (this.servoSpeedVolt >> 8);
+			}
 
 			memoryBuffer[index++] = (byte) (this.dump[0] & 0xFF);
 			memoryBuffer[index++] = (byte) (this.dump[0] >> 8);
@@ -639,12 +701,26 @@ public class ChargerSystem {
 			memoryBuffer[index++] = (byte) (this.dump[8] >> 8);
 			memoryBuffer[index++] = (byte) (this.dump[9] & 0xFF);
 			memoryBuffer[index++] = (byte) (this.dump[9] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[10] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[10] >> 8);
+			memoryBuffer[index++] = (byte) (this.dump[11] & 0xFF);
+			memoryBuffer[index++] = (byte) (this.dump[11] >> 8);
+			if (isDx) {
+				memoryBuffer[index++] = (byte) (this.dump[12] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.dump[12] >> 8);
+				memoryBuffer[index++] = (byte) (this.dump[13] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.dump[13] >> 8);
+				memoryBuffer[index++] = (byte) (this.dump[14] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.dump[14] >> 8);
+				memoryBuffer[index++] = (byte) (this.dump[15] & 0xFF);
+				memoryBuffer[index++] = (byte) (this.dump[15] >> 8);
+			}
 		}
 
 		return memoryBuffer;
 	}
 
-	public String toString(boolean isDuo) {
+	public String toString(final boolean isDuo, final boolean isDx) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.getClass().getSimpleName()).append(":\n");
 		sb.append(String.format("TempUnit \t\t= %d", this.tempUnit)).append("\n");
@@ -652,6 +728,8 @@ public class ChargerSystem {
 		sb.append(String.format("TempFansOn	\t= %d", this.tempFansOn)).append("\n");
 		sb.append(String.format("TempReduce	\t= %d", this.tempReduce)).append("\n");
 		//DUO reserved	sb.append(String.format("FansSpeed \t\t= %d", this.fansSpeed)).append("\n");
+		if (isDx)
+			sb.append(String.format("UsbPdEnable \t\t= %d", this.usbPdEnable)).append("\n");
 		sb.append(String.format("FansOffDelay \t\t= %d", this.fansOffDelay)).append("\n");
 		sb.append(String.format("LcdContraste \t\t= %d", this.lcdContraste)).append("\n");
 		sb.append(String.format("LightValue \t\t= %d", this.lightValue)).append("\n");
@@ -685,10 +763,11 @@ public class ChargerSystem {
 			sb.append(String.format("ServoUserOpAngle \t= %d", this.servoUserOpAngle)).append("\n");
 	
 			sb.append(String.format("ModBusMode \t\t= %d", this.modBusMode)).append("\n");
-			sb.append(String.format("ModBusAddr \t\t= %d", this.modBusAddr)).append("\n");
+			sb.append(String.format("SerialModBusAddr \t= %d", this.serialModBusAddr)).append("\n");
+			sb.append(String.format("SerialModBusBaudeRate \t= %d", this.serialModBusBaudeRate)).append("\n");
+			sb.append(String.format("SerialModBusParity \t= %d", this.serialModBusParity)).append("\n");
 	
-			sb.append(String.format("Dump \t\t\t= [%d, %d, %d, %d ,%d, %d, %d, %d, %d, %d]", this.dump[0], this.dump[1], this.dump[2], this.dump[3], this.dump[4], this.dump[5], this.dump[6], this.dump[7],
-					this.dump[8], this.dump[9])).append("\n");
+			sb.append(String.format("Dump \t\t\t= [%d, %d, %d, %d ,%d, %d, %d, %d]", this.dump[0], this.dump[1], this.dump[2], this.dump[3], this.dump[4], this.dump[5], this.dump[6], this.dump[7])).append("\n");
 		}
 		else {
 			sb.append(String.format("[0]inputLowVolt \t= %d", xInputSources[0].inputLowVolt)).append("\n");
@@ -731,29 +810,43 @@ public class ChargerSystem {
 			sb.append(String.format("[3]regCapLimit \t\t= %d", xInputSources[3].regCapLimit)).append("\n");
 			sb.append("\n");
 
-			sb.append(String.format("DischargePower \t\t= %d", this.xDischargePower)).append("\n");
-			sb.append(String.format("MonitorLogInterval \t= %d", this.xMonitorLogInterval)).append("\n");
-			sb.append(String.format("MonitorLogSaveToSD \t= %d", this.xMonitorLogSaveToSD)).append("\n");
-			sb.append("\n");
+			if (isDx) {
+				sb.append(String.format("ChargePower \t\t= [%d, %d]", this.chargePower[0], this.chargePower[1])).append("\n");
+				sb.append(String.format("DischargePower \t\t= [%d, %d]", this.dischargePower[0], this.dischargePower[1])).append("\n");
+				sb.append(String.format("ProPower \t\t= %d", this.batInputLowVolt)).append("\n");
+				sb.append(String.format("MonitorLogInterval \t= [%d, %d]", this.monitorLogInterval[0], this.monitorLogInterval[1])).append("\n");
+				sb.append(String.format("MonitorLogSaveToSD \t= [%d, %d]", this.monitorLogSaveToSD[0], this.monitorLogSaveToSD[1])).append("\n");
+				sb.append("\n");
+			}
+			else {
+				sb.append(String.format("DischargePower \t\t= %d", this.xDischargePower)).append("\n");
+				sb.append(String.format("MonitorLogInterval \t= %d", this.xMonitorLogInterval)).append("\n");
+				sb.append(String.format("MonitorLogSaveToSD \t= %d", this.xMonitorLogSaveToSD)).append("\n");
+				sb.append("\n");
+			}
 	
 			sb.append(String.format("ServoType \t\t= %d", this.servoType)).append("\n");
 			sb.append(String.format("ServoUserCenter \t= %d", this.servoUserCenter)).append("\n");
 			sb.append(String.format("ServoUserRate \t\t= %d", this.servoUserRate)).append("\n");
 			sb.append(String.format("ServoUserOpAngle \t= %d", this.servoUserOpAngle)).append("\n");
+			if (isDx)
+				sb.append(String.format("ServoSpeedVolt \t\t= %d", this.servoSpeedVolt)).append("\n");
 	
-			sb.append(String.format("ModBusMode \t\t= %d", this.modBusMode)).append("\n");
-			sb.append(String.format("ModBusAddr \t\t= %d", this.modBusAddr)).append("\n");
-	
-			sb.append(String.format("Dump \t\t\t= [%d, %d, %d, %d ,%d, %d, %d, %d, %d, %d]", this.dump[0], this.dump[1], this.dump[2], this.dump[3], this.dump[4], this.dump[5], this.dump[6], this.dump[7],
-					this.dump[8], this.dump[9])).append("\n");
+			if (isDx)
+				sb.append(String.format("Dump \t\t\t= [%d, %d, %d, %d ,%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d]", this.dump[0], this.dump[1], this.dump[2], this.dump[3], this.dump[4], this.dump[5], this.dump[6], this.dump[7],
+						this.dump[8], this.dump[9], this.dump[10], this.dump[11], this.dump[12], this.dump[13], this.dump[14], this.dump[15])).append("\n");
+			else
+				sb.append(String.format("Dump \t\t\t= [%d, %d, %d, %d ,%d, %d, %d, %d, %d, %d, %d, %d]", this.dump[0], this.dump[1], this.dump[2], this.dump[3], this.dump[4], this.dump[5], this.dump[6], this.dump[7],
+						this.dump[8], this.dump[9], this.dump[10], this.dump[11])).append("\n");
+
 		}
 		return sb.toString();
 	}
 
 	final static int size = 60 * 2; //size in byte
 
-	public static int getSize(boolean isDuo) {
-		return isDuo ? ChargerSystem.size : 156;
+	public static int getSize(final boolean isDuo, final boolean isDx) {
+		return isDuo ? ChargerSystem.size : isDx ? 180 : 156; //x=76x2=152, Dx=81x2=162
 	}
 
 	public short getTempUnit() {
@@ -794,6 +887,14 @@ public class ChargerSystem {
 
 	public void setFansSpeed(short fansSpeed) {
 		this.fansSpeed = fansSpeed;
+	}
+
+	public short getUsbPdEnable() {
+		return usbPdEnable;
+	}
+
+	public void setUsbPdEnable(short usbPdEnable) {
+		this.usbPdEnable = usbPdEnable;
 	}
 
 	public short getFansOffDelay() {
@@ -1034,6 +1135,14 @@ public class ChargerSystem {
 		this.servoUserOpAngle = servoUserOpAngle;
 	}
 
+	public short getServoSpeedVolt() {
+		return servoSpeedVolt;
+	}
+
+	public void setServoSpeedVolt(short servoSpeedVolt) {
+		this.servoSpeedVolt = servoSpeedVolt;
+	}
+
 	public short getModBusMode() {
 		return this.modBusMode;
 	}
@@ -1043,11 +1152,11 @@ public class ChargerSystem {
 	}
 
 	public short getModBusAddr() {
-		return this.modBusAddr;
+		return this.serialModBusAddr;
 	}
 
 	public void setModBusAddr(short modBusAddr) {
-		this.modBusAddr = modBusAddr;
+		this.serialModBusAddr = modBusAddr;
 	}
 
 	public short[] getDump() {

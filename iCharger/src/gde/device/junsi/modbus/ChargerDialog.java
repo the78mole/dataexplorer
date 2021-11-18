@@ -100,7 +100,7 @@ public class ChargerDialog extends DeviceDialog {
 	private Composite									memoryComposite, chargeComposite, dischargeComposite, storageComposite, cycleComposite, optionComposite, powerComposite, sysComposite;
 	private CLabel										powerLabel;
 	private Group 										grpTemperature, grpFans, grpBeepTone, grpLcdScreen, grpChargeDischargePower;
-	private Group 										grpInputDischargePowerLimits, grpInputPowerLimits, grpRegInputPowerLimits, grpLanguage, grpSaveLoadConfig;
+	private Group 										grpInputDischargePowerLimits, grpInputPowerLimits, grpRegInputPowerLimits, grpLanguage;
 	
 	private ParameterConfigControl[]	memoryParameters						= new ParameterConfigControl[50];																																				// battery type, number cells, capacity
 	private ParameterConfigControl[]	systemParameters						= new ParameterConfigControl[50];																																				// battery type, number cells, capacity
@@ -109,6 +109,7 @@ public class ChargerDialog extends DeviceDialog {
 	private int[]											memoryValues								= new int[memoryParameters.length];																																													//values to be used for modifying sliders
 	private int[]											systemValues								= new int[systemParameters.length];																																													//values to be used for modifying sliders
 	private final boolean							isDuo;
+	private final boolean							isDx;
 	final Listener										memoryParameterChangeListener;
 	final Listener										systemParameterChangeListener;
 	private ChargerInfo								systemInfo = null;
@@ -130,9 +131,10 @@ public class ChargerDialog extends DeviceDialog {
 	final static short								REG_HOLDING_MEM_START				= (short) 0x8c00;
 
 	final static short								VALUE_ORDER_KEY							= 0x55aa;
-	private Button btnSaveActualConf;
-	private Button btnRestoreSavedConf;
-	private Button btnLoadDefaultSysConf;
+//	private Group  grpSaveLoadConfig;
+//	private Button btnSaveActualConf;
+//	private Button btnRestoreSavedConf;
+//	private Button btnLoadDefaultSysConf;
 
 	enum Order {
 		ORDER_STOP, ORDER_RUN, ORDER_MODIFY, ORDER_WRITE_SYS, ORDER_WRITE_MEM_HEAD, ORDER_WRITE_MEM, ORDER_TRANS_LOG_ON, ORDER_TRANS_LOG_OFF, ORDER_MSGBOX_YES, ORDER_MSGBOX_NO;
@@ -168,6 +170,7 @@ public class ChargerDialog extends DeviceDialog {
 			//iChargerUsb device = new iCharger4010DUO("c:\\Users\\Winfried\\AppData\\Roaming\\DataExplorer\\Devices\\iCharger406DUO.xml"); //$NON-NLS-1$
 			iChargerUsb device = new iChargerX6("c:\\Users\\Winfried\\AppData\\Roaming\\DataExplorer\\Devices\\iCharger S6.xml"); //$NON-NLS-1$
 			boolean isDuo = device.getName().endsWith("DUO"); //DUO = true; X6 = false
+			boolean isDx = device.getName().contains(" DX");
 			ChargerUsbPort usbPort = new ChargerUsbPort(device, null);
 			if (!usbPort.isConnected()) usbPort.openUsbPort();
 
@@ -182,10 +185,10 @@ public class ChargerDialog extends DeviceDialog {
 
 				//Read system setup data
 				//MasterRead(0,REG_HOLDING_SYS_START,(sizeof(SYSTEM)+1)/2,(BYTE *)&System)
-				short sizeSystem = (short) (((systemInfo != null ? systemInfo.getSystemMemoryLength() : ChargerSystem.getSize(isDuo)) + 1) / 2);
+				short sizeSystem = (short) (((systemInfo != null ? systemInfo.getSystemMemoryLength() : ChargerSystem.getSize(isDuo, isDx)) + 1) / 2);
 				byte[] systemBuffer = new byte[sizeSystem * 2];
 				usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_SYS_START, sizeSystem, systemBuffer);
-				ChargerDialog.log.log(Level.INFO, new ChargerSystem(systemBuffer, isDuo).toString(isDuo));
+				ChargerDialog.log.log(Level.INFO, new ChargerSystem(systemBuffer, isDuo, isDx).toString(isDuo, isDx));
 				
 				//repair X6 while looping soft boot after writing wrong system memory using S6 configuration
 //				if (usbPort.isConnected()) usbPort.closeUsbPort();
@@ -291,17 +294,17 @@ public class ChargerDialog extends DeviceDialog {
 		return chargerStatus;
 	}
 
-	public void readSystem(boolean isDuo) {
+	public void readSystem(final boolean isDuo, final boolean isDx) {
 		try {
 			//Read system setup data
 			//MasterRead(0,REG_HOLDING_SYS_START,(sizeof(SYSTEM)+1)/2,(BYTE *)&System)
-			short sizeSystem = (short) (((this.systemInfo != null && this.systemInfo.getDeviceID() != 0 ? this.systemInfo.getSystemMemoryLength() : ChargerSystem.getSize(isDuo)) + 1) / 2);
+			short sizeSystem = (short) (((this.systemInfo != null && this.systemInfo.getDeviceID() != 0 ? this.systemInfo.getSystemMemoryLength() : ChargerSystem.getSize(isDuo, isDx)) + 1) / 2);
 			byte[] systemBuffer = new byte[sizeSystem * 2];
 			if (ModBusErrorCode.MB_EOK != this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_SYS_START, sizeSystem, systemBuffer))
 				throw new IllegalStateException();				
-			this.systemSettings = new ChargerSystem(systemBuffer, isDuo);
+			this.systemSettings = new ChargerSystem(systemBuffer, isDuo, isDx);
 			this.systemValues = this.systemSettings.getSystemValues(this.systemValues);
-			if (ChargerDialog.log.isLoggable(Level.FINER)) ChargerDialog.log.log(Level.FINER, new ChargerSystem(systemBuffer, isDuo).toString(isDuo));
+			if (ChargerDialog.log.isLoggable(Level.INFO)) ChargerDialog.log.log(Level.INFO, new ChargerSystem(systemBuffer, isDuo, isDx).toString(isDuo, isDx));
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
@@ -322,6 +325,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.usbPort = ((iChargerUsb) this.device).getUsbPort();
 		setText(this.device.getName());
 		this.isDuo = this.device.getName().toLowerCase().endsWith("duo") ? true : false; //$NON-NLS-1$
+		this.isDx = device.getName().toLowerCase().contains(" dx") ? true : false; //$NON-NLS-1$
 		String[] tmpNamesArray = this.isDuo ? iChargerUsb.BatteryTypesDuo.getValues() : iChargerX6.BatteryTypesX.getValues();
 		this.cellTypeNamesArray = new String[tmpNamesArray.length - (this.isDuo ? 2 : 4)];
 		System.arraycopy(tmpNamesArray, 1, this.cellTypeNamesArray, 0, this.cellTypeNamesArray.length);
@@ -823,7 +827,7 @@ public class ChargerDialog extends DeviceDialog {
 					systemSettings.setSelInputSource((short) systemValues[17]); //17 source input select
 					break;
 
-					//X/S only section
+					//DX/X/S only section
 				case 18: //18 discharge power Limit
 					systemSettings.setxDischargePower((short) systemValues[18]); 
 					break;
@@ -952,7 +956,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		try {
 			this.usbPort.masterWrite(Register.REG_SEL_MEM.value, (short) 1, index);
-
+			WaitTimer.delay(100);
 			this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
 			this.selectedProgramMemory = new ChargerMemory(memoryBuffer, this.isDuo);
 			if (ChargerDialog.log.isLoggable(Level.FINE)) ChargerDialog.log.log(Level.FINE, this.selectedProgramMemory.toString(this.isDuo));
@@ -1011,13 +1015,13 @@ public class ChargerDialog extends DeviceDialog {
 	 * @param modifiedSystemMemory the modified program memory class
 	 */
 	private boolean writeSystemMemory(boolean isDuo) {
-		short sizeSystem = (short) (((systemInfo != null ? systemInfo.getSystemMemoryLength() : ChargerSystem.getSize(isDuo)) + 1) / 2);
+		short sizeSystem = (short) (((systemInfo != null ? systemInfo.getSystemMemoryLength() : ChargerSystem.getSize(isDuo, isDx)) + 1) / 2);
 
 		try {
 			if (systemSettings != null) {
-				if (ChargerDialog.log.isLoggable(Level.FINE)) ChargerDialog.log.log(Level.FINE, new ChargerSystem(systemSettings.getAsByteArray(isDuo), isDuo).toString(isDuo));
+				if (ChargerDialog.log.isLoggable(Level.FINE)) ChargerDialog.log.log(Level.FINE, new ChargerSystem(systemSettings.getAsByteArray(isDuo, isDx), isDuo, isDx).toString(isDuo, isDx));
 				//MasterWrite(REG_HOLDING_SYS_START,(sizeof(SYSTEM)+1)/2,(BYTE *)&System)
-				this.usbPort.masterWrite(REG_HOLDING_SYS_START, sizeSystem, systemSettings.getAsByteArray(isDuo));
+				this.usbPort.masterWrite(REG_HOLDING_SYS_START, sizeSystem, systemSettings.getAsByteArray(isDuo, isDx));
 				//TransOrder(ORDER_WRITE_SYS)
 				transOrder((byte) Order.ORDER_WRITE_SYS.ordinal());
 			}
@@ -1278,6 +1282,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.usbPort = ((iChargerUsb) this.device).getUsbPort();
 		setText(this.device.getName());
 		this.isDuo = this.device.getName().toLowerCase().endsWith("duo") ? true : false; //$NON-NLS-1$
+		this.isDx = device.getName().toLowerCase().contains(" dx") ? true : false; //$NON-NLS-1$
 		String[] tmpNamesArray = this.isDuo ? iChargerUsb.BatteryTypesDuo.getValues() : iChargerX6.BatteryTypesX.getValues();
 		this.cellTypeNamesArray = new String[tmpNamesArray.length - (this.isDuo ? 2 : 4)];
 		System.arraycopy(tmpNamesArray, 1, this.cellTypeNamesArray, 0, this.cellTypeNamesArray.length);
@@ -1426,7 +1431,7 @@ public class ChargerDialog extends DeviceDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (mainTabFolder.getSelectionIndex() == 1) {
-					readSystem(isDuo);
+					readSystem(isDuo, isDx);
 					updateSystemParameterControls();
 				}
 			}
@@ -1455,7 +1460,7 @@ public class ChargerDialog extends DeviceDialog {
 
 		this.combo = new CCombo(this.grpProgramMemory, SWT.BORDER);
 		this.combo.setLayoutData(new RowData(350, this.comboHeight));
-		this.combo.setFont(SWTResourceManager.getFont(this.application, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+		this.combo.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
 		this.combo.setItems(((iChargerUsb) this.device).isDataGathererActive() ? new String[] { Messages.getString(MessageIds.GDE_MSGT2624) } : this.readProgramMemories());
 		this.combo.select(0);
 		this.combo.setBackground(this.application.COLOR_WHITE);
@@ -2048,45 +2053,41 @@ public class ChargerDialog extends DeviceDialog {
 		grpLanguage.addListener(SWT.Selection, systemParameterChangeListener);
 		grpLanguage.layout();
 
-		grpSaveLoadConfig = new Group(sysComposite, SWT.NONE);
-		grpSaveLoadConfig.setLayoutData(new RowData(740, this.comboHeight));
-		grpSaveLoadConfig.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		grpSaveLoadConfig.setText("Save, Restore & Load Configuration");
-		FillLayout fillLayout = new FillLayout(SWT.VERTICAL);
-		fillLayout.marginHeight = 10;
-		fillLayout.marginWidth = 30;
-		fillLayout.spacing = 5;
-		grpSaveLoadConfig.setLayout(fillLayout);
+//		grpSaveLoadConfig = new Group(sysComposite, SWT.NONE);
+//		grpSaveLoadConfig.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+//		grpSaveLoadConfig.setText("Save, Restore & Load Configuration");
+//		grpSaveLoadConfig.setLayout(new RowLayout(SWT.VERTICAL));
+//		
+//		btnSaveActualConf = new Button(grpSaveLoadConfig, SWT.NONE);
+//		btnSaveActualConf.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+//		btnSaveActualConf.setText("Save Actual System Configuration");
+//		btnSaveActualConf.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//			}
+//		});
+//		
+//		btnRestoreSavedConf = new Button(grpSaveLoadConfig, SWT.NONE);
+//		btnRestoreSavedConf.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+//		btnRestoreSavedConf.setText("Restore Saved System Configuration");
+//		btnRestoreSavedConf.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//			}
+//		});
+//		
+//		btnLoadDefaultSysConf = new Button(grpSaveLoadConfig, SWT.NONE);
+//		btnLoadDefaultSysConf.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+//		btnLoadDefaultSysConf.setText("Load Default System Configuration");
+//		btnLoadDefaultSysConf.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//			}
+//		});
+//		grpSaveLoadConfig.layout();
 		
-		btnSaveActualConf = new Button(grpSaveLoadConfig, SWT.NONE);
-		btnSaveActualConf.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		btnSaveActualConf.setText("Save Actual System Configuration");
-		btnSaveActualConf.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
-		
-		btnRestoreSavedConf = new Button(grpSaveLoadConfig, SWT.NONE);
-		btnRestoreSavedConf.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		btnRestoreSavedConf.setText("Restore Saved System Configuration");
-		btnRestoreSavedConf.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
-		
-		btnLoadDefaultSysConf = new Button(grpSaveLoadConfig, SWT.NONE);
-		btnLoadDefaultSysConf.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-		btnLoadDefaultSysConf.setText("Load Default System Configuration");
-		btnLoadDefaultSysConf.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
-		
-		//createGrpChargeDischargePower();//DUO only		
-		//createGrpInputDischargePowerLimits(); //X/S only
+		//createGrpInputDischargePowerLimits(); //X/S/DX
+		//createGrpChargeDischargePower();//dual channel devices only		
 		
 		btnSystemSave = new Button(mainSystemComposite, SWT.NONE);
 		FormData fd_btnSave = new FormData();
@@ -2140,11 +2141,13 @@ public class ChargerDialog extends DeviceDialog {
 				Messages.getString(MessageIds.GDE_MSGI2628), 175,  //$NON-NLS-1$
 				"0 - 3", 280, //$NON-NLS-1$
 				true, 50, 200, 0, 3, 0, false);
-		//18 discharge power Limit
-		this.systemParameters[18] = new ParameterConfigControl(this.grpInputDischargePowerLimits, this.systemValues, 18, GDE.STRING_EMPTY, 
-				Messages.getString(MessageIds.GDE_MSGI2629), 175,  //$NON-NLS-1$
-				String.format("5W - %dW", device.getDischargePowerMax()[0]), 280, //$NON-NLS-1$
-				true, 50, 200, 5, device.getDischargePowerMax()[0], -5, false);
+		if (!isDx) {
+			//18 discharge power Limit
+			this.systemParameters[18] = new ParameterConfigControl(this.grpInputDischargePowerLimits, this.systemValues, 18, GDE.STRING_EMPTY, 
+					Messages.getString(MessageIds.GDE_MSGI2629), 175,  //$NON-NLS-1$
+					String.format("5W - %dW", device.getDischargePowerMax()[0]), 280, //$NON-NLS-1$
+					true, 50, 200, 5, device.getDischargePowerMax()[0], -5, false);
+		}
 		grpInputDischargePowerLimits.addListener(SWT.Selection, systemParameterChangeListener);
 		
 		grpInputPowerLimits = new Group(grpInputDischargePowerLimits, SWT.NONE);
@@ -2233,11 +2236,11 @@ public class ChargerDialog extends DeviceDialog {
 				Messages.getString(MessageIds.GDE_MSGI2642, new String[] {Messages.getString(MessageIds.GDE_MSGI2645).split(",")[2]}), 175, 
 				String.format("5W - %dW", device.getDischargePowerMax()[1]), 280, //$NON-NLS-1$
 				true, 50, 200, 5, device.getDischargePowerMax()[1], -5, false);
-		//17 input select
-		this.systemParameters[17] = new ParameterConfigControl(this.grpChargeDischargePower, this.systemValues, 17, 
-				Messages.getString(MessageIds.GDE_MSGT2674), 175, 
-				Messages.getString(MessageIds.GDE_MSGI2647), 280,
-				new String[] { "DC", "Bat" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		if (isDuo) {
+			//17 input select
+			this.systemParameters[17] = new ParameterConfigControl(this.grpChargeDischargePower, this.systemValues, 17, Messages.getString(MessageIds.GDE_MSGT2674), 175,
+					Messages.getString(MessageIds.GDE_MSGI2647), 280, new String[] { "DC", "Bat" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		grpChargeDischargePower.addListener(SWT.Selection, this.systemParameterChangeListener);
 		grpChargeDischargePower.layout();
 	}
@@ -2254,6 +2257,14 @@ public class ChargerDialog extends DeviceDialog {
 				createGrpChargeDischargePower();
 			}
 		}
+		else if (isDx) {
+			if (grpInputDischargePowerLimits == null || grpInputDischargePowerLimits.isDisposed()) {
+				createGrpInputDischargePowerLimits();
+			}
+			if (grpChargeDischargePower == null || grpChargeDischargePower.isDisposed()) {
+				createGrpChargeDischargePower();
+			}		
+		}
 		else {
 			if (grpChargeDischargePower != null && !grpChargeDischargePower.isDisposed()) {
 				grpChargeDischargePower.removeListener(SWT.Selection, systemParameterChangeListener);
@@ -2262,7 +2273,6 @@ public class ChargerDialog extends DeviceDialog {
 			if (grpInputDischargePowerLimits == null || grpInputDischargePowerLimits.isDisposed()) {
 				createGrpInputDischargePowerLimits();
 			}
-
 		}
 		//update parameter controls
 		for (int i = 0; i < this.systemParameters.length; i++) {
