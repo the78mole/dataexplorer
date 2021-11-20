@@ -50,6 +50,7 @@ public class ChargerSystem {
 	short								regEnable;
 	short								regVoltLimit;
 	short								regCurrentLimit;
+	int									regCapacityLimit; //0 - 999900
 	short[]							chargePower					= new short[2]; 
 	short[]							dischargePower			= new short[2];
 	short								proPower;
@@ -285,7 +286,10 @@ public class ChargerSystem {
 			this.serialModBusBaudeRate = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.serialModBusParity = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 	
-			this.dump	= new short[8];
+			this.regCapacityLimit = DataParser.parse2Int(readSystemData, index);
+			index += 4;
+
+			this.dump	= new short[7];
 			this.dump[0] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[1] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[2] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
@@ -293,7 +297,6 @@ public class ChargerSystem {
 			this.dump[4] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[5] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 			this.dump[6] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
-			this.dump[7] = DataParser.parse2Short(readSystemData[index++], readSystemData[index++]);
 		}
 		else {			
 			this.xInputSources[0] = new InputSource(readSystemData, index);
@@ -480,6 +483,11 @@ public class ChargerSystem {
 			memoryBuffer[index++] = (byte) (this.serialModBusParity & 0xFF);
 			memoryBuffer[index++] = (byte) (this.serialModBusParity >> 8);
 
+			memoryBuffer[index++] = (byte) (this.regCapacityLimit & 0xFF);
+			memoryBuffer[index++] = (byte) ((this.regCapacityLimit & 0x0000FF00) >> 8);
+			memoryBuffer[index++] = (byte) ((this.regCapacityLimit & 0x00FF0000) >> 16);
+			memoryBuffer[index++] = (byte) (this.regCapacityLimit >> 24);
+			
 			memoryBuffer[index++] = (byte) (this.dump[0] & 0xFF);
 			memoryBuffer[index++] = (byte) (this.dump[0] >> 8);
 			memoryBuffer[index++] = (byte) (this.dump[1] & 0xFF);
@@ -494,8 +502,6 @@ public class ChargerSystem {
 			memoryBuffer[index++] = (byte) (this.dump[5] >> 8);
 			memoryBuffer[index++] = (byte) (this.dump[6] & 0xFF);
 			memoryBuffer[index++] = (byte) (this.dump[6] >> 8);
-			memoryBuffer[index++] = (byte) (this.dump[7] & 0xFF);
-			memoryBuffer[index++] = (byte) (this.dump[7] >> 8);
 		}
 		else {
 			memoryBuffer[index++] = (byte) (this.tempUnit & 0xFF);
@@ -751,6 +757,7 @@ public class ChargerSystem {
 			sb.append(String.format("RegEnable \t\t= %d", this.regEnable)).append("\n");
 			sb.append(String.format("RegVoltLimit	\t= %d", this.regVoltLimit)).append("\n");
 			sb.append(String.format("RegCurrentLimit \t= %d", this.regCurrentLimit)).append("\n");
+			sb.append(String.format("RegCapacityLimit \t= %d", this.regCapacityLimit)).append("\n");
 			sb.append(String.format("ChargePower \t\t= [%d, %d]", this.chargePower[0], this.chargePower[1])).append("\n");
 			sb.append(String.format("DischargePower \t\t= [%d, %d]", this.dischargePower[0], this.dischargePower[1])).append("\n");
 			sb.append(String.format("ProPower \t\t= %d", this.batInputLowVolt)).append("\n");
@@ -767,7 +774,7 @@ public class ChargerSystem {
 			sb.append(String.format("SerialModBusBaudeRate \t= %d", this.serialModBusBaudeRate)).append("\n");
 			sb.append(String.format("SerialModBusParity \t= %d", this.serialModBusParity)).append("\n");
 	
-			sb.append(String.format("Dump \t\t\t= [%d, %d, %d, %d ,%d, %d, %d, %d]", this.dump[0], this.dump[1], this.dump[2], this.dump[3], this.dump[4], this.dump[5], this.dump[6], this.dump[7])).append("\n");
+			sb.append(String.format("Dump \t\t\t= [%d, %d, %d, %d ,%d, %d, %d]", this.dump[0], this.dump[1], this.dump[2], this.dump[3], this.dump[4], this.dump[5], this.dump[6])).append("\n");
 		}
 		else {
 			sb.append(String.format("[0]inputLowVolt \t= %d", xInputSources[0].inputLowVolt)).append("\n");
@@ -1063,6 +1070,14 @@ public class ChargerSystem {
 		this.regCurrentLimit = regCurrentLimit;
 	}
 
+	public int getRegCapacityLimit() {
+		return regCapacityLimit;
+	}
+
+	public void setRegCapacityLimit(int regCapacityLimit) {
+		this.regCapacityLimit = regCapacityLimit;
+	}
+
 	public short[] getChargePower() {
 		return this.chargePower;
 	}
@@ -1204,6 +1219,17 @@ public class ChargerSystem {
 			values[26] = this.xInputSources[values[17]].getRegCapLimit(); //26 regCapLimit
 		}
 		values[27] = this.getSelectLanguage(); //27 language 0=en 1=de
+		
+		//duo input source configuration
+		values[28] = this.getDcInputLowVolt();
+		values[29] = this.getDcInputCurrentLimit();
+		values[30] = this.getBatInputLowVolt();
+		values[31] = this.getBatInputCurrentLimit();
+		values[32] = this.getRegEnable();
+		values[33] = this.getRegVoltLimit();
+		values[34] = this.getRegCurrentLimit();
+		values[35] = this.getRegCapacityLimit() / 100;
+
 		return values;
 	}
 

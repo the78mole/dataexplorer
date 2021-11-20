@@ -10,6 +10,7 @@ Device specific changes/fixes
 	* Junsi iCHargerUSB - correct power calculation for continuous recorded data while loading from OSD
 	* Junsi DX* - correct input power values
 	* Junsi DX* - correct system parameter dialog according updated specification
+	* Junsi iChargerDuo* - add missing input source power configuration
 	* GPS-Logger3 - calculate offset of both pressure sensors while calculating pressure ∆TEC
 	* GPS-Logger3 - calculate average pressure ∆TEC for 40 km/h and 70 km/h and average AirSpeed for pressure ∆TEC 1,0 hPa
 	* HoTTAdapter2 - update graphics template files to have voltage in blue, current in red, ...

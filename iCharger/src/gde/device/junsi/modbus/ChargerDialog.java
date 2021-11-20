@@ -101,13 +101,14 @@ public class ChargerDialog extends DeviceDialog {
 	private CLabel										powerLabel;
 	private Group 										grpTemperature, grpFans, grpBeepTone, grpLcdScreen, grpChargeDischargePower;
 	private Group 										grpInputDischargePowerLimits, grpInputPowerLimits, grpRegInputPowerLimits, grpLanguage;
+	private Group 										grpDuoInputPowerLimits, grpDcInputPowerLimits, grpBatInputPowerLimits, grpDuoRegInputPowerLimits;
 	
-	private ParameterConfigControl[]	memoryParameters						= new ParameterConfigControl[50];																																				// battery type, number cells, capacity
-	private ParameterConfigControl[]	systemParameters						= new ParameterConfigControl[50];																																				// battery type, number cells, capacity
+	private ParameterConfigControl[]	memoryParameters						= new ParameterConfigControl[50];																																				
+	private ParameterConfigControl[]	systemParameters						= new ParameterConfigControl[50];																																				
 	private final String							cellTypeNames;
 	private final String[]						cellTypeNamesArray;
-	private int[]											memoryValues								= new int[memoryParameters.length];																																													//values to be used for modifying sliders
-	private int[]											systemValues								= new int[systemParameters.length];																																													//values to be used for modifying sliders
+	private int[]											memoryValues								= new int[memoryParameters.length];																		//values to be used for modifying sliders
+	private int[]											systemValues								= new int[systemParameters.length];																		//values to be used for modifying sliders
 	private final boolean							isDuo;
 	private final boolean							isDx;
 	final Listener										memoryParameterChangeListener;
@@ -842,7 +843,8 @@ public class ChargerDialog extends DeviceDialog {
 					break;
 				case 22: //22 regEnable
 					systemSettings.xInputSources[systemValues[17]].setRegEnable((short) systemValues[22]);
-					grpRegInputPowerLimits.setEnabled(systemValues[22] == 1);
+					if (grpRegInputPowerLimits != null)
+						grpRegInputPowerLimits.setEnabled(systemValues[22] == 1);
 					break;
 				case 23: //23 regVoltLimit
 					systemSettings.xInputSources[systemValues[17]].setRegVoltLimit((short) systemValues[23]);
@@ -858,6 +860,33 @@ public class ChargerDialog extends DeviceDialog {
 					break;
 				case 27: //language 0=en 1=de
 					systemSettings.setSelectLanguage((short) systemValues[27]);
+					break;
+					
+				case 28: 	//28 duo dcInputLowVolt 
+					systemSettings.setDcInputLowVolt((short) systemValues[28]);
+					break;
+				case 29: 	//29 duo dcInputCurrentLimit 
+					systemSettings.setDcInputCurrentLimit((short) systemValues[29]);
+					break;
+				case 30: 	//30 duo batInputLowVolt
+					systemSettings.setBatInputLowVolt((short) systemValues[30]);
+					break;
+				case 31: 	//31 duo batInputCurrentLimit 
+					systemSettings.setBatInputCurrentLimit((short) systemValues[31]);
+					break;
+				case 32:	//32 duo regEnable
+					systemSettings.setRegEnable((short) systemValues[32]);
+					if (grpRegInputPowerLimits != null)
+						grpRegInputPowerLimits.setEnabled(systemValues[22] == 1);
+					break;
+				case 33:	//33 duo regVoltLimit
+					systemSettings.setRegVoltLimit((short) systemValues[33]);
+					break;
+				case 34:	//34 duo regCurrentLimit
+					systemSettings.setRegCurrentLimit((short) systemValues[34]);
+					break;
+				case 35:	//35 duo regCapLimit
+					systemSettings.setRegCapacityLimit(systemValues[35] * 100);
 					break;
 				default:
 					break;
@@ -2129,6 +2158,81 @@ public class ChargerDialog extends DeviceDialog {
 
 		updateSystemParameterControls();
 	}
+	
+	private void createGrpDuoInputPowerLimits() {
+		grpDuoInputPowerLimits = new Group(sysComposite, SWT.NONE);
+		grpDuoInputPowerLimits.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		grpDuoInputPowerLimits.setText(Messages.getString(MessageIds.GDE_MSGI2626)); //$NON-NLS-1$
+		grpDuoInputPowerLimits.setLayout(new RowLayout(SWT.VERTICAL));
+		grpDuoInputPowerLimits.setBackground(application.COLOR_CANVAS_YELLOW);
+		//17 input select
+		this.systemParameters[17] = new ParameterConfigControl(this.grpDuoInputPowerLimits, this.systemValues, 17, GDE.STRING_EMPTY, 175,
+				Messages.getString(MessageIds.GDE_MSGI2647), 280, new String[] { "DC", "Bat" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		grpDuoInputPowerLimits.addListener(SWT.Selection, systemParameterChangeListener);
+	
+		grpDcInputPowerLimits = new Group(grpDuoInputPowerLimits, SWT.NONE);
+		grpDcInputPowerLimits.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		grpDcInputPowerLimits.setText(Messages.getString(MessageIds.GDE_MSGI2635)); //$NON-NLS-1$
+		grpDcInputPowerLimits.setLayout(new RowLayout(SWT.VERTICAL));
+		//28 duo dcInputLowVolt
+		this.systemParameters[28] = new ParameterConfigControl(this.grpDcInputPowerLimits, this.systemValues, 28, "%3.1f", 
+				Messages.getString(MessageIds.GDE_MSGI2631), 175,  //$NON-NLS-1$
+				String.format("%dV - %dV", device.getDcInputVoltMin()/10, device.getDcInputVoltMax()/10), 280, //$NON-NLS-1$
+				true, 50, 200, device.getDcInputVoltMin(), device.getDcInputVoltMax(), -1*device.getDcInputVoltMin()/10, false);
+		//29 duo dcInputCurrentLimit
+		this.systemParameters[29] = new ParameterConfigControl(this.grpDcInputPowerLimits, this.systemValues, 29, "%3.1f", 
+				Messages.getString(MessageIds.GDE_MSGI2632), 175,  //$NON-NLS-1$
+				String.format("1A - %dA", device.getDcInputCurrentMax()/10), 280, //$NON-NLS-1$
+				true, 50, 200, 10, device.getDcInputCurrentMax(), -1, false);
+		grpDcInputPowerLimits.addListener(SWT.Selection, systemParameterChangeListener);
+				
+		grpBatInputPowerLimits = new Group(grpDuoInputPowerLimits, SWT.NONE);
+		grpBatInputPowerLimits.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		grpBatInputPowerLimits.setText(Messages.getString(MessageIds.GDE_MSGI2636)); //$NON-NLS-1$
+		grpBatInputPowerLimits.setLayout(new RowLayout(SWT.VERTICAL));
+		//30 duo batInputLowVolt
+		this.systemParameters[30] = new ParameterConfigControl(this.grpBatInputPowerLimits, this.systemValues, 30, "%3.1f", 
+				Messages.getString(MessageIds.GDE_MSGI2631), 175,  //$NON-NLS-1$
+				String.format("%dV - %dV", device.getDcInputVoltMin()/10, device.getDcInputVoltMax()/10), 280, //$NON-NLS-1$
+				true, 50, 200, device.getDcInputVoltMin(), device.getDcInputVoltMax(), -1*device.getDcInputVoltMin()/10, false);
+		//31 duo batInputCurrentLimit 
+		this.systemParameters[31] = new ParameterConfigControl(this.grpBatInputPowerLimits, this.systemValues, 31, "%3.1f", 
+				Messages.getString(MessageIds.GDE_MSGI2632), 175,  //$NON-NLS-1$
+				String.format("1A - %dA", device.getDcInputCurrentMax()/10), 280, //$NON-NLS-1$
+				true, 50, 200, 10, device.getDcInputCurrentMax(), -1, false);
+		//32 duo regEnable
+		this.systemParameters[32] = new ParameterConfigControl(this.grpBatInputPowerLimits, this.systemValues, 32, 
+				Messages.getString(MessageIds.GDE_MSGT2674), 175, 
+				"off, on", 280, //$NON-NLS-1$
+				new String[] { "off", "on" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		grpBatInputPowerLimits.addListener(SWT.Selection, systemParameterChangeListener);
+
+		grpDuoRegInputPowerLimits = new Group(grpBatInputPowerLimits, SWT.NONE);
+		grpDuoRegInputPowerLimits.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		grpDuoRegInputPowerLimits.setText(Messages.getString(MessageIds.GDE_MSGI2634)); //$NON-NLS-1$
+		grpDuoRegInputPowerLimits.setLayout(new RowLayout(SWT.VERTICAL));
+		grpDuoRegInputPowerLimits.setBackground(application.COLOR_GREY);
+		grpDuoRegInputPowerLimits.setEnabled(false);
+		//33 duo regVoltLimit
+		this.systemParameters[33] = new ParameterConfigControl(this.grpDuoRegInputPowerLimits, this.systemValues, 33, "%3.1f", 
+				Messages.getString(MessageIds.GDE_MSGI2631), 175,  //$NON-NLS-1$
+				String.format("%dV - %dV", device.getRegInputVoltMin()/10, device.getRegInputVoltMax()/10) , 280, //$NON-NLS-1$
+				true, 50, 200, device.getRegInputVoltMin(), device.getRegInputVoltMax(), -1*device.getRegInputVoltMin()/10, false);
+		//34 duo regCurrentLimit
+		this.systemParameters[34] = new ParameterConfigControl(this.grpDuoRegInputPowerLimits, this.systemValues, 34, "%3.1f", 
+				Messages.getString(MessageIds.GDE_MSGI2632), 175,  //$NON-NLS-1$
+				String.format("1A - %dA", device.getDcInputCurrentMax()/10), 280, //$NON-NLS-1$
+				true, 50, 200, 10, device.getDcInputCurrentMax(), -1, false);
+		//35 duo regCapacityLimit
+		this.systemParameters[35] = new ParameterConfigControl(this.grpDuoRegInputPowerLimits, this.systemValues, 35, GDE.STRING_EMPTY, 
+				Messages.getString(MessageIds.GDE_MSGI2638), 175,  //$NON-NLS-1$
+				"(auto)0Ah - 9999Ah x 100", 280, //$NON-NLS-1$
+				true, 50, 200, 0, 9999, 0, false);
+		grpDuoRegInputPowerLimits.addListener(SWT.Selection, systemParameterChangeListener);
+
+		grpDuoInputPowerLimits.layout();
+	}
 
 	private void createGrpInputDischargePowerLimits() {
 		grpInputDischargePowerLimits = new Group(sysComposite, SWT.NONE);
@@ -2236,11 +2340,6 @@ public class ChargerDialog extends DeviceDialog {
 				Messages.getString(MessageIds.GDE_MSGI2642, new String[] {Messages.getString(MessageIds.GDE_MSGI2645).split(",")[2]}), 175, 
 				String.format("5W - %dW", device.getDischargePowerMax()[1]), 280, //$NON-NLS-1$
 				true, 50, 200, 5, device.getDischargePowerMax()[1], -5, false);
-		if (isDuo) {
-			//17 input select
-			this.systemParameters[17] = new ParameterConfigControl(this.grpChargeDischargePower, this.systemValues, 17, Messages.getString(MessageIds.GDE_MSGT2674), 175,
-					Messages.getString(MessageIds.GDE_MSGI2647), 280, new String[] { "DC", "Bat" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
-		}
 		grpChargeDischargePower.addListener(SWT.Selection, this.systemParameterChangeListener);
 		grpChargeDischargePower.layout();
 	}
@@ -2253,11 +2352,22 @@ public class ChargerDialog extends DeviceDialog {
 				grpRegInputPowerLimits.removeListener(SWT.Selection, systemParameterChangeListener);
 				grpInputDischargePowerLimits.dispose();
 			}
+			if (grpDuoInputPowerLimits == null || grpDuoInputPowerLimits.isDisposed()) {
+				createGrpDuoInputPowerLimits();
+			}
 			if (grpChargeDischargePower == null || grpChargeDischargePower.isDisposed()) {
 				createGrpChargeDischargePower();
 			}
 		}
 		else if (isDx) {
+			if (grpDuoInputPowerLimits != null && !grpDuoInputPowerLimits.isDisposed()) {
+				grpDuoInputPowerLimits.removeListener(SWT.Selection, systemParameterChangeListener);
+				grpDcInputPowerLimits.removeListener(SWT.Selection, systemParameterChangeListener);
+				grpBatInputPowerLimits.removeListener(SWT.Selection, systemParameterChangeListener);
+				grpDuoRegInputPowerLimits.removeListener(SWT.Selection, systemParameterChangeListener);
+				grpDuoInputPowerLimits.dispose();
+			}
+
 			if (grpInputDischargePowerLimits == null || grpInputDischargePowerLimits.isDisposed()) {
 				createGrpInputDischargePowerLimits();
 			}
@@ -2266,6 +2376,14 @@ public class ChargerDialog extends DeviceDialog {
 			}		
 		}
 		else {
+			if (grpDuoInputPowerLimits != null && !grpDuoInputPowerLimits.isDisposed()) {
+				grpDuoInputPowerLimits.removeListener(SWT.Selection, systemParameterChangeListener);
+				grpDcInputPowerLimits.removeListener(SWT.Selection, systemParameterChangeListener);
+				grpBatInputPowerLimits.removeListener(SWT.Selection, systemParameterChangeListener);
+				grpDuoRegInputPowerLimits.removeListener(SWT.Selection, systemParameterChangeListener);
+				grpDuoInputPowerLimits.dispose();
+			}
+
 			if (grpChargeDischargePower != null && !grpChargeDischargePower.isDisposed()) {
 				grpChargeDischargePower.removeListener(SWT.Selection, systemParameterChangeListener);
 				grpChargeDischargePower.dispose();
