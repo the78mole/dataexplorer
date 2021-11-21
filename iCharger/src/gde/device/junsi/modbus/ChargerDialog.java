@@ -876,8 +876,8 @@ public class ChargerDialog extends DeviceDialog {
 					break;
 				case 32:	//32 duo regEnable
 					systemSettings.setRegEnable((short) systemValues[32]);
-					if (grpRegInputPowerLimits != null)
-						grpRegInputPowerLimits.setEnabled(systemValues[22] == 1);
+					if (grpDuoRegInputPowerLimits != null)
+						grpDuoRegInputPowerLimits.setEnabled(systemValues[32] == 1);
 					break;
 				case 33:	//33 duo regVoltLimit
 					systemSettings.setRegVoltLimit((short) systemValues[33]);
@@ -2213,7 +2213,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpDuoRegInputPowerLimits.setText(Messages.getString(MessageIds.GDE_MSGI2634)); //$NON-NLS-1$
 		grpDuoRegInputPowerLimits.setLayout(new RowLayout(SWT.VERTICAL));
 		grpDuoRegInputPowerLimits.setBackground(application.COLOR_GREY);
-		grpDuoRegInputPowerLimits.setEnabled(false);
+		grpDuoRegInputPowerLimits.setEnabled(systemValues[32] == 1);
 		//33 duo regVoltLimit
 		this.systemParameters[33] = new ParameterConfigControl(this.grpDuoRegInputPowerLimits, this.systemValues, 33, "%3.1f", 
 				Messages.getString(MessageIds.GDE_MSGI2631), 175,  //$NON-NLS-1$
@@ -2285,7 +2285,7 @@ public class ChargerDialog extends DeviceDialog {
 		grpRegInputPowerLimits.setText(Messages.getString(MessageIds.GDE_MSGI2634)); //$NON-NLS-1$
 		grpRegInputPowerLimits.setLayout(new RowLayout(SWT.VERTICAL));
 		grpRegInputPowerLimits.setBackground(application.COLOR_GREY);
-		grpRegInputPowerLimits.setEnabled(false);
+		grpRegInputPowerLimits.setEnabled(systemValues[22] == 1);
 		//23 regVoltLimit
 		this.systemParameters[23] = new ParameterConfigControl(this.grpRegInputPowerLimits, this.systemValues, 23, "%3.1f", 
 				Messages.getString(MessageIds.GDE_MSGI2631), 175,  //$NON-NLS-1$
