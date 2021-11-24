@@ -159,15 +159,17 @@ public class CSVReaderWriter {
 		CSVReaderWriter.log.log(Level.FINE, GDE.CHANNEL_CONFIG_NAME + header.get(GDE.CHANNEL_CONFIG_NUMBER) + " : " + header.get(GDE.CHANNEL_CONFIG_NAME));
 
 		List<String> ignoreIndexList = new ArrayList<String>();
-		for (int i = 2; i < headerLineArray.length; i++) {
+		for (int i = 2, j=2; i < headerLineArray.length; i++,j++) {
 			if (headerLineArray[i].contains("Date") || headerLineArray[i].contains("Time") || headerLineArray[i].contains("LSW")) { //GPS Time, GPS Date, LSW hex value
-				ignoreIndexList.add(GDE.STRING_EMPTY + i);
+				ignoreIndexList.add(GDE.STRING_EMPTY + j);
 				header.put(GDE.CSV_DATA_IGNORE_INDEX, StringHelper.listToString(ignoreIndexList, separator));
 				continue;
 			}
-			String mappedMeasurement = OpenTxAdapter.properties.getProperty(headerLineArray[i].contains("(") ? headerLineArray[i].substring(0, headerLineArray[i].indexOf("(")) : headerLineArray[i]);
+			String mappedMeasurement = headerLineArray[i].contains("(") 
+					? String.format("%s [%s]", headerLineArray[i].substring(0, headerLineArray[i].indexOf("(")), headerLineArray[i].substring(headerLineArray[i].indexOf("(")+1, headerLineArray[i].length()-1))
+					:	OpenTxAdapter.properties.getProperty(headerLineArray[i].contains("(") ? headerLineArray[i].substring(0, headerLineArray[i].indexOf("(")) : headerLineArray[i]);
 			if (mappedMeasurement == null) {
-				mappedMeasurement = String.format("%s [-]", headerLineArray[i]);
+					mappedMeasurement = String.format("%s [-]", headerLineArray[i]);
 			}
 			//check if the mapped measurement name is already in use
 			int count = 1;
@@ -184,8 +186,18 @@ public class CSVReaderWriter {
 			String[] inHeaderMeasurement = mappedMeasurement.trim().split("\\[|]"); //$NON-NLS-1$
 			String inMeasurement = inHeaderMeasurement.length >= 1 ? inHeaderMeasurement[0].trim() : Settings.EMPTY;
 			String inUnit = inHeaderMeasurement.length == 2 ? inHeaderMeasurement[1].trim() : Settings.EMPTY;
-			sb_measurements.append(inMeasurement).append(GDE.STRING_SEMICOLON);
-			sb_units.append(inUnit).append(GDE.STRING_SEMICOLON);
+			//check for OpenTx GPS coordinates
+			if (inMeasurement.equals("GPS")) {
+				sb_measurements.append(inMeasurement+".latitude").append(GDE.STRING_SEMICOLON);
+				sb_units.append("°").append(GDE.STRING_SEMICOLON);
+				sb_measurements.append(inMeasurement+".longitude").append(GDE.STRING_SEMICOLON);
+				sb_units.append("°").append(GDE.STRING_SEMICOLON);
+				++j;
+			}
+			else {
+				sb_measurements.append(inMeasurement).append(GDE.STRING_SEMICOLON);
+				sb_units.append(inUnit).append(GDE.STRING_SEMICOLON);
+			}
 		}
 		header.put(GDE.CSV_DATA_HEADER_MEASUREMENTS, sb_measurements.toString());
 		header.put(GDE.CSV_DATA_HEADER_UNITS, sb_units.toString());
@@ -259,13 +271,15 @@ public class CSVReaderWriter {
 				//find GPS related records and try to assign data type
 				for (int i = 0; i < recordSet.size(); i++) {
 					Record record = recordSet.get(i);
-					if (record.getName().toLowerCase().contains("gps") && record.getName().toLowerCase().contains("speed"))
+					if (record.getName().toLowerCase().contains("gps") && record.getName().toLowerCase().contains("speed") || record.getName().startsWith("GSpd"))
 						record.setDataType(Record.DataType.GPS_SPEED);
-					else if (record.getName().toLowerCase().contains("gps") && (record.getName().toLowerCase().contains("alt") || record.getName().toLowerCase().contains("höhe")))
+					else if ((record.getName().toLowerCase().contains("gps") && (record.getName().toLowerCase().contains("alt") || record.getName().toLowerCase().contains("höhe"))) || record.getName().startsWith("GAlt"))
 						record.setDataType(Record.DataType.GPS_ALTITUDE);
-					else if (record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("long") || record.getName().toLowerCase().contains("länge")))
+					else if ((record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("long") || record.getName().toLowerCase().contains("länge")))
+							|| (record.getName().toLowerCase().contains("gps") && (record.getName().toLowerCase().contains("long") || record.getName().toLowerCase().contains("länge"))))
 						record.setDataType(Record.DataType.GPS_LONGITUDE);
-					else if (record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("lat") || record.getName().toLowerCase().contains("breit")))
+					else if (record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("lat") || record.getName().toLowerCase().contains("breit"))
+							|| (record.getName().toLowerCase().contains("gps") && (record.getName().toLowerCase().contains("lat") || record.getName().toLowerCase().contains("breit"))))
 						record.setDataType(Record.DataType.GPS_LATITUDE);
 
 					MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
@@ -290,7 +304,7 @@ public class CSVReaderWriter {
 							recordSet.setRecordSetDescription(recordSet.getRecordSetDescription() + line.replace('#', GDE.CHAR_BLANK) + GDE.LINE_SEPARATOR);
 						continue;
 					}
-					String[] dataStr = line.split(GDE.STRING_EMPTY + separator);
+					String[] dataStr = line.split(" |"+separator);
 					String data = dataStr[0].trim();
 					int year = Integer.parseInt(data.substring(0, 4));
 					int month = Integer.parseInt(data.substring(5, 7));
@@ -338,6 +352,27 @@ public class CSVReaderWriter {
 							recordSet.descriptionAppendFilename(filePath);
 							activeChannel.setFileDescription((new SimpleDateFormat("yyyy-MM-dd").format(startTimeStamp)).substring(0, 10) + activeChannel.getFileDescription().substring(10));
 						}
+						
+						//find GPS related records and try to assign data type
+						for (int i = 0; i < recordSet.size(); i++) {
+							Record record = recordSet.get(i);
+							if (record.getName().toLowerCase().contains("gps") && record.getName().toLowerCase().contains("speed") || record.getName().startsWith("GSpd"))
+								record.setDataType(Record.DataType.GPS_SPEED);
+							else if ((record.getName().toLowerCase().contains("gps") && (record.getName().toLowerCase().contains("alt") || record.getName().toLowerCase().contains("höhe"))) || record.getName().startsWith("GAlt"))
+								record.setDataType(Record.DataType.GPS_ALTITUDE);
+							else if ((record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("long") || record.getName().toLowerCase().contains("länge")))
+									|| (record.getName().toLowerCase().contains("gps") && (record.getName().toLowerCase().contains("long") || record.getName().toLowerCase().contains("länge"))))
+								record.setDataType(Record.DataType.GPS_LONGITUDE);
+							else if (record.getUnit().contains("°") && record.getUnit().contains("'") && (record.getName().toLowerCase().contains("lat") || record.getName().toLowerCase().contains("breit"))
+									|| (record.getName().toLowerCase().contains("gps") && (record.getName().toLowerCase().contains("lat") || record.getName().toLowerCase().contains("breit"))))
+								record.setDataType(Record.DataType.GPS_LATITUDE);
+
+							if (log.isLoggable(Level.FINE)) log.log(Level.FINE, record.getName() + " - " + record.getDataType());
+							MeasurementType measurement = device.getMeasurement(activeChannel.getNumber(), i);
+							measurement.setName(tmpRecordNames[i]);
+							measurement.setSymbol(tmpRecordSymbols[i]);
+							measurement.setUnit(tmpRecordUnits[i]);
+						}
 					}
 					else
 						continue;
@@ -350,17 +385,31 @@ public class CSVReaderWriter {
 						}
 						try {
 							data = dataStr[j + 2].trim().replace(GDE.STRING_BLANK, GDE.STRING_EMPTY);
+							//log.log(Level.OFF, String.format("%s i=%d j=%d %s", recordSet.get(i).getName(), i, j, data));
 						}
 						catch (Exception e) {
 							data = "0";
 							CSVReaderWriter.log.log(Level.WARNING, String.format("Check line = %s", line));
 						}
+
 						switch (recordSet.get(i).getDataType()) {
 						case GPS_LONGITUDE:
 						case GPS_LATITUDE:
-							points[i] = data.contains(GDE.STRING_MINUS) ? 0
-									: Double.valueOf(data.replace("E", GDE.STRING_EMPTY).replace('W', GDE.CHAR_DASH).replace("N", GDE.STRING_EMPTY).replace('S', GDE.CHAR_DASH)
-											.replace(GDE.STRING_COLON, GDE.STRING_EMPTY).replace(GDE.STRING_DOT, GDE.STRING_EMPTY)).intValue();
+							if (data.contains(GDE.STRING_MINUS))
+								points[i] = 0;
+							else { //normalize GPS coordinate to enable %9.6f
+								data = data.replace("E", GDE.STRING_EMPTY).replace('W', GDE.CHAR_DASH).replace("N", GDE.STRING_EMPTY).replace('S', GDE.CHAR_DASH)
+								.replace(GDE.STRING_COLON, GDE.STRING_EMPTY);
+								if (recordSet.get(i).getUnit().endsWith("'"))
+									data = data.replace(GDE.STRING_DOT, GDE.STRING_EMPTY);
+								else {
+									if (data.length() != 0)
+										data = String.format("%.6f", Double.parseDouble(data)).replace(GDE.STRING_DOT, GDE.STRING_EMPTY);
+									else
+										data = "0.0";
+								}
+								points[i] = Double.valueOf(data).intValue();
+							}
 							break;
 
 						default:
@@ -370,6 +419,7 @@ public class CSVReaderWriter {
 									log.log(Level.WARNING, String.format("Check line %d, found misterious value %s", lineNumber, data));
 								else
 									points[i] = (int) (value * 1000.0);
+								
 							}
 							catch (NumberFormatException e) {
 								points[i] = 0;

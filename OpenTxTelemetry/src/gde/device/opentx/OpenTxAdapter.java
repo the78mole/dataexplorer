@@ -380,9 +380,13 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
-			int grad = ((int) (value / 1000));
-			double minuten = (value - (grad * 1000.0)) / 10.0;
-			newValue = grad + minuten / 60.0;
+			if (record.getUnit().equals("°"))
+				newValue = value / 1000.0;
+			else { //[° ']
+				int grad = ((int) (value / 1000));
+				double minuten = (value - (grad * 1000.0)) / 10.0;
+				newValue = grad + minuten / 60.0;
+			}			
 			break;
 
 		default:
@@ -424,9 +428,13 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
-			int grad = (int) value;
-			double minuten = (value - grad * 1.0) * 60.0;
-			newValue = (grad + minuten / 100.0) * 1000.0;
+			if (record.getUnit().equals("°"))
+				newValue = value * 1000.0;
+			else { //[° ']
+				int grad = (int) value;
+				double minuten = (value - grad * 1.0) * 60.0;
+				newValue = (grad + minuten / 100.0) * 1000.0;
+			}			
 			break;
 
 		default:
@@ -596,7 +604,7 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 	public Integer getGPS2KMZMeasurementOrdinal() {
 		RecordSet actualRecordSet = this.application.getActiveRecordSet();
 		if (this.kmzMeasurementOrdinal == null && actualRecordSet != null) {
-			return findRecordByUnit(this.application.getActiveRecordSet(), "km/h");
+			return findRecordByType(this.application.getActiveRecordSet(), DataType.GPS_SPEED);
 		}
 		return this.kmzMeasurementOrdinal != null ? this.kmzMeasurementOrdinal : -1;
 	}
@@ -666,14 +674,14 @@ public class OpenTxAdapter extends DeviceConfiguration implements IDevice {
 	 * @return string array of measurement names which match the ordinal of the record set requirements to restore file record properties
 	 */
 	public String[] crossCheckMeasurements(String[] fileRecordsProperties, RecordSet recordSet) {
-			//prevent duplicating names, replace by unique defaults
-		for (String tmpRecordName : recordSet.getRecordNames()) {
-			Record tmpRecord = recordSet.get(tmpRecordName);
-			recordSet.replaceRecordName((Record) tmpRecord, String.format("%d????", tmpRecord.getOrdinal()));
+		//prevent duplicating names, replace by unique defaults
+		String[] tmpRecordNames = recordSet.getRecordNames();
+		for (int i=0; i<tmpRecordNames.length; ++i) {
+			recordSet.replaceRecordName((Record) recordSet.get(i), String.format("%d????", i));
 		}
 		String[] recordKeys = recordSet.getRecordNames();
 		Vector<String> cleanedRecordNames = new Vector<String>();
-		int numberRecordSetEntries = recordSet.realSize();
+		int numberRecordSetEntries = recordKeys.length;
 		if ((numberRecordSetEntries - fileRecordsProperties.length) > 0) { 
 			for (int i = 0; i < fileRecordsProperties.length; ++i) {
 				cleanedRecordNames.add(recordKeys[i]);
