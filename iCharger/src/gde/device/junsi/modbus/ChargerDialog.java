@@ -2227,7 +2227,7 @@ public class ChargerDialog extends DeviceDialog {
 		//35 duo regCapacityLimit
 		this.systemParameters[35] = new ParameterConfigControl(this.grpDuoRegInputPowerLimits, this.systemValues, 35, GDE.STRING_EMPTY, 
 				Messages.getString(MessageIds.GDE_MSGI2638), 175,  //$NON-NLS-1$
-				"(auto)0Ah - 9999Ah x 100", 280, //$NON-NLS-1$
+				"(ingnore)0Ah - 999900Ah", 280, //$NON-NLS-1$
 				true, 50, 200, 0, 9999, 0, false);
 		grpDuoRegInputPowerLimits.addListener(SWT.Selection, systemParameterChangeListener);
 
@@ -2304,7 +2304,7 @@ public class ChargerDialog extends DeviceDialog {
 		//26 regCapLimit
 		this.systemParameters[26] = new ParameterConfigControl(this.grpRegInputPowerLimits, this.systemValues, 26, GDE.STRING_EMPTY, 
 				Messages.getString(MessageIds.GDE_MSGI2638), 175,  //$NON-NLS-1$
-				"(auto)0Ah - 999900Ah", 280, //$NON-NLS-1$
+				"(ignore)0Ah - 999900Ah", 280, //$NON-NLS-1$
 				true, 50, 200, 0, 999900, 0, false);
 		grpRegInputPowerLimits.addListener(SWT.Selection, systemParameterChangeListener);
 		grpInputDischargePowerLimits.layout();
@@ -2411,8 +2411,8 @@ public class ChargerDialog extends DeviceDialog {
 		this.memoryParameters[1] = new ParameterConfigControl(this.memoryComposite, this.memoryValues, 1, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2637), 175, "0(auto) - " + maxNumberCells, //$NON-NLS-1$
 				280, false, 50, 200, 0, maxNumberCells);
 		//battery capacity
-		this.memoryParameters[2] = new ParameterConfigControl(this.memoryComposite, this.memoryValues, 2, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2638), 175, "0(auto) ~ 65000 mAh", 280, //$NON-NLS-1$
-				true, 50, 200, 0, 65000, 0, true);
+		this.memoryParameters[2] = new ParameterConfigControl(this.memoryComposite, this.memoryValues, 2, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2638), 175, "0(auto) ~ 999900 mAh", 280, //$NON-NLS-1$
+				true, 50, 200, 0, 999900, 0, true);
 		this.memoryComposite.layout();
 		this.memoryComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
 	}

@@ -71,7 +71,7 @@ public class iChargerDX8 extends iChargerUsb {
 	 */
 	@Override
 	public int getDcInputVoltMax() {
-		return 490; //*0.1 V
+		return 480; //*0.1 V
 	}
 	
 	/**
@@ -95,7 +95,7 @@ public class iChargerDX8 extends iChargerUsb {
 	 */
 	@Override
 	public int getRegInputVoltMax() {
-		return 490; //*0.1 V
+		return 480; //*0.1 V
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class iChargerDX8 extends iChargerUsb {
 	 */
 	@Override
 	public int[] getChargePowerMax() {
-		return new int[] {1100, 1100};
+		return new int[] {1600, 1600};
 	}
 
 	/**

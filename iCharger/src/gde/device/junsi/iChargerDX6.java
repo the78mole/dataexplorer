@@ -94,7 +94,7 @@ public class iChargerDX6 extends iChargerUsb {
 	 */
 	@Override
 	public int getDcInputVoltMax() {
-		return 340; //*0.1 V
+		return 330; //*0.1 V
 	}
 	
 	/**
@@ -118,7 +118,7 @@ public class iChargerDX6 extends iChargerUsb {
 	 */
 	@Override
 	public int getRegInputVoltMax() {
-		return 340; //*0.1 V
+		return 330; //*0.1 V
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class iChargerDX6 extends iChargerUsb {
 	 */
 	@Override
 	public int[] getChargePowerMax() {
-		return new int[] {900, 900};
+		return new int[] {1500, 1500};
 	}
 
 	/**
