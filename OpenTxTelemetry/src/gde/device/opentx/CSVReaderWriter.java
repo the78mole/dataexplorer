@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -404,11 +405,17 @@ public class CSVReaderWriter {
 									data = data.replace(GDE.STRING_DOT, GDE.STRING_EMPTY);
 								else {
 									if (data.length() != 0)
-										data = String.format("%.6f", Double.parseDouble(data)).replace(GDE.STRING_DOT, GDE.STRING_EMPTY);
+										data = String.format(Locale.ENGLISH, "%.6f", Double.parseDouble(data)).replace(GDE.STRING_DOT, GDE.STRING_EMPTY);
 									else
 										data = "0.0";
 								}
-								points[i] = Double.valueOf(data).intValue();
+								try {
+									points[i] = Double.valueOf(data).intValue();
+								}
+								catch (NumberFormatException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 							break;
 
