@@ -66,7 +66,7 @@ public class NMEAParser implements IDataParser {
 	protected Vector<String>							missingImpleWarned				= new Vector<String>();
 	protected String 											deviceSerialNumber				= GDE.STRING_EMPTY;
 	protected String											firmwareVersion           = GDE.STRING_EMPTY;
-	protected int													pressureOffset						= 0;
+	protected int													sumPressureOffset						= 0;
 	protected int													pressureOffsetCount				= 0;
 	protected double											rho												= 0;
 	protected int 												avgAirSpeed40							= 0;
@@ -124,7 +124,7 @@ public class NMEAParser implements IDataParser {
 		this.deviceName = this.device.getName();
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.timeOffsetUTC = useTimeOffsetUTC;
-		this.pressureOffset	= 0;
+		this.sumPressureOffset	= 0;
 	}
 	
 	/**
@@ -1320,16 +1320,15 @@ public class NMEAParser implements IDataParser {
 		//this.values[24] = Airpressure TEK [hPa];
 		if (this.values[22] == 0) {
 			++pressureOffsetCount;
-			pressureOffset += this.values[23]-this.values[24];
+			sumPressureOffset += this.values[23]-this.values[24];
 			this.values[24] = 0;
-			//log.log(Level.OFF, String.format("offset = %d/%d = %d", pressureOffset, pressureOffsetCount, pressureOffset/pressureOffsetCount));
+			//log.log(Level.OFF, String.format("offset = %d/%d = %d", sumPressureOffset, pressureOffsetCount, sumPressureOffset/pressureOffsetCount));
 			
 			//uncomment if own airspeed should be calculated and replace Impulse values
 //			this.values[21] = this.values[7]; 
 		}
 		else {
-			//log.log(Level.OFF, "offset = " + pressureOffset);
-			this.values[24] = this.values[23] - this.values[24] - (pressureOffsetCount > 0 ? pressureOffset/pressureOffsetCount : pressureOffset);
+			this.values[24] = this.values[23] - this.values[24] - (pressureOffsetCount > 0 ? sumPressureOffset/pressureOffsetCount : sumPressureOffset);
 			
 			//uncomment if own airspeed should be calculated and replace Impulse values
 //			if (this.values[7] > 10000) {
@@ -1344,6 +1343,8 @@ public class NMEAParser implements IDataParser {
 			avgAirSpeed40 += this.values[22];
 			avgPressureDeltaTec40 += this.values[24];
 			countAvg40 += 1;
+			//log.log(Level.OFF, String.format("presOffset=%.3f AirSpeed=%.2f PresDeltaTec=%.2f countAvg40=%d sumAirSpeed40=%.2f sumPresDeltaTec40=%.2f", 
+			//		this.sumPressureOffset/this.pressureOffsetCount/1000., this.values[22]/1000., this.values[24]/1000., countAvg40, avgAirSpeed40/1000., avgPressureDeltaTec40/1000.));
 		}
 		//build sum of ∆TEC pressure values between 0,95 and 1,05 km/h as well as sum of matching ∆TEC pressure
 		if (this.values[24] >= 950 && this.values[24] <= 1050) {

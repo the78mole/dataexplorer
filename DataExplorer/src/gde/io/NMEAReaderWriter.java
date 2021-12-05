@@ -284,19 +284,19 @@ public class NMEAReaderWriter {
 				//write filename after import to record description
 				activeChannel.get(recordSetName).descriptionAppendFilename(filePath.substring(filePath.lastIndexOf(GDE.CHAR_FILE_SEPARATOR_UNIX)+1));
 				if (data.countAvg40 > 0 && data.countAvgDp1 > 0 && data.countAvg70 > 0)
-					log.log(Level.OFF, String.format("\n%s - %3d, %3d, %3d avgAirSpeed = %03.1f, %03.1f, %03.1f avgPressure ∆TEK = %.2f, %.2f, %.2f", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR)+1), data.countAvg40, data.countAvgDp1, data.countAvg70, 
+					log.log(Level.OFF, String.format("\n%s - offset = %.3f %3d, %3d, %3d avgAirSpeed = %03.1f, %03.1f, %03.1f avgPressure ∆TEK = %.2f, %.2f, %.2f", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR)+1), data.sumPressureOffset/data.pressureOffsetCount/1000., data.countAvg40, data.countAvgDp1, data.countAvg70, 
 							data.avgAirSpeed40/data.countAvg40/1000., data.avgAirSpeedDp1/data.countAvgDp1/1000., data.avgAirSpeed70/data.countAvg70/1000.,
 							data.avgPressureDeltaTec40/data.countAvg40/1000., data.avgPressureDeltaTecDp1/data.countAvgDp1/1000., data.avgPressureDeltaTec70/data.countAvg70/1000.));
 				else if (data.countAvg40 == 0 && data.countAvgDp1 > 0 && data.countAvg70 > 0)
-					log.log(Level.OFF, String.format("\n%s - %3d, %3d, %3d avgAirSpeed = %03.1f, %03.1f, %03.1f avgPressure ∆TEK = %.2f, %.2f, %.2f", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR)+1), data.countAvg40, data.countAvgDp1, data.countAvg70, 
+					log.log(Level.OFF, String.format("\n%s - offset = %.3f %3d, %3d, %3d avgAirSpeed = %03.1f, %03.1f, %03.1f avgPressure ∆TEK = %.2f, %.2f, %.2f", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR)+1), data.sumPressureOffset/data.pressureOffsetCount/1000., data.countAvg40, data.countAvgDp1, data.countAvg70, 
 							40.0, data.avgAirSpeedDp1/data.countAvgDp1/1000., data.avgAirSpeed70/data.countAvg70/1000.,
 							0.0, data.avgPressureDeltaTecDp1/data.countAvgDp1/1000., data.avgPressureDeltaTec70/data.countAvg70/1000.));
 				else if (data.countAvg40 > 0 && data.countAvgDp1 == 0 && data.countAvg70 > 0)
-					log.log(Level.OFF, String.format("\n%s - %3d, %3d, %3d avgAirSpeed = %03.1f, %03.1f, %03.1f avgPressure ∆TEK = %.2f, %.2f, %.2f", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR)+1), data.countAvg40, data.countAvgDp1, data.countAvg70, 
+					log.log(Level.OFF, String.format("\n%s - offset = %.3f %3d, %3d, %3d avgAirSpeed = %03.1f, %03.1f, %03.1f avgPressure ∆TEK = %.2f, %.2f, %.2f", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR)+1), data.sumPressureOffset/data.pressureOffsetCount/1000., data.countAvg40, data.countAvgDp1, data.countAvg70, 
 							data.avgAirSpeed40/data.countAvg40/1000., 00.0, data.avgAirSpeed70/data.countAvg70/1000.,
 							data.avgPressureDeltaTec40/data.countAvg40/1000., 1.0, data.avgPressureDeltaTec70/data.countAvg70/1000.));
 				else if (data.countAvg40 > 0 && data.countAvgDp1 > 0 && data.countAvg70 == 0)
-					log.log(Level.OFF, String.format("\n%s - %3d, %3d, %3d avgAirSpeed = %03.1f, %03.1f, %03.1f avgPressure ∆TEK = %.2f, %.2f, %.2f", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR)+1), data.countAvg40, data.countAvgDp1, data.countAvg70, 
+					log.log(Level.OFF, String.format("\n%s - offset = %.3f %3d, %3d, %3d avgAirSpeed = %03.1f, %03.1f, %03.1f avgPressure ∆TEK = %.2f, %.2f, %.2f", filePath.substring(filePath.lastIndexOf(GDE.FILE_SEPARATOR)+1), data.sumPressureOffset/data.pressureOffsetCount/1000., data.countAvg40, data.countAvgDp1, data.countAvg70, 
 							data.avgAirSpeed40/data.countAvg40/1000., data.avgAirSpeedDp1/data.countAvgDp1/1000., 70.0,
 							data.avgPressureDeltaTec40/data.countAvg40/1000., data.avgPressureDeltaTecDp1/data.countAvgDp1/1000., 0.0));
 			}
