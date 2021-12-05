@@ -1022,9 +1022,11 @@ public class ChargerMemory {
 		sb.append(String.format("safetyCapD \t\t= %d", safetyCapD)).append("\n");
 		sb.append(String.format("safetyTempD \t\t= %d", safetyTempD)).append("\n");
 
-		sb.append(String.format("regChMode \t\t= %d", regChMode)).append("\n");
-		sb.append(String.format("regChVolt \t\t= %d", regChVolt)).append("\n");
-		sb.append(String.format("regChCurrent \t\t= %d", regChCurrent)).append("\n");
+		if (isDuo) {
+			sb.append(String.format("regChMode \t\t= %d", regChMode)).append("\n");
+			sb.append(String.format("regChVolt \t\t= %d", regChVolt)).append("\n");
+			sb.append(String.format("regChCurrent \t\t= %d", regChCurrent)).append("\n");
+		}
 
 		sb.append(String.format("fastSto \t\t= %d", fastSto)).append("\n");
 		sb.append(String.format("stoCompensation \t= %d", stoCompensation)).append("\n");
@@ -1654,6 +1656,13 @@ public class ChargerMemory {
 		values[48] = this.getLogInterval();
 		//49 power option auto start
 		values[49] = this.getSaveToSD();
+		
+		//regenerative channel mode
+		values[50] = this.getRegChMode();
+		//regenerative to channel voltage limit
+		values[51] = this.getRegChVolt() / 100;
+		//regenerative to channel current limit
+		values[52] = this.getRegChCurrent();
 
 		return values;
 	}

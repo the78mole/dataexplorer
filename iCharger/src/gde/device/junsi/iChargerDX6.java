@@ -144,4 +144,20 @@ public class iChargerDX6 extends iChargerUsb {
 	public int[] getDischargePowerMax() {
 		return new int[] {40, 40};
 	}
+	
+	/**
+	 * @return the min/max regenerative channel voltage, factor 1000
+	 */
+	@Override
+	public int[] getRegChannelVoltageLimits() {
+		return new int[] {2000, 28000};
+	}
+
+	/**
+	 * @return the min/max regenerative channel current, factor 100
+	 */
+	@Override
+	public int[] getRegChannelCurrentLimits() {
+		return new int[] {5, 3200};
+	}
 }

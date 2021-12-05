@@ -102,8 +102,10 @@ public class ChargerDialog extends DeviceDialog {
 	private Group 										grpTemperature, grpFans, grpBeepTone, grpLcdScreen, grpChargeDischargePower;
 	private Group 										grpInputDischargePowerLimits, grpInputPowerLimits, grpRegInputPowerLimits, grpLanguage;
 	private Group 										grpDuoInputPowerLimits, grpDcInputPowerLimits, grpBatInputPowerLimits, grpDuoRegInputPowerLimits;
+	private Group											regToChannelSettings;
+	private CLabel										regToInputWarningLable;
 	
-	private ParameterConfigControl[]	memoryParameters						= new ParameterConfigControl[50];																																				
+	private ParameterConfigControl[]	memoryParameters						= new ParameterConfigControl[53];																																				
 	private ParameterConfigControl[]	systemParameters						= new ParameterConfigControl[50];																																				
 	private final String							cellTypeNames;
 	private final String[]						cellTypeNamesArray;
@@ -544,6 +546,19 @@ public class ChargerDialog extends DeviceDialog {
 						break;
 					case 20: // regenerative mode
 						ChargerDialog.this.selectedProgramMemory.setRegDchgMode((short) ChargerDialog.this.memoryValues[20]);
+						if (ChargerDialog.this.regToInputWarningLable != null) {
+							boolean isToInput = ChargerDialog.this.memoryValues[20] == 1;
+							ChargerDialog.this.regToInputWarningLable.setEnabled(isToInput);
+							ChargerDialog.this.regToInputWarningLable.setForeground(isToInput ? SWTResourceManager.getColor(SWT.COLOR_RED) : SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+						}
+						if (ChargerDialog.this.regToChannelSettings != null) {
+							boolean isToChannel = ChargerDialog.this.memoryValues[20] == 2;
+							ChargerDialog.this.regToChannelSettings.setEnabled(isToChannel);
+							ChargerDialog.this.memoryParameters[50].setEnabled(isToChannel);
+							boolean isResOrBulb = ChargerDialog.this.memoryValues[50] == 0;
+							ChargerDialog.this.memoryParameters[51].setEnabled(isToChannel && isResOrBulb);
+							ChargerDialog.this.memoryParameters[52].setEnabled(isToChannel && isResOrBulb);
+						}
 						break;
 					case 18: // discharge parameter cell voltage
 					case 21: // discharge extra
@@ -746,11 +761,28 @@ public class ChargerDialog extends DeviceDialog {
 					case 47: // channel mode asynchronous | synchronous DUO only
 						ChargerDialog.this.selectedProgramMemory.setChannelMode((byte) ChargerDialog.this.memoryValues[47]);
 						break;
-				case 48: // log interval
+					case 48: // log interval
 						ChargerDialog.this.selectedProgramMemory.setLogInterval((short) (ChargerDialog.this.memoryValues[48] - ChargerDialog.this.memoryValues[48]%5));
 						break;
 					case 49: // power option auto start
 						ChargerDialog.this.selectedProgramMemory.setSaveToSD((byte) ChargerDialog.this.memoryValues[49]);
+						break;
+						
+					case 50: //regenerative channel mode
+						log.log(Level.OFF, "setRegChMode = " + ChargerDialog.this.memoryValues[50]);
+						ChargerDialog.this.selectedProgramMemory.setRegChMode((byte) ChargerDialog.this.memoryValues[50]);
+						if (ChargerDialog.this.memoryParameters[51] != null && ChargerDialog.this.memoryParameters[52] != null) {
+							ChargerDialog.this.memoryParameters[51].setEnabled(ChargerDialog.this.memoryValues[50] == 0);
+							ChargerDialog.this.memoryParameters[52].setEnabled(ChargerDialog.this.memoryValues[50] == 0);
+						}
+						break;
+					case 51: //regenerative to channel voltage limit
+						log.log(Level.OFF, "setRegChVolt = " + ChargerDialog.this.memoryValues[51]);
+						ChargerDialog.this.selectedProgramMemory.setRegChVolt((short) (ChargerDialog.this.memoryValues[51] * 100));
+						break;
+					case 52: //regenerative to channel current limit
+						log.log(Level.OFF, "setRegChCurrent = " + ChargerDialog.this.memoryValues[52]);
+						ChargerDialog.this.selectedProgramMemory.setRegChCurrent((short) (ChargerDialog.this.memoryValues[52]));
 						break;
 
 					}
@@ -987,8 +1019,8 @@ public class ChargerDialog extends DeviceDialog {
 			this.usbPort.masterWrite(Register.REG_SEL_MEM.value, (short) 1, index);
 			
 			this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
-			this.selectedProgramMemory = new ChargerMemory(memoryBuffer, this.isDuo);
-			if (ChargerDialog.log.isLoggable(Level.FINE)) ChargerDialog.log.log(Level.FINE, this.selectedProgramMemory.toString(this.isDuo));
+			this.selectedProgramMemory = new ChargerMemory(memoryBuffer, this.isDuo ||this.isDx);
+			if (ChargerDialog.log.isLoggable(Level.OFF)) ChargerDialog.log.log(Level.OFF, this.selectedProgramMemory.toString(this.isDuo ||this.isDx));
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
@@ -1660,7 +1692,7 @@ public class ChargerDialog extends DeviceDialog {
 		this.memoryComposite.setLayout(new FillLayout(SWT.VERTICAL));
 		FormData fdMainComposite = new FormData();
 		fdMainComposite.top = new FormAttachment(0, 80);
-		fdMainComposite.bottom = new FormAttachment(0, 190);
+		fdMainComposite.bottom = new FormAttachment(0, (this.isDuo || this.isDx ? 210 : 190));
 		fdMainComposite.right = new FormAttachment(100, -10);
 		fdMainComposite.left = new FormAttachment(0, 10);
 		this.memoryComposite.setLayoutData(fdMainComposite);
@@ -2413,6 +2445,12 @@ public class ChargerDialog extends DeviceDialog {
 		//battery capacity
 		this.memoryParameters[2] = new ParameterConfigControl(this.memoryComposite, this.memoryValues, 2, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2638), 175, "0(auto) ~ 999900 mAh", 280, //$NON-NLS-1$
 				true, 50, 200, 0, 999900, 0, true);
+		if (this.isDuo || this.isDx) {
+			//channel mode asynchronous | synchronous - DUO & DX only
+			this.memoryParameters[47] = new ParameterConfigControl(this.memoryComposite, this.memoryValues, 47, Messages.getString(MessageIds.GDE_MSGI2649), 175, //$NON-NLS-1$
+					"asynchronous, synchronous", 280, //$NON-NLS-1$
+					new String[] { "async", "sync" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 		this.memoryComposite.layout();
 		this.memoryComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
 	}
@@ -2421,14 +2459,14 @@ public class ChargerDialog extends DeviceDialog {
 		this.tbtmCharge = new CTabItem(this.tabFolderProgrMem, SWT.NONE);
 		this.tbtmCharge.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.tbtmCharge.setText(Messages.getString(MessageIds.GDE_MSGT2639));
-		ScrolledComposite scrolledComposite = new ScrolledComposite(this.tabFolderProgrMem, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		this.tbtmCharge.setControl(scrolledComposite);
-		scrolledComposite.setExpandHorizontal(true);
-		scrolledComposite.setLayout(new FillLayout(SWT.VERTICAL));
-		this.chargeComposite = new Composite(scrolledComposite, SWT.NONE);
+		ScrolledComposite scrolledChargeComposite = new ScrolledComposite(this.tabFolderProgrMem, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		this.tbtmCharge.setControl(scrolledChargeComposite);
+		scrolledChargeComposite.setExpandHorizontal(true);
+		scrolledChargeComposite.setLayout(new FillLayout(SWT.VERTICAL));
+		this.chargeComposite = new Composite(scrolledChargeComposite, SWT.NONE);
 		this.chargeComposite.setLayout(new RowLayout(SWT.VERTICAL));
-		scrolledComposite.setContent(this.chargeComposite);
-		scrolledComposite.setMinSize(this.chargeComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		scrolledChargeComposite.setContent(this.chargeComposite);
+		scrolledChargeComposite.setMinSize(this.chargeComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		this.chargeComposite.setSize(750, GDE.IS_WINDOWS ? 880 : 1050);
 		//charge parameter current
 		this.memoryParameters[3] = new ParameterConfigControl(this.chargeComposite, this.memoryValues, 3, "%4.2f", Messages.getString(MessageIds.GDE_MSGT2640), 175, 
@@ -2447,7 +2485,7 @@ public class ChargerDialog extends DeviceDialog {
 		if (this.memoryValues[5] == 0) this.memoryParameters[6].setEnabled(false);
 		//charge parameter cell voltage
 		this.memoryParameters[7] = new ParameterConfigControl(this.chargeComposite, this.memoryValues, 7, "%4.3f", Messages.getString(MessageIds.GDE_MSGT2644), 175, "4.000 V - 4.200 V", 280, //$NON-NLS-1$
-				true, 50, 200, 4000, 4200, -4000, false);
+				true, 50, 200, 4000, 4350, 4200, -4000, false);
 
 		//Ni charge voltage drop
 		this.memoryParameters[26] = new ParameterConfigControl(this.chargeComposite, this.memoryValues, 26, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2645), 175, "1 mV - 20 mV", 280, //$NON-NLS-1$
@@ -2538,9 +2576,15 @@ public class ChargerDialog extends DeviceDialog {
 		this.tbtmDischarge = new CTabItem(this.tabFolderProgrMem, SWT.NONE);
 		this.tbtmDischarge.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.tbtmDischarge.setText(Messages.getString(MessageIds.GDE_MSGT2670));
-		this.dischargeComposite = new Composite(this.tabFolderProgrMem, SWT.NONE);
-		this.tbtmDischarge.setControl(this.dischargeComposite);
+		ScrolledComposite scrolledDischargeComposite = new ScrolledComposite(this.tabFolderProgrMem, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		this.tbtmDischarge.setControl(scrolledDischargeComposite);
+		scrolledDischargeComposite.setExpandHorizontal(true);
+		scrolledDischargeComposite.setLayout(new FillLayout(SWT.VERTICAL));
+		this.dischargeComposite = new Composite(scrolledDischargeComposite, SWT.NONE);
 		this.dischargeComposite.setLayout(new RowLayout(SWT.VERTICAL));
+		scrolledDischargeComposite.setContent(this.dischargeComposite);
+		scrolledDischargeComposite.setMinSize(this.dischargeComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		this.dischargeComposite.setSize(750, GDE.IS_WINDOWS ? 480 : 580);
 		//discharge parameter current
 		this.memoryParameters[17] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 17, "%4.2f", Messages.getString(MessageIds.GDE_MSGT2671), 175, 
 				String.format("0.05 ~ %d A", device.getChargeCurrentMax()/10), 280, //$NON-NLS-1$
@@ -2551,17 +2595,14 @@ public class ChargerDialog extends DeviceDialog {
 		//discharge end current
 		this.memoryParameters[19] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 19, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2673), 175, "1% - 100%", 280, //$NON-NLS-1$
 				true, 50, 200, 1, 100, -1, false);
-		//20 regenerative mode
-		this.memoryParameters[20] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 20, Messages.getString(MessageIds.GDE_MSGT2674), 175, "off, on", 280, //$NON-NLS-1$
-				new String[] { "off", "on" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
 		//discharge extra
-		this.memoryParameters[21] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 21, Messages.getString(MessageIds.GDE_MSGT2675), 175, "off, on", 280, //$NON-NLS-1$
-				new String[] { "off", "on" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		this.memoryParameters[21] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 21, Messages.getString(MessageIds.GDE_MSGT2675), 175, Messages.getString(MessageIds.GDE_MSGT2648), 280, //$NON-NLS-1$
+				new String[] { Messages.getString(MessageIds.GDE_MSGT2649), Messages.getString(MessageIds.GDE_MSGT2650) }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
 		//discharge balancer
-		this.memoryParameters[22] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 22, Messages.getString(MessageIds.GDE_MSGT2676), 175, "off, on", 280, //$NON-NLS-1$
-				new String[] { "off", "on" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		this.memoryParameters[22] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 22, Messages.getString(MessageIds.GDE_MSGT2676), 175, Messages.getString(MessageIds.GDE_MSGT2648), 280, //$NON-NLS-1$
+				new String[] { Messages.getString(MessageIds.GDE_MSGT2649), Messages.getString(MessageIds.GDE_MSGT2650) }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
 		this.dischargeComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
-
+		//discharge safety settings
 		this.grpDischargeSaftySettings = new Group(this.dischargeComposite, SWT.NONE);
 		this.grpDischargeSaftySettings.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 		this.grpDischargeSaftySettings.setText(Messages.getString(MessageIds.GDE_MSGT2654));
@@ -2578,6 +2619,46 @@ public class ChargerDialog extends DeviceDialog {
 				"0(OFF) - 9999 Min", 280, //$NON-NLS-1$
 				true, 50, 200, 0, 9999, 0, false);
 		this.grpDischargeSaftySettings.addListener(SWT.Selection, this.memoryParameterChangeListener);
+		//20 regenerative mode off, to input, to channel (duo, dx)
+		if (isDuo || isDx )
+			this.memoryParameters[20] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 20, Messages.getString(MessageIds.GDE_MSGT2674), 175, 
+					String.format("%s, %s, %s", Messages.getString(MessageIds.GDE_MSGT2649), Messages.getString(MessageIds.GDE_MSGI2652), Messages.getString(MessageIds.GDE_MSGI2653)), 280, 				
+					new String[] { Messages.getString(MessageIds.GDE_MSGT2649), Messages.getString(MessageIds.GDE_MSGI2654), Messages.getString(MessageIds.GDE_MSGI2655) }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		else
+			this.memoryParameters[20] = new ParameterConfigControl(this.dischargeComposite, this.memoryValues, 20, Messages.getString(MessageIds.GDE_MSGT2674), 175, 
+					String.format("%s, %s", Messages.getString(MessageIds.GDE_MSGT2649), Messages.getString(MessageIds.GDE_MSGI2652)), 280, 				
+					new String[] { Messages.getString(MessageIds.GDE_MSGT2649), Messages.getString(MessageIds.GDE_MSGI2654) }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		//regenerative to input
+		this.regToInputWarningLable = new CLabel(this.dischargeComposite, SWT.NONE);
+		this.regToInputWarningLable.setLayoutData(new RowData(750, this.comboHeight));
+		this.regToInputWarningLable.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.regToInputWarningLable.setText(Messages.getString(MessageIds.GDE_MSGE2602));
+		boolean isToInput = this.memoryValues[20] == 1;
+		this.regToInputWarningLable.setForeground(isToInput ? SWTResourceManager.getColor(SWT.COLOR_RED) : SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+		this.regToInputWarningLable.setEnabled(isToInput);
+		//regenerative to channel/output
+		this.regToChannelSettings = new Group(this.dischargeComposite, SWT.NONE);
+		this.regToChannelSettings.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+		this.regToChannelSettings.setText(Messages.getString(MessageIds.GDE_MSGI2656));
+		this.regToChannelSettings.setBackground(this.application.COLOR_WHITE);
+		this.regToChannelSettings.setLayout(new RowLayout(SWT.VERTICAL));
+		boolean isToChannel = this.memoryValues[20] == 2;
+		this.regToChannelSettings.setEnabled(isToChannel);
+		//regenerative channel join
+		this.memoryParameters[50] = new ParameterConfigControl(this.regToChannelSettings, this.memoryValues, 50, Messages.getString(MessageIds.GDE_MSGI2657), 175, Messages.getString(MessageIds.GDE_MSGI2658), 280, //$NON-NLS-1$
+				Messages.getString(MessageIds.GDE_MSGI2658).split(", "), 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		this.memoryParameters[50].setEnabled(isToChannel);
+		//regenerative channel voltage limit
+		this.memoryParameters[51] = new ParameterConfigControl(this.regToChannelSettings, this.memoryValues, 51, "%.1f", Messages.getString(MessageIds.GDE_MSGI2659), 175, 
+				String.format("%.1fV - %.1fV", this.device.getRegChannelVoltageLimits()[0]/1000., this.device.getRegChannelVoltageLimits()[1]/1000.), 280, //$NON-NLS-1$
+				true, 50, 200, this.device.getRegChannelVoltageLimits()[0]/100, this.device.getRegChannelVoltageLimits()[1]/100, 0, false);
+		this.memoryParameters[51].setEnabled(isToChannel);
+		//regenerative channel current limit
+		this.memoryParameters[52] = new ParameterConfigControl(this.regToChannelSettings, this.memoryValues, 52, "%.2f", Messages.getString(MessageIds.GDE_MSGI2660), 175,
+				String.format("%.2fA - %.2fA", this.device.getRegChannelCurrentLimits()[0]/100., this.device.getRegChannelCurrentLimits()[1]/100.), 280, //$NON-NLS-1$
+				true, 50, 200, this.device.getRegChannelCurrentLimits()[0], this.device.getRegChannelCurrentLimits()[1], 0, false);
+		this.memoryParameters[52].setEnabled(isToChannel);
+		this.regToChannelSettings.addListener(SWT.Selection, this.memoryParameterChangeListener);
 	}
 
 	private void createStorageTabItem() {
@@ -2594,8 +2675,9 @@ public class ChargerDialog extends DeviceDialog {
 		this.memoryParameters[37] = new ParameterConfigControl(this.storageComposite, this.memoryValues, 37, GDE.STRING_EMPTY, Messages.getString(MessageIds.GDE_MSGT2697), 175, "0mV - 200mV", 280, //$NON-NLS-1$
 				true, 50, 200, 0, 200, 0, false);
 		//storage acceleration
-		this.memoryParameters[38] = new ParameterConfigControl(this.storageComposite, this.memoryValues, 38, Messages.getString(MessageIds.GDE_MSGT2698), 175, "off, on", 280, //$NON-NLS-1$
-				new String[] { "off", "on" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		this.memoryParameters[38] = new ParameterConfigControl(this.storageComposite, this.memoryValues, 38, Messages.getString(MessageIds.GDE_MSGT2698), 175, 
+				Messages.getString(MessageIds.GDE_MSGT2648), 280, //$NON-NLS-1$
+				new String[] { Messages.getString(MessageIds.GDE_MSGT2649), Messages.getString(MessageIds.GDE_MSGT2650) }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
 		this.storageComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
 	}
 
@@ -2659,19 +2741,15 @@ public class ChargerDialog extends DeviceDialog {
 		this.optionComposite = new Composite(this.tabFolderProgrMem, SWT.NONE);
 		this.tbtmOption.setControl(this.optionComposite);
 		this.optionComposite.setLayout(new RowLayout(SWT.VERTICAL));
-		//channel mode asynchronous | synchronous DUO only
-		this.memoryParameters[47] = new ParameterConfigControl(this.optionComposite, this.memoryValues, 47, "Channel mode", 175, //$NON-NLS-1$
-				"asynchronous, synchronous", 280, //$NON-NLS-1$
-				new String[] { "async", "sync" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
 		//log interval
 		this.memoryParameters[48] = new ParameterConfigControl(this.optionComposite, this.memoryValues, 48, "%3.1f", //$NON-NLS-1$
-				"Log interval", 175, //$NON-NLS-1$
+				Messages.getString(MessageIds.GDE_MSGI2650), 175, //$NON-NLS-1$
 				"0.5 - 60.0 Sec", 280, //$NON-NLS-1$
 				true, 50, 200, 5, 600, -5, false);
-		//power option auto start
-		this.memoryParameters[49] = new ParameterConfigControl(this.optionComposite, this.memoryValues, 49, "Save log to SD", 175, //$NON-NLS-1$
-				"off, on", 280, //$NON-NLS-1$
-				new String[] { "off", "on" }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
+		//power option auto start 
+		this.memoryParameters[49] = new ParameterConfigControl(this.optionComposite, this.memoryValues, 49, Messages.getString(MessageIds.GDE_MSGI2651), 175, //$NON-NLS-1$
+				 Messages.getString(MessageIds.GDE_MSGT2648), 280, //$NON-NLS-1$
+				 new String[] { Messages.getString(MessageIds.GDE_MSGT2649), Messages.getString(MessageIds.GDE_MSGT2650) }, 50, 200); //$NON-NLS-1$ //$NON-NLS-2$
 		this.optionComposite.layout();
 		this.optionComposite.addListener(SWT.Selection, this.memoryParameterChangeListener);
 	}
@@ -2715,19 +2793,19 @@ public class ChargerDialog extends DeviceDialog {
 			if (this.isDuo) {
 				switch (this.memoryValues[0]) { //battery type LiPo,LiLo,LiFe,NiMH,Nicd,Pb,NiZn,LiHV
 				case 0: //LiPo
-					this.memoryParameters[7].updateValueRange("3.850 - 4.200 V", 3850, 4200, -3850); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("4.2V (3.850 - 4.350V)", 3850, 4350, 4200, -3850); //$NON-NLS-1$
 					break;
 				case 1: //LiIo
-					this.memoryParameters[7].updateValueRange("3.750 - 4.100 V", 3750, 4100, -3750); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("4.1V (3.750 - 4.350V)", 3750, 4350, 4100, -3750); //$NON-NLS-1$
 					break;
 				case 2: //LiFe
-					this.memoryParameters[7].updateValueRange("3.300 - 3.600 V", 3300, 3600, -3300); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("3.3V (3.300 - 3.800 V", 3300, 3800, 3600, -3300); //$NON-NLS-1$
 					break;
 				case 6: //NiZn
-					this.memoryParameters[7].updateValueRange("1.200 - 2.000 V", 1200, 2000, -1200); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("1.9V (1.200 - 2.100 V", 1200, 2100, 2000, -1200); //$NON-NLS-1$
 					break;
 				case 7: //LiHV
-					this.memoryParameters[7].updateValueRange("3.900 - 4.350 V", 3900, 4350, -3900); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("4.35V (3.900 - 4.400V)", 3900, 4400, 4350, -3900); //$NON-NLS-1$
 					break;
 				case 3: //NiMH
 				case 4: //NiCd
@@ -2755,22 +2833,22 @@ public class ChargerDialog extends DeviceDialog {
 			else {
 				switch (this.memoryValues[0]) { //battery type LiPo,LiLo,LiFe,LiHV,LTO, NiMH,Nicd,NiZn,Pb
 				case 0: //LiPo
-					this.memoryParameters[7].updateValueRange("3.850 - 4.200 V", 3850, 4200, -3850); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("4.2V (3.850 - 4.350V)", 3850, 4350, 4200, -3850); //$NON-NLS-1$
 					break;
 				case 1: //LiIo
-					this.memoryParameters[7].updateValueRange("3.750 - 4.100 V", 3750, 4100, -3750); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("4.1V (3.750 - 4.350V)", 3750, 4350, 4100, -3750); //$NON-NLS-1$
 					break;
 				case 2: //LiFe
-					this.memoryParameters[7].updateValueRange("3.300 - 3.600 V", 3300, 3600, -3300); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("3.3V (3.300 - 3.800 V", 3300, 3800, 3600, -3300); //$NON-NLS-1$
 					break;
 				case 3: //LiHV
-					this.memoryParameters[7].updateValueRange("3.900 - 4.350 V", 3900, 4350, -3900); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("4.35V (3.900 - 4.400V)", 3900, 4400, 4350, -3900); //$NON-NLS-1$
 					break;
 				case 4: //LTO
-					this.memoryParameters[7].updateValueRange("2.400 - 3.100 V", 2400, 3100, -2400); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("2.85V (2.400 - 3.100 V", 2400, 3100, 2850, -2400); //$NON-NLS-1$
 					break;
 				case 7: //NiZn
-					this.memoryParameters[7].updateValueRange("1.200 - 2.000 V", 1200, 2000, -1200); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("1.9V (1.200 - 2.100 V", 1200, 2100, 2000, -1200); //$NON-NLS-1$
 					break;
 				case 5: //NiMH
 				case 6: //NiCd
@@ -2808,39 +2886,39 @@ public class ChargerDialog extends DeviceDialog {
 			if (this.isDuo) {
 				switch (this.memoryValues[0]) { //LiPo,LiLo,LiFe,NiMH,Nicd,Pb
 				case 0: //LiPo
-					this.memoryParameters[18].updateValueRange("3.000 - 4.100 V", 3000, 4100, -3000); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("3.5V (3.000 - 4.100V)", 3000, 4100, -3000); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
 				case 1: //LiIo
-					this.memoryParameters[18].updateValueRange("2.500 - 4.000 V", 2500, 4000, -2500); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("3.5V (2.500 - 4.000V)", 2500, 4000, -2500); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
 				case 2: //LiFe
-					this.memoryParameters[18].updateValueRange("2.000 - 3.500 V", 2000, 3500, -2000); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("2.5V (2.000 - 3.500V)", 2000, 3500, -2000); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
 				case 3: //NiMH
 				case 4: //NiCd
 					this.memoryParameters[18].updateNameLabel(Messages.getString(MessageIds.GDE_MSGT2619));
-					this.memoryParameters[18].updateValueRange("0.100 - 35.000 V", 100, 35000, -100); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("0.100 - 35.000V", 100, 35000, -100); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(false);
 					this.memoryParameters[22].setEnabled(false);
 					break;
 				case 5: //Pb
-					this.memoryParameters[18].updateValueRange("1.500 - 2.400 V", 1500, 2400, -1500); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("1.8V (1.500 - 2.400V)", 1500, 2400, -1500); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(false);
 					this.memoryParameters[22].setEnabled(false);
 					break;
 				case 6: //NiZn
-					this.memoryParameters[18].updateValueRange("0.900 - 1.600 V", 900, 1600, -900); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("1.1V (0.900 - 1.600V)", 900, 1600, -900); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
 				case 7: //LiHV
-					this.memoryParameters[18].updateValueRange("3.000 - 4.250 V", 3000, 4250, -3000); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("3.6V (3.000 - 4.250V)", 3000, 4250, -3000); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
@@ -2851,27 +2929,27 @@ public class ChargerDialog extends DeviceDialog {
 			else {
 				switch (this.memoryValues[0]) { //LiPo,LiLo,LiFe,NiMH,Nicd,Pb
 				case 0: //LiPo
-					this.memoryParameters[18].updateValueRange("3.000 - 4.100 V", 3000, 4100, -3000); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("3.5V (3.000 - 4.100V)", 3000, 4100, -3000); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
 				case 1: //LiIo
-					this.memoryParameters[18].updateValueRange("2.500 - 4.000 V", 2500, 4000, -2500); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("3.5V (2.500 - 4.000V)", 2500, 4000, -2500); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
 				case 2: //LiFe
-					this.memoryParameters[18].updateValueRange("2.000 - 3.500 V", 2000, 3500, -2000); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("2.5V (2.000 - 3.500V)", 2000, 3500, -2000); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
 				case 3: //LiHV
-					this.memoryParameters[18].updateValueRange("3.000 - 4.250 V", 3000, 4250, -3000); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("3.6V (3.000 - 4.250V)", 3000, 4250, -3000); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
 				case 4: //LTO
-					this.memoryParameters[18].updateValueRange("1.500 - 2.900 V", 1500, 2900, -1500); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("1.8V (1.500 - 2.900V)", 1500, 2900, -1500); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
@@ -2883,12 +2961,12 @@ public class ChargerDialog extends DeviceDialog {
 					this.memoryParameters[22].setEnabled(false);
 					break;
 				case 7: //NiZn
-					this.memoryParameters[18].updateValueRange("0.900 - 1.600 V", 900, 1600, -900); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("1.1V (0.900 - 1.600V)", 900, 1600, -900); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(true);
 					this.memoryParameters[22].setEnabled(true);
 					break;
 				case 8: //Pb
-					this.memoryParameters[18].updateValueRange("1.500 - 2.400 V", 1500, 2400, -1500); //$NON-NLS-1$
+					this.memoryParameters[18].updateValueRange("1.8V (1.500 - 2.400V)", 1500, 2400, -1500); //$NON-NLS-1$
 					this.memoryParameters[21].setEnabled(false);
 					this.memoryParameters[22].setEnabled(false);
 					break;
@@ -3006,16 +3084,16 @@ public class ChargerDialog extends DeviceDialog {
 					}
 					switch (this.memoryValues[0]) { //LiPo,LiLo,LiFe
 					case 0: //LiPo
-						this.memoryParameters[36].updateValueRange("3.700 - 3.900 V", 3700, 3900, -3700); //$NON-NLS-1$
+						this.memoryParameters[36].updateValueRange("3.85V (3.700 - 3.900V)", 3700, 3900, -3700); //$NON-NLS-1$
 						break;
 					case 1: //LiIo
-						this.memoryParameters[36].updateValueRange("3.600 - 3.800 V", 3600, 3800, -3600); //$NON-NLS-1$
+						this.memoryParameters[36].updateValueRange("3.75V (3.600 - 3.800V)", 3600, 3800, -3600); //$NON-NLS-1$
 						break;
 					case 2: //LiFe
-						this.memoryParameters[36].updateValueRange("3.100 - 3.400 V", 3100, 3400, -3100); //$NON-NLS-1$
+						this.memoryParameters[36].updateValueRange("3.3V (3.100 - 3.400V)", 3100, 3400, -3100); //$NON-NLS-1$
 						break;
 					case 7: //LiHV
-						this.memoryParameters[36].updateValueRange("3.750 - 4.100 V", 3750, 4100, -3750); //$NON-NLS-1$
+						this.memoryParameters[36].updateValueRange("3.9V (3.750 - 4.100V)", 3750, 4100, -3750); //$NON-NLS-1$
 						break;
 					default:
 						break;
@@ -3047,19 +3125,19 @@ public class ChargerDialog extends DeviceDialog {
 					}
 					switch (this.memoryValues[0]) { //LiPo,LiLo,LiFe
 					case 0: //LiPo
-						this.memoryParameters[36].updateValueRange("3.700 - 3.900 V", 3700, 3900, -3700); //$NON-NLS-1$
+						this.memoryParameters[36].updateValueRange("3.85V (3.700 - 3.900V)", 3700, 3900, -3700); //$NON-NLS-1$
 						break;
 					case 1: //LiIo
-						this.memoryParameters[36].updateValueRange("3.600 - 3.800 V", 3600, 3800, -3600); //$NON-NLS-1$
+						this.memoryParameters[36].updateValueRange("3.75V (3.600 - 3.800V)", 3600, 3800, -3600); //$NON-NLS-1$
 						break;
 					case 2: //LiFe
-						this.memoryParameters[36].updateValueRange("3.100 - 3.400 V", 3100, 3400, -3100); //$NON-NLS-1$
+						this.memoryParameters[36].updateValueRange("3.3V (3.100 - 3.400V)", 3100, 3400, -3100); //$NON-NLS-1$
 						break;
 					case 3: //LiHV
-						this.memoryParameters[36].updateValueRange("3.750 - 4.100 V", 3750, 4100, -3750); //$NON-NLS-1$
+						this.memoryParameters[36].updateValueRange("3.9V (3.750 - 4.100V)", 3750, 4100, -3750); //$NON-NLS-1$
 						break;
 					case 4: //LTO
-						this.memoryParameters[36].updateValueRange("2.200 - 2.600 V", 2200, 2600, -2200); //$NON-NLS-1$
+						this.memoryParameters[36].updateValueRange("2.5V (2.200 - 2.600V)", 2200, 2600, -2200); //$NON-NLS-1$
 						break;
 					default:
 						break;
@@ -3080,10 +3158,38 @@ public class ChargerDialog extends DeviceDialog {
 					break;
 				}
 			}
-			if (isDuo) //47 channel mode asynchronous | synchronous DUO only
+			if (isDuo || isDx) {//47 channel mode asynchronous | synchronous DUO only
 				this.memoryParameters[47].setEnabled(true);
-			else
-				this.memoryParameters[47].setEnabled(false);
+				if (this.regToInputWarningLable != null) {
+					boolean isToInput = this.memoryValues[20] == 1;
+					this.regToInputWarningLable.setEnabled(isToInput);
+					this.regToInputWarningLable.setForeground(isToInput ? SWTResourceManager.getColor(SWT.COLOR_RED) : SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+				}
+				if (this.regToChannelSettings != null) {
+					boolean isToChannel = this.memoryValues[20] == 2;
+					this.regToChannelSettings.setEnabled(isToChannel);
+					this.memoryParameters[50].setEnabled(isToChannel);
+					boolean isResOrBulb = this.memoryValues[50] == 0;
+					this.memoryParameters[51].setEnabled(isToChannel && isResOrBulb);
+					this.memoryParameters[52].setEnabled(isToChannel && isResOrBulb);
+				}
+			}
+			else {
+				if (this.memoryParameters[47] != null)
+					this.memoryParameters[47].setEnabled(false);
+				if (this.regToInputWarningLable != null) {
+					boolean isToInput = this.memoryValues[20] == 1;
+					this.regToInputWarningLable.setEnabled(isToInput);
+					this.regToInputWarningLable.setForeground(isToInput ? SWTResourceManager.getColor(SWT.COLOR_RED) : SWTResourceManager.getColor(SWT.COLOR_WIDGET_BACKGROUND));
+				}
+				if (this.regToChannelSettings != null) {
+					boolean isToChannel = false;
+					this.regToChannelSettings.setEnabled(isToChannel);
+					this.memoryParameters[50].setEnabled(isToChannel);
+					this.memoryParameters[51].setEnabled(isToChannel);
+					this.memoryParameters[52].setEnabled(isToChannel);
+				}
+			}
 		}
 		else if (!this.isDuo && this.memoryValues[0] == 9) { // X devices power type memory
 			this.memoryComposite.removeListener(SWT.Selection, this.memoryParameterChangeListener);

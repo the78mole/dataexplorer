@@ -119,4 +119,20 @@ public class iCharger4010DUO extends iChargerUsb {
 	public int[] getDischargePowerMax() {
 		return new int[] {130, 130};
 	}
+	
+	/**
+	 * @return the min/max regenerative channel voltage, factor 1000
+	 */
+	@Override
+	public int[] getRegChannelVoltageLimits() {
+		return new int[] {100, 40000};
+	}
+
+	/**
+	 * @return the min/max regenerative channel current, factor 100
+	 */
+	@Override
+	public int[] getRegChannelCurrentLimits() {
+		return new int[] {5, 4000};
+	}
 }
