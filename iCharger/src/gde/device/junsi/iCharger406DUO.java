@@ -125,7 +125,7 @@ public class iCharger406DUO extends iChargerUsb {
 	 */
 	@Override
 	public int[] getRegChannelVoltageLimits() {
-		return new int[] {100, 27000};
+		return new int[] {200, 27000};
 	}
 
 	/**
