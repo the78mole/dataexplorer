@@ -148,6 +148,9 @@ public class LogViewReader {
 		deviceMap.put("openformat\\av4ms_fv_762", "AV4ms_FV_762"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("openformat\\usb-wde1", "USB-WDE1"); //$NON-NLS-1$ //$NON-NLS-2$
 		deviceMap.put("elv usb-wde1", "USB-WDE1"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("schulze next 10.36 car", "next 10.36-8"); //$NON-NLS-1$ //$NON-NLS-2$
+		deviceMap.put("schulze next 10.36", "next 10.36-8"); //$NON-NLS-1$ //$NON-NLS-2$
+		
 		// add more supported devices here, key in lower case
 	}
 

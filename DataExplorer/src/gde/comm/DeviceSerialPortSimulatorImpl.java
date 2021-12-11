@@ -337,6 +337,9 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 	 */
 	public byte[] read(byte[] readBuffer, int timeout_msec, int stableIndex) throws IOException, TimeOutException {
 		byte[] resultBuffer = new byte[0];
+		byte leader = (byte) this.device.getDataBlockLeader().charAt(0);
+		byte[] lineEnding = this.device.getDataBlockEnding();
+		boolean isNextGen = this.device.getName().startsWith("next");
 		try {
 			waitForStableReceiveBuffer(readBuffer.length, timeout_msec, 100);
 		}
@@ -349,12 +352,25 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				byte tmpByte, lastByte = 0x00;
 				try {
 					boolean isOF = false;
-					while ((tmpByte = data_in.readByte()) != 0xff) {
-						if (!isOF)isOF = tmpByte == '$'; 
-						tmpVector.add(tmpByte);
-						if (isOF && tmpByte == 0x0A && lastByte == 0x0D) 
-							break;
-						lastByte = tmpByte;
+					
+					if (isNextGen) {
+						while ((tmpByte = data_in.readByte()) != 0xff) {
+							if (!isOF) {
+								isOF = tmpByte == ':' && (lastByte == '1' || lastByte == '2'); 
+							}
+							tmpVector.add(tmpByte);
+							if (isOF && tmpByte == lineEnding[1] && lastByte == lineEnding[0]) 
+								break;
+							lastByte = tmpByte;
+						}						
+					} else {
+						while ((tmpByte = data_in.readByte()) != 0xff) {
+							if (!isOF)isOF = tmpByte == leader; 
+							tmpVector.add(tmpByte);
+							if (isOF && tmpByte == lineEnding[1] && lastByte == lineEnding[0]) 
+								break;
+							lastByte = tmpByte;
+						}
 					}
 					
 					int size2Read = this.device.getLovDataByteSize() - Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
@@ -363,14 +379,22 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 						//end of file reached
 						this.close();
 					}
+					else {
+						for (byte tmp : tmpBuffer)
+							tmpVector.add(tmp);
+					}
 				}
 				catch (Exception e) {
 					this.close();
 				}
 
 				if (this.device.getDataBlockLeader().length() > 0) {
-					while (tmpVector.size() > 1 && tmpVector.get(0) != this.device.getDataBlockLeader().charAt(0))
-						tmpVector.remove(0);
+					if (isNextGen)
+						while (tmpVector.size() > 2 && (tmpVector.get(0) != '1' || tmpVector.get(0) != '2') && tmpVector.get(1) != ':')
+							tmpVector.remove(0);
+					else
+						while (tmpVector.size() > 2 && tmpVector.get(0) != leader)
+							tmpVector.remove(0);
 				}
 				if (tmpVector.size() != readBuffer.length) {
 					readBuffer = new byte[tmpVector.size()];
@@ -447,7 +471,12 @@ public class DeviceSerialPortSimulatorImpl implements IDeviceCommPort {
 				}
 			}
 		}
-		return resultBuffer.length <= readBuffer.length ? readBuffer : resultBuffer;
+		else 
+			throw new IOException("Connection closed by EOF"); //$NON-NLS-1$ 
+			
+		byte[] resultData = resultBuffer.length <= readBuffer.length ? readBuffer : resultBuffer;
+		//log.log(Level.OFF, StringHelper.byte2Hex2CharString(resultData, resultData.length));
+		return resultData;
 	}
 
 	/* (non-Javadoc)

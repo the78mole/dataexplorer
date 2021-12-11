@@ -2506,9 +2506,14 @@ public class DeviceConfiguration {
 	 * @return getRecordSetStateName
 	 */
 	public String getRecordSetStateNameReplacement(final int stateNumber) {
-		return this.getStateType() != null ? this.getStateType().getProperty() != null
-				? xmlResource.getReplacement(this.getStateProperty(stateNumber).getName()) : xmlResource.getReplacement("state_data_recording")
-				: xmlResource.getReplacement("state_data_recording");
+		try {
+			return this.getStateType() != null ? this.getStateType().getProperty() != null
+					? xmlResource.getReplacement(this.getStateProperty(stateNumber).getName()) : xmlResource.getReplacement("state_data_recording")
+					: xmlResource.getReplacement("state_data_recording");
+		}
+		catch (Exception e) {
+			return xmlResource.getReplacement("state_data_recording");
+		}
 	}
 
 	/**
