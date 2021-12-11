@@ -20,6 +20,7 @@ package gde.device.wb;
 
 import gde.comm.DeviceCommPort;
 import gde.comm.IDeviceCommPort;
+import gde.config.Settings;
 import gde.device.IDevice;
 import gde.device.InputTypes;
 import gde.exception.TimeOutException;
@@ -53,6 +54,10 @@ public class CSV2SerialPort extends DeviceCommPort implements IDeviceCommPort {
 	boolean							isDataReceived	= false;
 	int									index						= 0;
 	boolean 						isEndByte_1 		= false;
+	
+	final Settings			settings;
+	final boolean				isSerialRequest;
+	final byte[]				serialRequest;
 
 	/**
 	 * constructor of default implementation
@@ -70,6 +75,9 @@ public class CSV2SerialPort extends DeviceCommPort implements IDeviceCommPort {
 		this.isDataReceived = false;
 		this.index = 0;
 		this.tmpData = new byte[0];
+		this.settings = Settings.getInstance();
+		this.isSerialRequest = this.settings.isSerialRequest();
+		this.serialRequest = this.settings.getSerialRequest();
 	}
 
 	/**
@@ -82,6 +90,9 @@ public class CSV2SerialPort extends DeviceCommPort implements IDeviceCommPort {
 		int startIndex;
 
 		try {
+			if (this.settings.isSerialRequest())
+				this.write(this.serialRequest); 
+			
 			//receive data while needed
 			readNewData();
 

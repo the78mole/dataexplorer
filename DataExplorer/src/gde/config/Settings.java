@@ -232,6 +232,8 @@ public final class Settings extends Properties {
 	public final static String			UTILS_LOG_LEVEL									= "utils_log_level";																																							//$NON-NLS-1$
 	public final static String			FILE_IO_LOG_LEVEL								= "file_IO_log_level";																																						//$NON-NLS-1$
 	public final static String			SERIAL_IO_LOG_LEVEL							= "serial_IO_log_level";																																					//$NON-NLS-1$
+	public final static String			IS_SERIAL_REQUEST								= "is_serial_request";																																					//$NON-NLS-1$
+	public final static String			SERIAL_REQUEST									= "serial_request";																																					//$NON-NLS-1$
 	public final static Properties	classbasedLogger								= new Properties();
 
 	public static final String			LOCALE_IN_USE										= "locale_in_use";																																								//$NON-NLS-1$
@@ -798,6 +800,8 @@ public final class Settings extends Properties {
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.UTILS_LOG_LEVEL, getLogLevel(Settings.UTILS_LOG_LEVEL))); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.FILE_IO_LOG_LEVEL, getLogLevel(Settings.FILE_IO_LOG_LEVEL))); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.SERIAL_IO_LOG_LEVEL, getLogLevel(Settings.SERIAL_IO_LOG_LEVEL))); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_SERIAL_REQUEST, isSerialRequest())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.SERIAL_REQUEST, getSerialRequestString())); //$NON-NLS-1$
 
 			writer.write(String.format("%s\n", Settings.HISTO_BLOCK)); // [Histo Settings] //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.IS_HISTO_ACTIVE, isHistoActive())); //$NON-NLS-1$
@@ -3197,5 +3201,27 @@ public final class Settings extends Properties {
 
 	public boolean isRXTXcommToBeUsed() {
 		return Boolean.valueOf(this.getProperty(Settings.IS_RXTX_COMM_TO_BE_USED, "false"));
+	}
+
+	//temporary to enable a serial request before reading CSV data, this need to be moved to XSD
+	public boolean isSerialRequest() {
+		return Boolean.valueOf(this.getProperty(Settings.IS_SERIAL_REQUEST, "false"));
+	}
+
+	public byte[] getSerialRequest() {
+		String[] requestBytes = this.getProperty(Settings.SERIAL_REQUEST, ",").split(GDE.STRING_COMMA);
+		byte[] request = new byte[requestBytes.length];
+		for (int i=0; i < request.length; ++i)
+			request[i] = Integer.valueOf(requestBytes[i].substring(2),16).byteValue();
+			
+		return request;
+	}
+	
+	public String getSerialRequestString() {
+		StringBuilder sb = new StringBuilder();
+		for (byte cmd : this.getSerialRequest())
+			sb.append(String.format("0x%x,", cmd));
+			
+		return sb.toString();
 	}
 }
