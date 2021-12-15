@@ -6,6 +6,7 @@ Generic changes/fixes
 	* correct average calculation while two triggers are defined
 	* update jSerialComm to version 2.7.0 to support MAC OS X ARM architecture
 	* update formatting GPS coordinates
+	* update XSD to enable device based request as byte hex array to be written before reading from serial port
 	
 Device specific changes/fixes
 	* Junsi iCHargerUSB - correct power calculation for continuous recorded data while loading from OSD

@@ -8,10 +8,14 @@
 
 package gde.device;
 
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -53,26 +57,31 @@ import javax.xml.bind.annotation.XmlType;
     "flowControlMode", //$NON-NLS-1$
     "isRTS", //$NON-NLS-1$
     "isDTR", //$NON-NLS-1$
-    "timeOut" //$NON-NLS-1$
+    "timeOut", //$NON-NLS-1$
+    "request" //$NON-NLS-1$
 })
 public class SerialPortType {
 
-    @XmlElement(required = true)
-    protected String port;
-    @XmlElement(required = true)
-    protected Integer baudeRate;
-    @XmlElement(required = true)
-    protected DataBitsTypes dataBits;
-    @XmlElement(required = true)
-    protected StopBitsTypes stopBits;
-    @XmlElement(required = true)
-    protected ParityTypes parity;
-    @XmlElement(required = true)
-    protected FlowControlTypes flowControlMode;
-    protected boolean isRTS;
-    protected boolean isDTR;
-    @XmlElement(name = "TimeOut") //$NON-NLS-1$
-    protected TimeOutType timeOut;
+  @XmlElement(required = true)
+  protected String port;
+  @XmlElement(required = true)
+  protected Integer baudeRate;
+  @XmlElement(required = true)
+  protected DataBitsTypes dataBits;
+  @XmlElement(required = true)
+  protected StopBitsTypes stopBits;
+  @XmlElement(required = true)
+  protected ParityTypes parity;
+  @XmlElement(required = true)
+  protected FlowControlTypes flowControlMode;
+  protected boolean isRTS;
+  protected boolean isDTR;
+  @XmlElement(name = "TimeOut") //$NON-NLS-1$
+  protected TimeOutType timeOut;
+  @XmlElement(type = String.class)
+  @XmlJavaTypeAdapter(HexBinaryAdapter.class)
+  @XmlSchemaType(name = "hexBinary") //$NON-NLS-1$
+  protected byte[] request;
 
     /**
      * Gets the value of the port property.
@@ -294,6 +303,30 @@ public class SerialPortType {
      */
     public void setTimeOut(TimeOutType value) {
         this.timeOut = value;
+    }
+
+    /**
+     * Gets the value of the request property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public byte[] getRequest() {
+        return request;
+    }
+
+    /**
+     * Sets the value of the request property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setRequest(byte[] value) {
+        this.request = ((byte[]) value);
     }
 
 }

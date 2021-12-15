@@ -775,6 +775,32 @@ public class DeviceConfiguration {
 			this.serialPort.setTimeOut(null);
 		}
 	}
+	
+	/**
+	 * @return true if there is a request byte array defined
+	 */
+	public boolean isSerialPortRequest() {
+		if (this.serialPort == null) createSerialPort();
+		return this.serialPort.getRequest() != null && this.serialPort.getRequest().length > 0;
+	}
+	
+	/**
+	 * @return byte array to write prior to read from serial port
+	 */
+	public byte[] getSerialPortRequest() {
+		if (this.serialPort == null) createSerialPort();
+		return this.serialPort.getRequest();
+	}
+	
+	/**
+	 * set a new byte arra as serial port request
+	 * @param newRequest
+	 */
+	public void setSerialPortRequest(final byte[] newRequest) {
+		this.isChangePropery = true;
+		if (this.serialPort == null) createSerialPort();
+		this.serialPort.setRequest(newRequest);
+	}
 
 	public UsbInterfaceType getUsbInterfaceType() {
 		return this.usbPort.getUsbInterface();

@@ -48,7 +48,7 @@
 			<xs:element name="isRTS" type="xs:boolean" />
 			<xs:element name="isDTR" type="xs:boolean" />
 			<xs:sequence>
-				<xs:element name="TimeOut" type="TimeOutType" minOccurs="0" />
+				<xs:element name="TimeOut" type="TimeOutType" minOccurs="0" maxOccurs="1" />
 			</xs:sequence>
 			<xs:element name="request" type="xs:hexBinary" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
