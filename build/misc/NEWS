@@ -1,50 +1,45 @@
-GNU DataExplorer - News - comes with Version 3.5.1 - 25 Oct 2021
+GNU DataExplorer - News - comes with Version 3.5.2 - 23 DEC 2021
 
 Generic changes/fixes
-	* adapt NMNEA parsing supporting GNS sentence
-	* fix trigger calculation using trigger smaller as a value
-	* enhance trigger capabilities to AND or OR trigger ranges
-	* enhance trigger referencing primary and secondary trigger -> XSD update
-	* make merge ranges merge results visible in trace log
-	* enhance filling out trigger comments
-	* enhance junit test checking record set time step errors
+	* correct statistic value formating while two triggers are defined
+	* correct average calculation while two triggers are defined
+	* update jSerialComm to version 2.7.0 to support MAC OS X ARM architecture
+	* update formatting GPS coordinates
+	* update XSD to enable device based request as byte hex array to be written before reading from serial port
 	
 Device specific changes/fixes
-	* HoTTAdapter* - display always given GPS version value, even if this does not match known measurement placements
-	* HoTTAdapter* - evaluate byte, byte, byte, short, short, short, byte for unknown GPS (version 2,3,5 - 99)
-	* HoTTAdapter* - evaluate AirSpeed provided by SM MicroVario, SM GPS-Logger3
-	* HoTTAdapter2* - fix scale synchronization reference channels from 82 to 87
-	* HoTTAdapter2* - synchronize scale GPS-Speed and AirSpeed
-	* Core-Telemetry - fix assignment of parsed data with modified name (duplication)
-	* Weatronic-Telemetry - add error handling for corrupt log files
-	* GPS-Logger3 - add HoTT speed type configuration
-	* GPS-Logger3 - calculate pressure delta TEC instead of pressure TEC
-	* GPS-Logger2/3 - take real GPS altitude from SMGPS instead of value from GNS/GGA
-	* GPS-Logger* - fix parsing RMC sentence while status V 
-	* Junsi iChargerUSB* - fix time stamp error while opening OSD with time span of > 3 days
-	* Junsi DX6/8 - add initial support
+	* Junsi iChargerUSB - correct energy calculation for continuous recorded data while loading from OSD
+	* Junsi DX* - correct input power values
+	* Junsi DX* - correct system parameter dialog according updated specification
+	* Junsi DX* - add graphics templates
+	* Junsi iChargerDuo* - add missing input source power configuration
+	* Junsi iCharger* - update help documentation related to DX devices
+	* GPS-Logger3 - calculate offset of both pressure sensors while calculating pressure ∆TEC
+	* GPS-Logger3 - calculate average pressure ∆TEC for 40 km/h and 70 km/h and average AirSpeed for pressure ∆TEC 1,0 hPa
+	* HoTTAdapter2 - update graphics template files to have voltage in blue, current in red, ...
+	* OpenTx-Telemetry - correct parsing of GPS tag with coordinates in degree with different decimals
+	* Schulze next - initial implementation (not tested with real hardware)
+	* CSV2SerialAdapter - add capability to write request each time before reading data
 	
 Generelle Änderungen/Verbesserungen
-	* NMNEA-Parsing zur Unterstützung des GNS Satzes angepasst
-	* Trigger Berechnung für Trigger kleiner als Wert korrigiert
-	* Trigger-Möglichkeiten zu UND oder ODER Verarbeitung von Triggerbereichen erweitert
-	* Trigger-Möglichkeiten zur Referenzierung von primären und sekundären Triggern erweitert -> XSD update
-	* Tigger Verarbeitungsergebnis ist nun im Trace-Log sichtbar, erfordert aber Einnarbeitung
-	* Automatisches Ausfüllen von Trigger-Kommentaren erweitert
-	* Junit-Test zur Prüfung von RecordSet Zeiteintragsfehlern erweitert
+    * Formatierung der Werte in der Statistik bei gesetzten Triggern korrigiert
+    * Mittelwertbildung bei zwei gesetzten Triggern korrigiert
+    * Update jSerialComm zu Version 2.7.0, unterstützt MAC OS X ARM Architecture
+    * GPS Koordinaten Formatierung verbessert
+    * Update XMl Schema Definition (XSD), um beim seriellen Port eine Definitio von konfigurierbaren Bytes vor dem Lesen zu ermöglichen
 
 Geräte spezifische Änderungen/Verbesserungen
-	* HoTTAdapter* - permanente Anzeige der GPS-Versionsnummer, auch, wenn diese nicht bekannt ist
-	* HoTTAdapter* - Auswertung von byte, byte, byte, short, short, short, byte für unbekannte GPS (version 2,3,5 - 99)
-	* HoTTAdapter* - Auswertung von AirSpeed bei Verwendung von SM MicroVario, SM GPS-Logger3
-	* HoTTAdapter2* - Skalen Synchronization Referenz von Kanälen korrigiert (82 nach 87)
-	* HoTTAdapter2* - synchronisiere Skalen für GPS-Geschwindigkeit und Fluggeschwindigkeit bei Verwendung des GPS-Logger3
-	* Core-Telemetry - Zuweisung von Daten bei duplizierten Messwertnamen korrigiert
-	* Weatronic-Telemetry - Fehlerbehandlung von kaputten Log-Dateien erweitert
-	* GPS-Logger3 - HoTT spezifische Einstellung der darzustellenden Geschwindigkeit eingeführt (ab FW 1.28)
-	* GPS-Logger3 - berechne die Druckdifferenz Normal-Druck zu TEK-Druck anstatt Darstellung des TEK Druckes
-	* GPS-Logger2/3 - verwende wirkliche GPS-Höhe vom SMGPS Satz anstatt vom GNS/GGA Satz (ab FW 1.28)
-	* GPS-Logger* - fehlerhafer Auswerten bei RMC Satz und Status V korrigiert 
-	* Junsi iChargerUSB* - Zeitstempel Auswertung beim Öffnen einer OSD-Datei für große Zeiträume behoben
-	* Junsi DX6/8 - initiale Unterstützung ohne tiefergehende Prüfung wegen mangelnder Verfügbarkeit
+    * Junsi iChargerUSB - Energieberechnung für kontinuierlich aufgenommenen Diagrammen korrigiert
+    * Junsi DX* - Eingangsleistungswerte korrigiert
+    * Junsi DX* - Systemparameter Einstelldialog an Spezifikation angepasst
+    * Junsi DX* - Grafik-Vorlagen hinzugefügt
+    * Junsi iChargerDuo* - fehlende Konfigurationsmöglichkeit der Eingangsleistungsparameter hinzugefügt
+    * Junsi iCharger* - Update Hilfe-Dokumentation bezüglich der DX* Geräte
+    * GPS-Logger3 - Berechnung und Berücksichtigung des Offsets zwischen den beiden Drucksensoren bei Berechnung von Druck ∆TEK
+    * GPS-Logger3 - Berechnung Mittelwerte für Druck ∆TEK bei 40 km/h und 70 km/h, dazu den Mittelwert der AirSpeed bei Druck ∆TEK 1,0 hPa
+    * HoTTAdapter2 - Update Grafik-Vorlagen für Spannungen in blau, Ströme in rot, ...
+    * OpenTx-Telemetry - GPS-Tag-Parsing an aktuellen Firmwarestand angepasst
+    * Schulze next - initiale Implementierung (ungetestet)
+    * CSV2SerialAdapter - Möglichkeit ein Byte-Folge als Anfrage vor dem dem Lesen hinzugefügt
+
 	
