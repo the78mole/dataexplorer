@@ -987,6 +987,7 @@ public class ChargerDialog extends DeviceDialog {
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);
+			this.application.openMessageDialogAsync(e.getMessage());
 		}
 		catch (RuntimeException rte) {
 			ChargerDialog.log.log(Level.SEVERE, rte.getMessage(), rte);
@@ -1020,7 +1021,7 @@ public class ChargerDialog extends DeviceDialog {
 			
 			this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
 			this.selectedProgramMemory = new ChargerMemory(memoryBuffer, this.isDuo ||this.isDx);
-			if (ChargerDialog.log.isLoggable(Level.OFF)) ChargerDialog.log.log(Level.OFF, this.selectedProgramMemory.toString(this.isDuo ||this.isDx));
+			if (ChargerDialog.log.isLoggable(Level.FINE)) ChargerDialog.log.log(Level.FINE, this.selectedProgramMemory.toString(this.isDuo ||this.isDx));
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);

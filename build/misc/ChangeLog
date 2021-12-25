@@ -1,5 +1,12 @@
 Development history / change log, please read from bottom up
 
+Version 3.5.3 - xx yyy 2022
+Generic changes/fixes
+	* 
+		
+Device specific changes/fixes
+	* Junsi iChargerUSB - add message box signaling timeout while initializing program memories for dialog
+
 Version 3.5.2 - 23 DEC 2021
 Generic changes/fixes
 	* correct statistic value formating while two triggers are defined
