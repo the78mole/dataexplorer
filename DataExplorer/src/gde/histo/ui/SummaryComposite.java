@@ -622,7 +622,7 @@ public final class SummaryComposite extends AbstractChartComposite {
 		trailRecordSet.updateSyncSummaryScale(this.chartData);
 		if (trailRecordSet.getDisplayRecords() == null || trailRecordSet.getDisplayRecords().isEmpty()) return; // concurrent activity
 
-		Density density = Density.toDensity(curveAreaBounds.width, trailRecordSet.getTimeStepSize());
+		Density density = Density.toDensity(curveAreaBounds.width, trailRecordSet.getTimeStepSize() == 0 ? 1 : trailRecordSet.getTimeStepSize());
 		int stripHeight = fixedCanvasHeight / trailRecordSet.getDisplayRecords().size();
 		log.fine(() -> "curve area bounds = " + curveAreaBounds.toString());
 

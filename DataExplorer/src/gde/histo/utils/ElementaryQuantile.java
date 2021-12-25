@@ -385,26 +385,32 @@ public class ElementaryQuantile<T extends Number & Comparable<T>> {
 	 */
 	public double getQuantile(double probabilityCutPoint) {
 		int pSize = trunk.size();
-		if (isSample) {
-			if (probabilityCutPoint >= 1. / (pSize + 1) && probabilityCutPoint < (double) pSize / (pSize + 1)) {
-				double position = (pSize + 1) * probabilityCutPoint;
-				return trunk.get((int) position - 1).doubleValue() + (position - (int) position) * (trunk.get((int) position).doubleValue() - trunk.get((int) position - 1).doubleValue());
-			} else if (probabilityCutPoint < 1. / (pSize + 1))
-				return trunk.get(0).doubleValue();
-			else
-				return trunk.get(pSize - 1).doubleValue();
-		} else {
-			if (probabilityCutPoint > 0. && probabilityCutPoint < 1.) {
-				double position = pSize * probabilityCutPoint;
-				if (position % 2 == 0)
-					return (trunk.get((int) position).doubleValue() + trunk.get((int) (position + 1)).doubleValue()) / 2.;
+		if (pSize > 0) {
+			if (isSample) {
+				if (probabilityCutPoint >= 1. / (pSize + 1) && probabilityCutPoint < (double) pSize / (pSize + 1)) {
+					double position = (pSize + 1) * probabilityCutPoint;
+					return trunk.get((int) position - 1).doubleValue() + (position - (int) position) * (trunk.get((int) position).doubleValue() - trunk.get((int) position - 1).doubleValue());
+				}
+				else if (probabilityCutPoint < 1. / (pSize + 1))
+					return trunk.get(0).doubleValue();
 				else
-					return trunk.get((int) (position)).doubleValue();
-			} else if (probabilityCutPoint == 0.)
-				return trunk.get(0).doubleValue();
-			else
-				return trunk.get(pSize - 1).doubleValue();
+					return trunk.get(pSize - 1).doubleValue();
+			}
+			else {
+				if (probabilityCutPoint > 0. && probabilityCutPoint < 1.) {
+					double position = pSize * probabilityCutPoint;
+					if (position % 2 == 0)
+						return (trunk.get((int) position).doubleValue() + trunk.get((int) (position + 1)).doubleValue()) / 2.;
+					else
+						return trunk.get((int) (position)).doubleValue();
+				}
+				else if (probabilityCutPoint == 0.)
+					return trunk.get(0).doubleValue();
+				else
+					return trunk.get(pSize - 1).doubleValue();
+			} 
 		}
+		return 1.0;
 	}
 
 	public double getQuartile0() {
