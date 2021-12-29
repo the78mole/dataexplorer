@@ -204,12 +204,14 @@ public class HoTTbinReader2 extends HoTTbinReader {
 								bufCopier.copyToVarioBuffer();
 								if (bufCopier.is4BuffersFull()) {
 									HoTTbinReader2.varBinParser.parse();
+
+									if (!isVarioDetected) {
+										HoTTAdapter2.updateVarioTypeDependent((HoTTbinReader.buf4[9] & 0xFF), device, HoTTbinReader2.recordSet);
+										isVarioDetected = true;								
+									}
+									
 									bufCopier.clearBuffers();
 									isSensorData = true;
-								}
-								if (!isVarioDetected) {
-									HoTTAdapter2.updateVarioTypeDependent((HoTTbinReader.buf4[9] & 0xFF), device, HoTTbinReader2.recordSet);
-									isVarioDetected = true;								
 								}
 							}
 							break;

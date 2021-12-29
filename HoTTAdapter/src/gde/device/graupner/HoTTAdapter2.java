@@ -2263,7 +2263,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			tmpRecordSet.get(17).setName(device.getMeasurementReplacement("acceleration") + " Z Vario");
 			tmpRecordSet.get(17).setUnit("g");
 			tmpRecordSet.get(17).createProperty(IDevice.SYNC_ORDINAL, DataTypes.INTEGER, 15); //$NON-NLS-1$
-			tmpRecordSet.get(18).setName(device.getMeasurementReplacement("air_speed"));
+			tmpRecordSet.get(18).setName(device.getMeasurementReplacement("air_speed") + " Vario");
 			tmpRecordSet.get(18).setUnit("km/h");
 			tmpRecordSet.get(18).setFactor(2.0);
 			tmpRecordSet.get(19).setName("Version Vario");

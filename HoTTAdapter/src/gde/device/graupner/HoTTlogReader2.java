@@ -180,7 +180,7 @@ public class HoTTlogReader2 extends HoTTlogReader {
 							migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber, valuesVario, valuesGPS, valuesGAM, valuesEAM, valuesESC);
 							isReceiverData = false;
 							
-							if (isVarioData && !isVarioDetected) {
+							if (!isVarioDetected) {
 								HoTTAdapter2.updateVarioTypeDependent((HoTTbinReader.buf[65] & 0xFF), device, HoTTlogReader2.recordSet);
 								isVarioDetected = true;								
 							}
@@ -191,10 +191,11 @@ public class HoTTlogReader2 extends HoTTlogReader {
 						if (isGPSData && isReceiverData) {
 							migrateAddPoints(isVarioData, isGPSData, isGeneralData, isElectricData, isMotorDriverData, channelNumber, valuesVario, valuesGPS, valuesGAM, valuesEAM, valuesESC);
 							isReceiverData = false;
-						}
-						if (isGPSData && !isGPSdetected) {
-							HoTTAdapter2.updateGpsTypeDependent((HoTTbinReader.buf[65] & 0xFF), device, HoTTlogReader2.recordSet, 0);
-							isGPSdetected = true;					
+
+							if (!isGPSdetected) {
+								HoTTAdapter2.updateGpsTypeDependent((HoTTbinReader.buf[65] & 0xFF), device, HoTTlogReader2.recordSet, 0);
+								isGPSdetected = true;					
+							}
 						}
 						break;
 					case HoTTAdapter.ANSWER_SENSOR_GENERAL_19200:
@@ -329,14 +330,10 @@ public class HoTTlogReader2 extends HoTTlogReader {
 			for (int j = 0; !isVarioData && !isGPSData && !isGeneralData && j < 3; j++) { //0=altitude 1=climb1 2=climb3
 				HoTTlogReader2.points[j+10] = valuesEAM[j+20];
 			}
-			//out 60=Voltage E, 61=Current E, 62=Capacity E, 63=Power E, 64=Balance E, 65=CellVoltage E1, 66=CellVoltage E2 .... 78=CellVoltage E14,
-			for (int k = 0; k < 19; k++) { //3=voltage 4=current 5=capacity...
-				HoTTlogReader2.points[k+60] = valuesEAM[k+1];
-			}
-			//out 79=Voltage E1, 80=Voltage E2, 81=Temperature E1, 82=Temperature E2 83=Revolution E 84=MotorTime 85=Speed 86=Event E
-			for (int k = 0; k < 8; k++) { //3=voltage 4=current 5=capacity...
-				HoTTlogReader2.points[k+79] = valuesEAM[k+23];
-			}
+            //out 60=Voltage E, 61=Current E, 62=Capacity E, 63=Power E, 64=Balance E, 65=CellVoltage E1, 66=CellVoltage E2 .... 78=CellVoltage E14,
+            System.arraycopy(valuesEAM, 1, HoTTlogReader2.points, 60, 19);
+            //out 79=Voltage E1, 80=Voltage E2, 81=Temperature E1, 82=Temperature E2 83=Revolution E 84=MotorTime 85=Speed 86=Event E
+            System.arraycopy(valuesEAM, 23, HoTTlogReader2.points, 79, 8);
 		}
 		//in 0=RF_RXSQ, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Balance, 6=CellVoltage 1, 7=CellVoltage 2 .... 11=CellVoltage 6,
 		//in 12=Revolution, 13=Altitude, 14=Climb, 15=Climb3, 16=FuelLevel, 17=Voltage 1, 18=Voltage 2, 19=Temperature 1, 20=Temperature 2
