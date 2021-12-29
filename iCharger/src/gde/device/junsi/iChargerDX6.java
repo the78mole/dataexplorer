@@ -22,8 +22,8 @@ import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBException;
 
-import gde.GDE;
 import gde.device.DeviceConfiguration;
+import gde.device.junsi.iChargerX6.BatteryTypesX;
 
 /**
  * Junsi iCharger DX6 device class
@@ -31,28 +31,6 @@ import gde.device.DeviceConfiguration;
  */
 public class iChargerDX6 extends iChargerUsb {
 
-	public enum BatteryTypesX { //is different to iChargerUSB.BatteryTypesDuo
-		BT_UNKNOWN("?"), BT_LIPO("LiPo"), BT_LIIO("LiIo"), BT_LIFE("LiFe"), BT_LIHV("LiHV"), BT_LTO("LTO"), BT_NIMH("NiMH"), BT_NICD("NiCd"), BT_NIZN("NiZn"), BT_PB("PB"), BT_POWER("Power"), BT_USER("User"), BT_UNKNOWN_("?");
-
-		private String value;
-		
-		private BatteryTypesX(String newValue) {
-			value = newValue;
-		}
-		
-		protected String getName() {
-			return value;
-		}
-		
-		public static BatteryTypesX[] VALUES = values();
-		
-		public static String[] getValues() {
-			StringBuilder sb = new StringBuilder();
-			for (BatteryTypesX bt : BatteryTypesX.values()) 
-				sb.append(bt.value).append(GDE.CHAR_CSV_SEPARATOR);
-			return sb.toString().split(GDE.STRING_CSV_SEPARATOR);
-		}
-	};
 		
 	/**
 	 * @param deviceProperties
