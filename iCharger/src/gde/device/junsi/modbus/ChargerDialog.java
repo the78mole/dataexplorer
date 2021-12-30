@@ -1017,8 +1017,8 @@ public class ChargerDialog extends DeviceDialog {
 			this.usbPort.masterWrite(Register.REG_SEL_MEM.value, (short) 1, index);
 			
 			this.usbPort.masterRead((byte) 0, ChargerDialog.REG_HOLDING_MEM_START, sizeMemory, memoryBuffer);
-			this.selectedProgramMemory = new ChargerMemory(memoryBuffer, this.isDuo ||this.isDx);
-			if (ChargerDialog.log.isLoggable(Level.FINE)) ChargerDialog.log.log(Level.FINE, this.selectedProgramMemory.toString(this.isDuo ||this.isDx));
+			this.selectedProgramMemory = new ChargerMemory(memoryBuffer, this.isDuo);
+			if (ChargerDialog.log.isLoggable(Level.FINE)) ChargerDialog.log.log(Level.FINE, this.selectedProgramMemory.toString(this.isDuo));
 		}
 		catch (IllegalStateException | TimeOutException e) {
 			ChargerDialog.log.log(Level.SEVERE, e.getMessage(), e);

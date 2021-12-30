@@ -26,6 +26,9 @@ import gde.device.junsi.MessageIds;
 import gde.device.junsi.iCharger308DUO;
 import gde.device.junsi.iCharger4010DUO;
 import gde.device.junsi.iCharger406DUO;
+import gde.device.junsi.iChargerDX6;
+import gde.device.junsi.iChargerDX8;
+import gde.device.junsi.iChargerS6;
 import gde.device.junsi.iChargerUsb.BatteryTypesDuo;
 import gde.device.junsi.iChargerX12;
 import gde.device.junsi.iChargerX6;
@@ -672,7 +675,7 @@ public class ChargerMemory {
 			this.liHVStoCellVolt = DataParser.parse2Short(memoryBuffer[168], memoryBuffer[169]); //LIHV storage cell voltage
 			this.liHVDchgCellVolt = DataParser.parse2Short(memoryBuffer[170], memoryBuffer[171]); //LIHV discharge cell voltage
 			if (isDuo) { //without LTO, User, Power		
-				this.dump = memoryBuffer[166];
+				this.dump = memoryBuffer[172];
 				return;
 			}
 			this.ltoChgCellVolt = DataParser.parse2Short(memoryBuffer[172], memoryBuffer[173]); //LTO charge cell voltage
@@ -1067,10 +1070,10 @@ public class ChargerMemory {
 		if (device instanceof iChargerX12) {
 			return (int) (20 * 2 / 1.2);
 		}
-		else if (device instanceof iChargerX8 || device instanceof iCharger308DUO) {
+		else if (device instanceof iChargerX8 || device instanceof iCharger308DUO || device instanceof iChargerDX8) {
 			return (int) (15 * 2 / 1.2);
 		}
-		else if (device instanceof iChargerX6 || device instanceof iCharger406DUO) {
+		else if (device instanceof iChargerX6 || device instanceof iChargerS6 || device instanceof iCharger406DUO || device instanceof iChargerDX6) {
 			return (int) (12 * 2 / 1.2);
 		}
 		else if (device instanceof iCharger4010DUO) {
@@ -1088,10 +1091,10 @@ public class ChargerMemory {
 		if (device instanceof iChargerX12) {
 			return 20;
 		}
-		else if (device instanceof iChargerX8 || device instanceof iCharger308DUO) {
+		else if (device instanceof iChargerX8 || device instanceof iCharger308DUO || device instanceof iChargerDX8) {
 			return 15;
 		}
-		else if (device instanceof iChargerX6 || device instanceof iCharger406DUO) {
+		else if (device instanceof iChargerX6 || device instanceof iChargerS6 || device instanceof iCharger406DUO || device instanceof iChargerDX6) {
 			return 12;
 		}
 		else if (device instanceof iCharger4010DUO) {

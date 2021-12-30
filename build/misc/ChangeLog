@@ -9,6 +9,7 @@ Generic changes/fixes
 Device specific changes/fixes
 	* Junsi iChargerUSB - add message box signaling timeout while initializing program memories for dialog
 	* Junsi iChargerDX6,S6 - cleanup duplicated BatteryTypesX definition
+	* Junsi iChargerDX* - fix partially wrong program memory, PB, Ni* max cells
 	* HoTTAdapter*2 - cleanup possible clash AirSpeed Vario, sync update variable Vario/GPS dependencies
 
 Version 3.5.2 - 23 DEC 2021
