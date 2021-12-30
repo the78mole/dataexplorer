@@ -116,9 +116,9 @@ public class UsbGathererThread extends Thread {
 				this.device.getDialog().startLogTransmission();
 				this.chargerInfo = this.device.getDialog().readInfo();
 				if (this.chargerInfo != null)
-					log.log(Level.OFF, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + this.chargerInfo.getSystemInfo(this.device.getName().toLowerCase().endsWith("duo") ? true : false));
+					log.log(Level.INFO, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + this.chargerInfo.getSystemInfo(this.device.getName().toLowerCase().endsWith("duo") ? true : false));
 				else 
-					log.log(Level.OFF, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + "failed to initialize chargerInfo");
+					log.log(Level.WARNING, this.device.getName() + GDE.STRING_MESSAGE_CONCAT + "failed to initialize chargerInfo");
 			}
 		}
 		catch (Exception e) {

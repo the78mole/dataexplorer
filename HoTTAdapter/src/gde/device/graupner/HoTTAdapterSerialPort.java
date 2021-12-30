@@ -266,7 +266,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 
 //			if (answer.length == 51) {
 //				//HoTTAdapterSerialPort.log.logp(Level.FINER, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2FourDigitsIntegerString(data));
-//				HoTTAdapterSerialPort.log.logp(Level.OFF, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answer, answer.length));
+//				HoTTAdapterSerialPort.log.logp(Level.INFO, HoTTAdapterSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.byte2Hex2CharString(answer, answer.length));
 //			}
 
 			if (!this.isInterruptedByUser && (answer[0] != 0x00 || answer[4] != 0x00 || answer[5] != 0x04 || answer[6] != 0x01 || (answer[answer.length - 3] < 0 && answer[answer.length - 3] > 100))) {
@@ -1124,7 +1124,7 @@ public class HoTTAdapterSerialPort extends DeviceCommPort {
 				}
 			}
 			parent.updateSdFolder(this.querySdCardSizes(0));
-			HoTTbinReader.log.log(Level.OFF, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
+			HoTTbinReader.log.log(Level.INFO, "read time = " + StringHelper.getFormatedTime("mm:ss:SSS", (System.nanoTime() / 1000000 - startTime))); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		finally {
 			if (data_in != null) data_in.close();

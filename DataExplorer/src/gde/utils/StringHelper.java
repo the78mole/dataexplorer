@@ -437,7 +437,7 @@ public class StringHelper {
 			break;
 		default:
 		}
-		log.log(Level.OFF, "keyCode = SWT." + keyCode);
+		log.log(Level.INFO, "keyCode = SWT." + keyCode);
 	}
 
 	/**

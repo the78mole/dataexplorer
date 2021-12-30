@@ -633,7 +633,7 @@ public class HoTTbinReader {
 				HoTTbinReader.setAltitudeClimbPickeParameter(pickerParameters, detectedSensors);
 			}
 		}
-		log.log(Level.OFF, String.format("pickerParameters.altitudeClimbSensorSelection = %s", Sensor.fromOrdinal(pickerParameters.altitudeClimbSensorSelection).name()));
+		log.log(Level.INFO, String.format("pickerParameters.altitudeClimbSensorSelection = %s", Sensor.fromOrdinal(pickerParameters.altitudeClimbSensorSelection).name()));
 	}
 
 	/**
@@ -790,7 +790,7 @@ public class HoTTbinReader {
 							bufCopier.copyToBuffer();
 						}
 						timeSteps_ms[BinParser.TIMESTEP_INDEX] += 10;// add default time step from device of 10 msec
-						// log.log(Level.OFF, "sensor type ID = " + StringHelper.byte2Hex2CharString(new byte[] {(byte) (HoTTbinReader.buf[7] & 0xFF)}, 1));
+						// log.log(Level.INFO, "sensor type ID = " + StringHelper.byte2Hex2CharString(new byte[] {(byte) (HoTTbinReader.buf[7] & 0xFF)}, 1));
 						if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4) { // expected data block number
 							switch ((byte) (HoTTbinReader.buf[7] & 0xFF)) {
 							case HoTTAdapter.SENSOR_TYPE_VARIO_115200:

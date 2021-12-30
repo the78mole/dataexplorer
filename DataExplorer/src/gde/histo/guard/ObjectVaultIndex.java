@@ -488,7 +488,7 @@ public final class ObjectVaultIndex {
 	 */
 	public ObjectVaultIndex(DataAccess dataAccess, Settings settings) {
 		this.objectVaultMap = new ObjectVaultMap(dataAccess, settings);
-		log.log(Level.OFF, "vault key index loaded");
+		log.log(Level.INFO, "vault key index loaded");
 	}
 
 	/**
@@ -496,7 +496,7 @@ public final class ObjectVaultIndex {
 	 */
 	public ObjectVaultIndex(String[] objectKeys, DataAccess dataAccess, Settings settings) {
 		this.objectVaultMap = new ObjectVaultMap(objectKeys, dataAccess, settings);
-		log.log(Level.OFF, "vault key index loaded for", objectKeys);
+		log.log(Level.INFO, "vault key index loaded for", objectKeys);
 	}
 
 	/**
@@ -566,7 +566,7 @@ public final class ObjectVaultIndex {
 			if (result.get(key) == null) result.put(key, new ArrayList<>());
 			result.get(key).add(new VaultKeyPair(idx.vaultDirectory, idx.vaultName));
 		}
-		log.log(Level.OFF, "Size   ", result.size());
+		log.log(Level.INFO, "Size   ", result.size());
 		return result;
 	}
 

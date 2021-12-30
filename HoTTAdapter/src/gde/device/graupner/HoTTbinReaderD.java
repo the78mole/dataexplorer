@@ -802,7 +802,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 		default:
 			break;
 		}
-		//log.log(Level.OFF, String.format("pickerParameters.altitudeClimbSensorSelection = %s", pickerParameters.altitudeClimbSensorSelection)));
+		//log.log(Level.INFO, String.format("pickerParameters.altitudeClimbSensorSelection = %s", pickerParameters.altitudeClimbSensorSelection)));
 		
 		HoTTbinReaderD.recordSet.addPoints(HoTTbinReaderD.points, HoTTbinReader.timeStep_ms);
 		HoTTbinReaderD.isJustMigrated = true;
@@ -953,7 +953,7 @@ public class HoTTbinReaderD extends HoTTbinReader {
 				}
 				break;
 			}
-			//log.log(Level.OFF, StringHelper.byte2Hex2CharString(_buf3, _buf3.length));
+			//log.log(Level.INFO, StringHelper.byte2Hex2CharString(_buf3, _buf3.length));
 			HoTTbinReader.pointsGPS[20] = (_buf3[5] & 0xFF) * 1000; //20=HomeDirection
 			//21=Roll 22=Pitch 23=Yaw
 			HoTTbinReader.pointsGPS[21] = _buf3[6] * 1000;

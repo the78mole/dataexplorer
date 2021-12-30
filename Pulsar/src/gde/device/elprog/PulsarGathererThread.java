@@ -111,7 +111,7 @@ public class PulsarGathererThread extends Thread {
 			try {
 				// get data from device
 				tmpBuffer = this.serialPort.getData();
-				log.log(Level.OFF, startByte + " " + new String(tmpBuffer));
+				log.log(Level.INFO, startByte + " " + new String(tmpBuffer));
 				
 				if (tmpBuffer.length <= maxBufferSize) {
 					//find line of Ri starting with ! only while more than 160 bytes received
@@ -120,7 +120,7 @@ public class PulsarGathererThread extends Thread {
 						++index;
 					if (index > 159 && tmpBuffer[index] == startByteRi && (tmpBuffer.length - index) == 66) { //! line with Ri values exist
 						System.arraycopy(tmpBuffer, index, dataBufferRi, 0, dataBufferRi.length);
-						log.log(Level.OFF, startByteRi + " " + new String(dataBufferRi));
+						log.log(Level.INFO, startByteRi + " " + new String(dataBufferRi));
 					} 
 				}
 				System.arraycopy(tmpBuffer, 0, dataBuffer, 0, dataBuffer.length);
@@ -245,7 +245,7 @@ public class PulsarGathererThread extends Thread {
 			lastCycleTime += 5000;
 			long delay = lastCycleTime - (System.nanoTime()/1000000);
 			if (delay > 0 ) WaitTimer.delay(delay);
-			if (log.isLoggable(Level.OFF)) log.log(Level.OFF, String.format("delay = %d", delay)); //$NON-NLS-1$
+			if (log.isLoggable(Level.INFO)) log.log(Level.INFO, String.format("delay = %d", delay)); //$NON-NLS-1$
 		}
 		this.application.setStatusMessage(GDE.STRING_EMPTY);
 		if (log.isLoggable(Level.FINE)) log.logp(Level.FINE, PulsarGathererThread.$CLASS_NAME, $METHOD_NAME, "======> exit"); //$NON-NLS-1$
@@ -271,11 +271,11 @@ public class PulsarGathererThread extends Thread {
 		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
 		}
-		log.log(Level.OFF, $METHOD_NAME+" - this.isCollectDataStopped=" + this.isCollectDataStopped);
-		log.log(Level.OFF, $METHOD_NAME+" - this.serialPortisConnected=" + this.serialPort.isConnected());
+		log.log(Level.INFO, $METHOD_NAME+" - this.isCollectDataStopped=" + this.isCollectDataStopped);
+		log.log(Level.INFO, $METHOD_NAME+" - this.serialPortisConnected=" + this.serialPort.isConnected());
 
 		RecordSet recordSet = this.channel.get(this.recordSetKey);
-		log.log(Level.OFF, $METHOD_NAME+" - " + (recordSet != null && recordSet.getRecordDataSize(true) > 5));
+		log.log(Level.INFO, $METHOD_NAME+" - " + (recordSet != null && recordSet.getRecordDataSize(true) > 5));
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
 			if (enableEndMessage) this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT3907));

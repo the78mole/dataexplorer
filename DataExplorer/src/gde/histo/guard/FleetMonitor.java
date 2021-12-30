@@ -108,7 +108,7 @@ public final class FleetMonitor {
 				oS.minReminders[0] = ReminderType.min(oS.minReminders[0], oS.minReminders[0]);
 				oS.maxReminders[1] = ReminderType.max(oS.maxReminders[1], oS.maxReminders[1]);
 			}
-			log.log(Level.OFF, "objectSummary", oS);
+			log.log(Level.INFO, "objectSummary", oS);
 			return oS;
 		}
 
@@ -259,7 +259,7 @@ public final class FleetMonitor {
 				channelVaults.get(logChannelNumber).add(vault);
 			}
 		}
-		log.log(Level.OFF, String.format("valid vaults size=%,7d in %d channels", //
+		log.log(Level.INFO, String.format("valid vaults size=%,7d in %d channels", //
 				channelVaults.values().stream().mapToInt(Collection::size).sum(), channelVaults.size()));
 		return channelVaults;
 	}

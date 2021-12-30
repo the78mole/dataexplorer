@@ -280,7 +280,7 @@ public class MC3000GathererThread extends Thread {
 							//check for all processing finished and stop gathering after 15 min
 							if (this.device.isProcessingStatusStandByOrFinished(dataBuffer1) && this.device.isProcessingStatusStandByOrFinished(dataBuffer2) && this.device.isProcessingStatusStandByOrFinished(dataBuffer3) && this.device.isProcessingStatusStandByOrFinished(dataBuffer4)) {
 								if (0 >= (retryCounterEnd_sec -= 4)) {
-									log.log(Level.OFF, "finish device activation timeout"); //$NON-NLS-1$
+									log.log(Level.INFO, "finish device activation timeout"); //$NON-NLS-1$
 									this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3601));
 									stopDataGatheringThread(false, null);
 								}
@@ -295,7 +295,7 @@ public class MC3000GathererThread extends Thread {
 							log.logp(Level.FINE, MC3000GathererThread.$CLASS_NAME, $METHOD_NAME, "wait for device activation ..."); //$NON-NLS-1$
 
 							if (0 >= (retryCounterRest_sec -= 1)) {
-								log.log(Level.OFF, "device activation timeout"); //$NON-NLS-1$
+								log.log(Level.INFO, "device activation timeout"); //$NON-NLS-1$
 								this.application.openMessageDialogAsync(Messages.getString(MessageIds.GDE_MSGI3601));
 								stopDataGatheringThread(false, null);
 							}

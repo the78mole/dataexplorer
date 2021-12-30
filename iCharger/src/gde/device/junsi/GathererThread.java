@@ -252,11 +252,11 @@ public class GathererThread extends Thread {
 		if (this.serialPort != null && this.serialPort.isConnected() && this.isPortOpenedByLiveGatherer == true && this.serialPort.isConnected()) {
 			this.serialPort.close();
 		}
-		log.log(Level.OFF, $METHOD_NAME+" - this.isCollectDataStopped=" + this.isCollectDataStopped);
-		log.log(Level.OFF, $METHOD_NAME+" - this.serialPortisConnected=" + this.serialPort.isConnected());
+		log.log(Level.INFO, $METHOD_NAME+" - this.isCollectDataStopped=" + this.isCollectDataStopped);
+		log.log(Level.INFO, $METHOD_NAME+" - this.serialPortisConnected=" + this.serialPort.isConnected());
 
 		RecordSet recordSet = this.channel.get(this.recordSetKey);
-		log.log(Level.OFF, $METHOD_NAME+" - " + (recordSet != null && recordSet.getRecordDataSize(true) > 5));
+		log.log(Level.INFO, $METHOD_NAME+" - " + (recordSet != null && recordSet.getRecordDataSize(true) > 5));
 		if (recordSet != null && recordSet.getRecordDataSize(true) > 5) { // some other exception while program execution, record set has data points
 			finalizeRecordSet(false);
 			if (enableEndMessage) this.application.openMessageDialog(Messages.getString(MessageIds.GDE_MSGT2609));

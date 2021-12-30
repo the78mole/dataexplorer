@@ -769,7 +769,6 @@ public class ChargerDialog extends DeviceDialog {
 						break;
 						
 					case 50: //regenerative channel mode
-						log.log(Level.OFF, "setRegChMode = " + ChargerDialog.this.memoryValues[50]);
 						ChargerDialog.this.selectedProgramMemory.setRegChMode((byte) ChargerDialog.this.memoryValues[50]);
 						if (ChargerDialog.this.memoryParameters[51] != null && ChargerDialog.this.memoryParameters[52] != null) {
 							ChargerDialog.this.memoryParameters[51].setEnabled(ChargerDialog.this.memoryValues[50] == 0);
@@ -777,11 +776,9 @@ public class ChargerDialog extends DeviceDialog {
 						}
 						break;
 					case 51: //regenerative to channel voltage limit
-						log.log(Level.OFF, "setRegChVolt = " + ChargerDialog.this.memoryValues[51]);
 						ChargerDialog.this.selectedProgramMemory.setRegChVolt((short) (ChargerDialog.this.memoryValues[51] * 100));
 						break;
 					case 52: //regenerative to channel current limit
-						log.log(Level.OFF, "setRegChCurrent = " + ChargerDialog.this.memoryValues[52]);
 						ChargerDialog.this.selectedProgramMemory.setRegChCurrent((short) (ChargerDialog.this.memoryValues[52]));
 						break;
 

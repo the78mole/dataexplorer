@@ -110,7 +110,7 @@ public class PowerPeakSerialPort extends DeviceCommPort {
 
 			answer = new byte[data.length];
 			answer = this.read(data, 3000);
-			log.logp(java.util.logging.Level.OFF, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(answer));
+			log.logp(java.util.logging.Level.INFO, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(answer));
 
 			// synchronize received data to DeviceCommPort.FF of sent data 
 			while (answer[0] != DeviceCommPort.FF) {
@@ -120,10 +120,10 @@ public class PowerPeakSerialPort extends DeviceCommPort {
 						System.arraycopy(answer, i, data, 0, data.length - i);
 						answer = new byte[i];
 						answer = this.read(answer, 1000);
-						log.logp(java.util.logging.Level.OFF, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(answer));
+						log.logp(java.util.logging.Level.INFO, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, StringHelper.convert2CharString(answer));
 						System.arraycopy(answer, 0, data, data.length - i, i);
 						this.isInSync = true;
-						log.logp(java.util.logging.Level.OFF, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
+						log.logp(java.util.logging.Level.INFO, PowerPeakSerialPort.$CLASS_NAME, $METHOD_NAME, "----> receive sync finished"); //$NON-NLS-1$
 						break; //sync
 					}
 				}

@@ -609,7 +609,7 @@ public class KMZWriter {
 							.append(String.format(Locale.ENGLISH, "%d", relativeAltitude)).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
 
 					zipWriter.write(sb.toString().getBytes());
-					KMZWriter.log.log(java.util.logging.Level.OFF, "data line = " + sb.toString()); //$NON-NLS-1$
+					KMZWriter.log.log(java.util.logging.Level.INFO, "data line = " + sb.toString()); //$NON-NLS-1$
 			}
 			sb = new StringBuilder();
 			double latitude = Double.parseDouble(wayPoints.get(0).split(GDE.STRING_SEMICOLON)[0].substring(0,7))/100;
@@ -623,7 +623,7 @@ public class KMZWriter {
 					.append(String.format(Locale.ENGLISH, "%d", relativeAltitude)).append(GDE.LINE_SEPARATOR); //$NON-NLS-1$
 
 			zipWriter.write(sb.toString().getBytes());
-			KMZWriter.log.log(java.util.logging.Level.OFF, "data line = " + sb.toString()); //$NON-NLS-1$
+			KMZWriter.log.log(java.util.logging.Level.INFO, "data line = " + sb.toString()); //$NON-NLS-1$
 
 			zipWriter.write(KMZWriter.triangleTrailer.getBytes());
 			zipWriter.write(KMZWriter.triangleFooter.getBytes());

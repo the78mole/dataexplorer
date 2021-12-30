@@ -85,7 +85,7 @@ public class NextGenSerialPort extends DeviceCommPort implements IDeviceCommPort
 			//receive data while needed
 			this.isDataReceived = false;
 			readNewData();
-			//log.log(Level.OFF, "'" + new String(answer) + "'");
+			//log.log(Level.INFO, "'" + new String(answer) + "'");
 
 			//find start index
 			while (this.answer.length >= this.tmpDataLength && this.index < this.answer.length-1 && (this.answer[this.index] != this.startByte1 || this.answer[this.index] != this.startByte2) && this.answer[this.index+1] != this.startByteTrailer)
@@ -111,7 +111,7 @@ public class NextGenSerialPort extends DeviceCommPort implements IDeviceCommPort
 			}
 			throw e;
 		}
-		//log.log(Level.OFF, StringHelper.byte2Hex2CharString(this.data, this.data.length));
+		//log.log(Level.INFO, StringHelper.byte2Hex2CharString(this.data, this.data.length));
 		return this.data;
 	}
 
@@ -125,7 +125,7 @@ public class NextGenSerialPort extends DeviceCommPort implements IDeviceCommPort
 		final String $METHOD_NAME = "findDataEnd";
 		int endIndex;
 		
-		//log.log(Level.OFF, StringHelper.byte2Hex2CharString(this.answer, this.answer.length));
+		//log.log(Level.INFO, StringHelper.byte2Hex2CharString(this.answer, this.answer.length));
 
 		if (answer.length - startIndex >=  Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO))) {
 			this.index =  Math.abs(this.device.getDataBlockSize(InputTypes.SERIAL_IO));
@@ -143,7 +143,7 @@ public class NextGenSerialPort extends DeviceCommPort implements IDeviceCommPort
 			//System.out.println(startIndex + " - " + this.tmpData.length + " - " + endIndex);
 			System.arraycopy(this.tmpData, 0, this.data, 0, this.tmpData.length);
 			System.arraycopy(this.answer, startIndex, this.data, this.tmpData.length, endIndex - startIndex);
-			//log.log(Level.OFF, StringHelper.byte2Hex2CharString(this.data, this.data.length));
+			//log.log(Level.INFO, StringHelper.byte2Hex2CharString(this.data, this.data.length));
 
 			if (NextGenSerialPort.log.isLoggable(Level.FINER)) {
 				StringBuilder sb = new StringBuilder().append("'");

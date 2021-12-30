@@ -65,7 +65,7 @@ public class NextGen8 extends DeviceConfiguration implements IDevice {
 		}
 		
 		public int getOrdinal() {
-			log.log(Level.OFF, "state = " + this.value);
+			log.log(Level.INFO, "state = " + this.value);
 			int result = super.ordinal();
 			return result == -1 ? 0 : result;
 		}

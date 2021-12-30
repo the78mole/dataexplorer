@@ -1053,7 +1053,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 					this.points[34] = ((_buf4[5]-48) * 1000000 + (_buf4[7]-48) * 10000 + (_buf4[6]-48) * 100) * 10;//yy-MM-dd
 					this.points[35] = (DataParser.parse2Short(_buf3, 6) - 500) * 1000; //TODO remove offset 500 after correction
 					this.points[36] = (_buf4[3] & 0xFF) * 1000;
-					//log.log(Level.OFF, StringHelper.byte2Hex2CharString(_buf4, _buf4.length));
+					//log.log(Level.INFO, StringHelper.byte2Hex2CharString(_buf4, _buf4.length));
 				}
 				else if ((_buf4[9] & 0xFF) == 0 || (_buf4[9] & 0xFF) == 1) { //Graupner GPS need workaround to distinguish between different Graupner GPS version #0
 					int version = this.points[37] == 1000 || (_buf3[6] != 0 && _buf3[7] != 0 && _buf3[8] != 0) ? 1 : 0;

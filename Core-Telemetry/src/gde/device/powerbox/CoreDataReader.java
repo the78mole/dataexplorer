@@ -141,7 +141,7 @@ public class CoreDataReader {
 					int numberLogFiles = logFiles.size();
 					int numberProcessedLogFiles = 1;
 					for (File logFile : logFiles) {
-						log.log(Level.OFF, logFile.getAbsolutePath());
+						log.log(Level.INFO, logFile.getAbsolutePath());
 						line = 0;
 
 						FileInputStream fis = new FileInputStream(logFile);
@@ -172,7 +172,7 @@ public class CoreDataReader {
 								else if (strLine.startsWith("#SensorsTable")) {
 									isSensorTable = true;
 									isStartLogEntries = false;
-									log.log(Level.OFF, "SensorsTable");
+									log.log(Level.INFO, "SensorsTable");
 								}
 								else if (strLine.startsWith("#Time")) {
 									if (isSensorTable) {
@@ -198,7 +198,7 @@ public class CoreDataReader {
 													dataVar.setName(newRecordName);
 												}
 												vecRecordNames.add(newRecordName);
-												if (CoreDataReader.log.isLoggable(Level.OFF)) CoreDataReader.log.log(Level.OFF, String.format("add new record = %s [%s]", newRecordName, dataVar.getUnit()));
+												if (CoreDataReader.log.isLoggable(Level.INFO)) CoreDataReader.log.log(Level.INFO, String.format("add new record = %s [%s]", newRecordName, dataVar.getUnit()));
 
 												device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
 												device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
@@ -259,7 +259,7 @@ public class CoreDataReader {
 										startTime_ms = Long.parseLong(strLine.substring(8).trim(), 16) * 1000;
 										isSensorTable = false;
 										isStartLogEntries = true;
-										//log.log(Level.OFF, "Time = " + StringHelper.getFormatedTime("YYYY-MM-dd hh:mm:ss.SSS", startTime_ms));
+										//log.log(Level.INFO, "Time = " + StringHelper.getFormatedTime("YYYY-MM-dd hh:mm:ss.SSS", startTime_ms));
 									}
 									catch (Exception e) {
 										log.log(Level.SEVERE, logFile.getName() + " line # " + line + " failed parsing " + strLine.substring(8));
@@ -275,7 +275,7 @@ public class CoreDataReader {
 									long entryTime_ms = startTime_ms + Integer.parseInt(strLine.substring(1, 3)) * 1000;
 									strLine = String.format("%09d;%s", entryTime_ms, strLine.substring(4));
 									if (entryTime_ms > lastEntryTime_ms) {
-										//log.log(Level.OFF, "addPoints");
+										//log.log(Level.INFO, "addPoints");
 										recordSet.addPoints(points, time_ms);
 										if (lastEntryTime_ms != 0) time_ms += entryTime_ms - lastEntryTime_ms;
 										lastEntryTime_ms = entryTime_ms;
@@ -286,7 +286,7 @@ public class CoreDataReader {
 								}
 
 							}
-							//log.log(Level.OFF, strLine);
+							//log.log(Level.INFO, strLine);
 
 							List<String> array = new ArrayList<String>();
 							array.addAll(Arrays.asList(strLine.replace("|", ";").split(";")));
@@ -297,7 +297,7 @@ public class CoreDataReader {
 									continue;
 								}
 								//if (!array.get(0).equals("000000000")) //print sensor measurements
-								//	log.log(Level.OFF, array.toString());
+								//	log.log(Level.INFO, array.toString());
 								parseLineParams(array.toArray(new String[5]), recordSet, points, logFile.getName(), line);
 							}
 						}
@@ -425,7 +425,7 @@ public class CoreDataReader {
 					sensor = param;
 					//Insert a new sensor and exit the queue
 					if (timestamp == 0 && paramId == 0) {
-						if (TelemetryData.log.isLoggable(Level.OFF)) TelemetryData.log.log(Level.OFF, "adding sensor " + sensor);
+						if (TelemetryData.log.isLoggable(Level.INFO)) TelemetryData.log.log(Level.INFO, "adding sensor " + sensor);
 						TelemetrySensor telemetrySensor = new TelemetrySensor(deviceId, sensor);
 						CoreDataReader.sensorData.add(telemetrySensor);
 					}
@@ -463,7 +463,7 @@ public class CoreDataReader {
 						if (param.startsWith("0x")) {
 							switch (param.length()) {
 							case 10: //GPS coordinate
-								//log.log(Level.OFF, paramId + " param = " + param);
+								//log.log(Level.INFO, paramId + " param = " + param);
 								dataType = TelemetryData.T_GPS;
 								val = Integer.parseInt(param.substring(2), 16);
 								break;
@@ -483,7 +483,7 @@ public class CoreDataReader {
 						TelemetryVar sensorVar = CoreDataReader.getSensor(deviceId).getVar(paramId);
 						if (sensorVar != null) {
 							int pontsIndex = recordSet.get(sensorVar.name).getOrdinal();
-							//log.log(Level.OFF, String.format("TelemetryData: deviceId=%03d, paramId=%02d, value=%d, decimals=%d timeStamp=%d ordinal=%d", deviceId, paramId, val, sensorVar.decimals, timestamp, pontsIndex));	
+							//log.log(Level.INFO, String.format("TelemetryData: deviceId=%03d, paramId=%02d, value=%d, decimals=%d timeStamp=%d ordinal=%d", deviceId, paramId, val, sensorVar.decimals, timestamp, pontsIndex));	
 							if (dataType == TelemetryData.T_GPS)
 								points[pontsIndex] = val;
 							else

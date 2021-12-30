@@ -180,7 +180,7 @@ public class ArduPilotLogReader {
 					case PID:
 					case QUAT:
 					case GPS:
-						log.log(Level.OFF, String.format("%4s\t%12s\t%s", tmpFMT[3], tmpFMT[4], tmpFMT[5]));
+						log.log(Level.INFO, String.format("%4s\t%12s\t%s", tmpFMT[3], tmpFMT[4], tmpFMT[5]));
 						logFmts.put(tmpFMT[3], new LogFMT(line, separator));
 						break;
 					default: //skip, since not part of implemented log entry enum

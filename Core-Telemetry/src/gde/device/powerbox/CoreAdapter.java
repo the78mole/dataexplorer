@@ -486,7 +486,7 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 
 					}
 					for (String tmpFileName : filteredFileList) {
-						log.log(Level.OFF, "selectedImportFile = " + tmpFileName); //$NON-NLS-1$
+						log.log(Level.INFO, "selectedImportFile = " + tmpFileName); //$NON-NLS-1$
 
 						if (tmpFileName.length() > 22) { //_13_38_39_00_Tele.log
 							try {

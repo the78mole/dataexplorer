@@ -4,6 +4,7 @@ Version 3.5.3 - xx yyy 2022
 Generic changes/fixes
 	* add base directory to Linux start scripts
 	* fix a possible error when displaying history graphs calculations with an empty trail record set
+	* cleanup senseless log level OFF or change to level INFO
 		
 Device specific changes/fixes
 	* Junsi iChargerUSB - add message box signaling timeout while initializing program memories for dialog

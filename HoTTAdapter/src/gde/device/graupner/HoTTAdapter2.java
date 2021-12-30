@@ -293,7 +293,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 
 			case HoTTAdapter2.SENSOR_TYPE_GPS_19200:
 				if (dataBuffer.length == 57) {
-					//log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
+					//log.log(Level.INFO, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
 					// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
 					// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario 15=misc Vario_1 16=misc Vario_2 17=misc Vario_3 18=misc Vario_4 19=misc Vario_5
 					// 20=Latitude, 21=Longitude, 22=Velocity, 23=Distance, 24=Direction, 25=TripDistance 26=NumSatellites 27=GPS-Fix 28=EventGPS
@@ -341,7 +341,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 						points[28] = (dataBuffer[14] & 0xFF) * 1000; //28=EventGPS
 						//29=HomeDirection 30=Roll 31=Pitch 32=Yaw 33=GyroX 34=GyroY 35=GyroZ 36=Vibration 37=Version
 						points[29] = (dataBuffer[38] & 0xFF) * 1000; //Home direction
-						//log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, 37, dataBuffer.length));
+						//log.log(Level.INFO, StringHelper.byte2Hex2CharString(dataBuffer, 37, dataBuffer.length));
 						if (HoTTAdapter2.isGPSdetected || (dataBuffer[46] & 0xFF) == 0x01) { //RCE Sparrow
 							//30=servoPulse 31=n/a 32=voltage GU 33=HH:mm:ss.SSS 34=yy-dd-mm 35=Altitude MSL 36=ENL 37=Version
 							points[30] = dataBuffer[47] * 1000; //servo pulse
@@ -562,7 +562,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 
 			case HoTTAdapter2.SENSOR_TYPE_GPS_115200:
 				if (dataBuffer.length >= 46) {
-					log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
+					log.log(Level.INFO, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
 					// 0=RX-TX-VPacks, 1=RXSQ, 2=Strength, 3=VPacks, 4=Tx, 5=Rx, 6=VoltageRx, 7=TemperatureRx 8=VoltageRxMin 9=EventRx
 					// 10=Altitude, 11=Climb 1, 12=Climb 3, 13=Climb 10 14=EventVario 15=misc Vario_1 16=misc Vario_2 17=misc Vario_3 18=misc Vario_4 19=misc Vario_5
 					// 20=Latitude, 21=Longitude, 22=Velocity, 23=Distance, 24=Direction, 25=TripDistance 26=NumSatellites 27=GPS-Fix 28=EventGPS
@@ -619,7 +619,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 							points[35] = DataParser.parse2Short(dataBuffer, 36) * 1000;; //Altitude MSL
 							points[36] = (dataBuffer[44] & 0xFF) * 1000; //ENL
 							//three char
-							log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, 47, dataBuffer.length));
+							log.log(Level.INFO, StringHelper.byte2Hex2CharString(dataBuffer, 47, dataBuffer.length));
 						}
 						else { //SM GPS-Logger				
 							points[30] = dataBuffer[36] * 1000; //Roll
@@ -777,7 +777,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 				break;
 			case HoTTAdapter.SENSOR_TYPE_SERVO_POSITION_115200:
 				if (dataBuffer.length >= 74) {
-					//log.log(Level.OFF, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
+					//log.log(Level.INFO, StringHelper.byte2Hex2CharString(dataBuffer, dataBuffer.length));
 					StringBuffer sb = new StringBuffer();
 					for (int i = 0, j = 0; i < 16; i++, j+=2) {
 						sb.append(String.format("%2d = %4d; ", i+1, DataParser.parse2Short(dataBuffer, 8 + j) / 16 + 50));					

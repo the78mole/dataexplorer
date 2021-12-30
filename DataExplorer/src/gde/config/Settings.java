@@ -3138,7 +3138,7 @@ public final class Settings extends Properties {
 	 * @param csvValues is the list of deviceName*lastUsedChannelOrdinal from the user choices (the first entry is the most recently used entry)
 	 */
 	public void setDeviceUseCsv(String csvValues) {
-		log.log(Level.INFO, csvValues);
+		log.log(Level.FINE, csvValues);
 		this.setProperty(Settings.DEVICE_USE, String.valueOf(csvValues));
 	}
 

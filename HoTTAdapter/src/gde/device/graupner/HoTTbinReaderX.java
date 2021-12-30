@@ -310,7 +310,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 //							printByteValues(timeStep_ms, HoTTbinReaderX.bufB);
 //							printByteValues(timeStep_ms, HoTTbinReaderX.bufC);
 //							printByteValues(timeStep_ms, HoTTbinReaderX.bufD);
-//							HoTTbinReaderX.logx.logp(Level.OFF, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, GDE.CHAR_BLANK);
+//							HoTTbinReaderX.logx.logp(Level.INFO, HoTTbinReaderX.$CLASS_NAMEX, $METHOD_NAME, GDE.CHAR_BLANK);
 							switch (HoTTbinReaderX.buf[7]) {
 							case 00: //receiver 1
 								parseAddReceiver(HoTTbinReaderX.buf1, HoTTbinReaderX.buf2, HoTTbinReaderX.buf4, HoTTbinReaderX.bufD);
@@ -550,7 +550,7 @@ public class HoTTbinReaderX extends HoTTbinReader {
 		for (int i = 16; buffer != null && i < buffer.length; i++) {
 			sb.append("(").append(i).append(")").append(String.format("%3d", buffer[i]&0xFF)).append(GDE.STRING_BLANK);
 		}
-		HoTTbinReaderX.logx.log(Level.OFF, sb.toString());
+		HoTTbinReaderX.logx.log(Level.INFO, sb.toString());
 	}
 
 	static void printShortValues(long millisec, byte[] buffer) {

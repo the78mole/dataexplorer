@@ -107,7 +107,7 @@ public class GathererThread extends Thread {
 				
 				this.channelNumber = this.parser.getChannelConfigNumber();
 				this.stateNumber = this.parser.getState(); 
-				if (log.isLoggable(Level.OFF)) log.logp(Level.OFF, GathererThread.$CLASS_NAME, $METHOD_NAME,	device.getChannelCount() + " - data for channel = " + channelNumber + " state = " + stateNumber);
+				if (log.isLoggable(Level.INFO)) log.logp(Level.INFO, GathererThread.$CLASS_NAME, $METHOD_NAME,	device.getChannelCount() + " - data for channel = " + channelNumber + " state = " + stateNumber);
 
 				if (this.channelNumber == 1)
 					this.isProgrammExecuting1 = this.stateNumber > 0;

@@ -586,7 +586,7 @@ public class UniLog2 extends DeviceConfiguration implements IDevice {
 			if (i > 1 && recordRevolution.get(i)> 100000 && recordCurrent.get(i) > 3000) { //100 1/min && 3A
 				if (prop_n100W == 99999) { // A1 -> torque
 					eta = (2 * Math.PI * (this.translateValue(recordA1, recordA1.get(i) / 1000.)) * (recordRevolution.get(i) / 1000.)) / ((recordVoltage.get(i) / 1000.) * (recordCurrent.get(i) / 1000.) * 60.);
-					log.log(Level.OFF, String.format("(2 * %4.3f * %3.1fNcm * %5.0frpm) / (%3.1fV * %3.1fA * 60 * 100) = %4.2f", Math.PI, (this.translateValue(recordA1, recordA1.get(i) / 1000.)), (recordRevolution.get(i) / 1000.), (recordVoltage.get(i) / 1000.), (recordCurrent.get(i) / 1000.), eta));
+					log.log(Level.INFO, String.format("(2 * %4.3f * %3.1fNcm * %5.0frpm) / (%3.1fV * %3.1fA * 60 * 100) = %4.2f", Math.PI, (this.translateValue(recordA1, recordA1.get(i) / 1000.)), (recordRevolution.get(i) / 1000.), (recordVoltage.get(i) / 1000.), (recordCurrent.get(i) / 1000.), eta));
 				}
 				else {
 					double motorPower = Math.pow(((recordRevolution.get(i) / numberMotor) / 1000.0 * 4.64) / prop_n100W, 3) * 1000.0;

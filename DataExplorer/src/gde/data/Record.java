@@ -1598,7 +1598,7 @@ public class Record extends AbstractRecord implements IRecord {
 	 * @return point time, value
 	 */
 	public Point getDisplayPoint(int measurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
-		//log.log(Level.OFF, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue()) + ")");
+		//log.log(Level.INFO, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue()) + ")");
 		return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(),
 				yDisplayOffset - Double.valueOf(((this.get(measurementPointIndex) / 1000.0) - (this.minDisplayValue * 1 / this.syncMasterFactor)) * this.displayScaleFactorValue).intValue());
 	}
@@ -1612,7 +1612,7 @@ public class Record extends AbstractRecord implements IRecord {
 	 * @return point time, value
 	 */
 	public Point getGPSDisplayPoint(int measurementPointIndex, int xDisplayOffset, int yDisplayOffset) {
-		//log.log(Level.OFF, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue()) + ")");
+		//log.log(Level.INFO, " measurementPointIndex=" + measurementPointIndex + " value=" + (this.get(measurementPointIndex) / 1000.0) + "(" + (yDisplayOffset - Double.valueOf((this.get(measurementPointIndex)/1000.0 - (this.minDisplayValue*1/this.syncMasterFactor)) * this.displayScaleFactorValue).intValue()) + ")");
 		int grad = this.get(measurementPointIndex) / 1000000;
 		if (this.getUnit().endsWith("'")) {
 			return new Point(xDisplayOffset + Double.valueOf(this.getTime_ms(measurementPointIndex) * this.displayScaleFactorTime).intValue(), yDisplayOffset - Double
@@ -2350,7 +2350,7 @@ public class Record extends AbstractRecord implements IRecord {
 			if (log.isLoggable(Level.FINER)) sb.append("\n"); //$NON-NLS-1$
 			if (this.triggerRanges != null) {
 				for (TriggerRange range : this.triggerRanges) {
-					//log.log(Level.OFF, this.name + " range = " + range.toString());
+					//log.log(Level.INFO, this.name + " range = " + range.toString());
 					long startValue = this.getUnit().contains("Ah") ? this.get(range.in) : 0;
 					for (int i = range.in; i < range.out; i++) {
 						sum += this.get(i) - startValue;
@@ -2501,7 +2501,7 @@ public class Record extends AbstractRecord implements IRecord {
 		Vector<TriggerRange> primaryTriggerRanges = this.parent.get(referencedMeasurementOrdinal).getTriggerRanges();
 		if (primaryTriggerRanges != null && !this.parent.get(referencedMeasurementOrdinal).isTriggerRangesMerged()) {
 			Vector<TriggerRange> secondaryTriggerRanges = this.parent.get(referencedSecondaryMeasurementOrdinal).getTriggerRanges();
-			if (log.isLoggable(Level.OFF)) {
+			if (log.isLoggable(Level.INFO)) {
 				StringBuilder sb = new StringBuilder().append(String.format("build trigger ranges for %s(%d)\n", this.name, this.ordinal));
 				sb.append(String.format("primaryTriggerRanges for %s\n", this.parent.get(referencedMeasurementOrdinal).name));
 				for (TriggerRange range : primaryTriggerRanges) {
@@ -2511,7 +2511,7 @@ public class Record extends AbstractRecord implements IRecord {
 				for (TriggerRange range : secondaryTriggerRanges) {
 					sb.append(String.format("range in %d, out %d\n", range.in, range.out));					
 				}
-				log.log(Level.OFF, sb.toString());
+				log.log(Level.INFO, sb.toString());
 			}
 			this.triggerRanges = new Vector<TriggerRange>();
 			boolean isGreaterSecondary = this.parent.get(referencedSecondaryMeasurementOrdinal).getTriggerIsGreater();
@@ -2572,13 +2572,13 @@ public class Record extends AbstractRecord implements IRecord {
 					}
 				}
 			}
-			if (log.isLoggable(Level.OFF)) {
+			if (log.isLoggable(Level.INFO)) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(String.format("trigger rages merged for %s and %s\n", this.parent.get(referencedMeasurementOrdinal).name, this.parent.get(referencedSecondaryMeasurementOrdinal).name));
 				for (TriggerRange range : this.triggerRanges) {
 					sb.append(String.format("range in %d, out %d\n", range.in, range.out));					
 				}
-				log.log(Level.OFF, sb.toString());
+				log.log(Level.INFO, sb.toString());
 			}
 			this.parent.get(referencedMeasurementOrdinal).setTriggerRanges(this.triggerRanges);
 			this.parent.get(referencedMeasurementOrdinal).setTriggerRangesIsMerged();
