@@ -1486,7 +1486,8 @@ public class SettingsDialog extends Dialog {
 										if (SettingsDialog.this.draw10TicksPerRecordButton.getSelection())
 											SettingsDialog.this.application.updateAllTabs(false);
 										else {
-											SettingsDialog.this.application.getActiveChannel().applyTemplate(SettingsDialog.this.application.getActiveRecordSet().getName(), false);
+											if (SettingsDialog.this.application.getActiveRecordSet() != null)
+												SettingsDialog.this.application.getActiveChannel().applyTemplate(SettingsDialog.this.application.getActiveRecordSet().getName(), false);
 										}
 											
 										SettingsDialog.this.application.getHistoExplorer().ifPresent(h -> h.updateHistoTabs(false, false, true));

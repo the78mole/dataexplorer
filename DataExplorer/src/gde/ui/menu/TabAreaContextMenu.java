@@ -46,9 +46,10 @@ public class TabAreaContextMenu {
 	private final static Logger	log					= Logger.getLogger($CLASS_NAME);
 
 	private final DataExplorer	application	= DataExplorer.getInstance();
+	private final Settings			settings	= Settings.getInstance();
 
 	MenuItem										curveSelectionItem;
-	MenuItem										displayGraphicsHeaderItem;
+	MenuItem										displayGraphicsHeaderItem, displayGridLine10Item;
 	MenuItem										displayGraphicsCommentItem, displayGraphicsCurveSurvey;
 	MenuItem										separatorView;
 	MenuItem										copyTabItem;
@@ -80,6 +81,7 @@ public class TabAreaContextMenu {
 					TabAreaContextMenu.this.curveSelectionItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().getCurveSelectionMenuItem().getSelection());
 					TabAreaContextMenu.this.displayGraphicsHeaderItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().getGraphicsHeaderMenuItem().getSelection());
 					TabAreaContextMenu.this.displayGraphicsCommentItem.setSelection(TabAreaContextMenu.this.application.getMenuBar().getRecordCommentMenuItem().getSelection());
+					TabAreaContextMenu.this.displayGridLine10Item.setSelection(TabAreaContextMenu.this.settings.isDraw10TicksPerRecord());
 				}
 
 				if (type == TabMenuType.TABLE && TabAreaContextMenu.this.editTableItem != null) {
@@ -129,6 +131,28 @@ public class TabAreaContextMenu {
 						boolean selection = TabAreaContextMenu.this.displayGraphicsCommentItem.getSelection();
 						TabAreaContextMenu.this.application.getMenuBar().getRecordCommentMenuItem().setSelection(selection);
 						TabAreaContextMenu.this.application.enableRecordSetComment(selection);
+					}
+				});
+
+				this.separatorView = new MenuItem(popupMenu, SWT.SEPARATOR);
+				
+				this.displayGridLine10Item = new MenuItem(popupMenu, SWT.CHECK);
+				this.displayGridLine10Item.setText(Messages.getString(MessageIds.GDE_MSGT0968));
+				if (!GDE.IS_OS_ARCH_ARM) this.displayGridLine10Item.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0969));
+				this.displayGridLine10Item.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(Event e) {
+						TabAreaContextMenu.log.log(Level.FINEST, "toggle displayGridLine10Item action performed! " + e); //$NON-NLS-1$
+						boolean selection = TabAreaContextMenu.this.displayGridLine10Item.getSelection();
+						TabAreaContextMenu.this.settings.setDraw10TicksPerRecord(selection);
+						if (TabAreaContextMenu.this.settings.isDraw10TicksPerRecord()) {
+							TabAreaContextMenu.this.application.getActiveRecordSet().setValueGridRecordOrdinal(
+									TabAreaContextMenu.this.application.getActiveRecordSet().getVisibleAndDisplayableRecords().firstElement().getOrdinal());
+							TabAreaContextMenu.this.application.updateAllTabs(false);
+						}
+						else {
+							TabAreaContextMenu.this.application.getActiveChannel().applyTemplate(TabAreaContextMenu.this.application.getActiveRecordSet().getName(), false);
+						}
 					}
 				});
 

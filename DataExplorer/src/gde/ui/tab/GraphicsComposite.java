@@ -871,12 +871,15 @@ public class GraphicsComposite extends Composite {
 		for (Record actualRecord : recordSet.getRecordsSortedForDisplay()) {
 			boolean isActualRecordEnabled = actualRecord.isVisible() && actualRecord.isDisplayable();
 			if (log.isLoggable(Level.FINE) && isActualRecordEnabled) log.log(Level.FINE, "drawing record = " + actualRecord.getName() + " isVisibel=" + actualRecord.isVisible() + " isDisplayable=" //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-					+ actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced());
-			if (actualRecord.isScaleVisible()) CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, isDraw10TicksPerRecord);
+					+ actualRecord.isDisplayable() + " isScaleSynced=" + actualRecord.isScaleSynced() + " isScaleVisible=" + actualRecord.isScaleVisible());
+			
+			if (actualRecord.isScaleVisible()) {
+				CurveUtils.drawScale(actualRecord, gc, x0, y0, width, height, dataScaleWidth, isDrawScaleInRecordColor, isDrawNameInRecordColor, isDrawNumbersInRecordColor, isDraw10TicksPerRecord);
 
-			if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getValueGridRecordOrdinal()) // check for activated horizontal grid
-				drawCurveGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
-
+				if (isCurveGridEnabled && actualRecord.getOrdinal() == recordSet.getValueGridRecordOrdinal()) // check for activated horizontal grid
+					drawCurveGrid(recordSet, gc, this.curveAreaBounds, this.settings.getGridDashStyle());
+			}
+			
 			if (isActualRecordEnabled) {
 				//gc.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 				//gc.drawRectangle(x0, y0-height, width, height);

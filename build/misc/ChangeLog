@@ -5,6 +5,7 @@ Generic changes/fixes
 	* add base directory to Linux start scripts
 	* fix a possible error when displaying history graphs calculations with an empty trail record set
 	* cleanup senseless log level OFF or change to level INFO
+	* fix grid line alignment error while toggle to 10 grid lines
 		
 Device specific changes/fixes
 	* Junsi iChargerUSB - add message box signaling timeout while initializing program memories for dialog
