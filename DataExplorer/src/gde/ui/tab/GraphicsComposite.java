@@ -865,7 +865,11 @@ public class GraphicsComposite extends Composite {
 		boolean isDrawScaleInRecordColor = this.settings.isDrawScaleInRecordColor();
 		boolean isDrawNameInRecordColor = this.settings.isDrawNameInRecordColor();
 		boolean isDrawNumbersInRecordColor = this.settings.isDrawNumbersInRecordColor();
+		
 		boolean isDraw10TicksPerRecord = this.settings.isDraw10TicksPerRecord();
+		if (isDraw10TicksPerRecord && recordSet.getVisibleAndDisplayableRecords().size() > 0)
+			recordSet.setValueGridRecordOrdinal(recordSet.getVisibleAndDisplayableRecords().firstElement().getOrdinal());
+
 		recordSet.syncScaleOfSyncableRecords();
 		recordSet.updateSyncRecordScale();
 		for (Record actualRecord : recordSet.getRecordsSortedForDisplay()) {

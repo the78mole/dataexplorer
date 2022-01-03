@@ -146,12 +146,11 @@ public class TabAreaContextMenu {
 						boolean selection = TabAreaContextMenu.this.displayGridLine10Item.getSelection();
 						TabAreaContextMenu.this.settings.setDraw10TicksPerRecord(selection);
 						if (TabAreaContextMenu.this.settings.isDraw10TicksPerRecord()) {
-							TabAreaContextMenu.this.application.getActiveRecordSet().setValueGridRecordOrdinal(
-									TabAreaContextMenu.this.application.getActiveRecordSet().getVisibleAndDisplayableRecords().firstElement().getOrdinal());
 							TabAreaContextMenu.this.application.updateAllTabs(false);
 						}
 						else {
-							TabAreaContextMenu.this.application.getActiveChannel().applyTemplate(TabAreaContextMenu.this.application.getActiveRecordSet().getName(), false);
+							if (TabAreaContextMenu.this.application.getActiveRecordSet() != null) 
+								TabAreaContextMenu.this.application.getActiveChannel().applyTemplate(TabAreaContextMenu.this.application.getActiveRecordSet().getName(), false);
 						}
 					}
 				});
