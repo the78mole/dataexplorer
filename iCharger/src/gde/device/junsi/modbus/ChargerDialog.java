@@ -1377,16 +1377,17 @@ public class ChargerDialog extends DeviceDialog {
 			this.usbPort.getData();
 		}
 		catch (Exception e1) {
-			//ignore
+			ChargerDialog.log.log(Level.WARNING, e1.getMessage(), e1);
 		}
 		try {
 			this.usbPort.getData(); //sync logging and modbus query
 			WaitTimer.delay(100);
 		}
 		catch (Exception e) {
-			//ignore 
+			ChargerDialog.log.log(Level.WARNING, e.getMessage(), e);
 		}
 		this.stopLogTransmission();
+		WaitTimer.delay(100);
 		this.systemInfo = this.readInfo();
 		if (this.systemInfo == null || this.systemInfo.getDeviceID() == 0) {
 			log.log(Level.SEVERE, "Read system info failed");
@@ -2803,7 +2804,7 @@ public class ChargerDialog extends DeviceDialog {
 					this.memoryParameters[7].updateValueRange("1.9V (1.200 - 2.100 V", 1200, 2100, 2000, -1200); //$NON-NLS-1$
 					break;
 				case 7: //LiHV
-					this.memoryParameters[7].updateValueRange("4.35V (3.900 - 4.400V)", 3900, 4400, 4350, -3900); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("4.35V (3.900 - 4.450V)", 3900, 4450, 4350, -3900); //$NON-NLS-1$
 					break;
 				case 3: //NiMH
 				case 4: //NiCd
@@ -2840,7 +2841,7 @@ public class ChargerDialog extends DeviceDialog {
 					this.memoryParameters[7].updateValueRange("3.3V (3.300 - 3.800 V", 3300, 3800, 3600, -3300); //$NON-NLS-1$
 					break;
 				case 3: //LiHV
-					this.memoryParameters[7].updateValueRange("4.35V (3.900 - 4.400V)", 3900, 4400, 4350, -3900); //$NON-NLS-1$
+					this.memoryParameters[7].updateValueRange("4.35V (3.900 - 4.450V)", 3900, 4450, 4350, -3900); //$NON-NLS-1$
 					break;
 				case 4: //LTO
 					this.memoryParameters[7].updateValueRange("2.85V (2.400 - 3.100 V", 2400, 3100, 2850, -2400); //$NON-NLS-1$

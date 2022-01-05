@@ -253,7 +253,7 @@ public class ChargerMemory {
 
 	//#ifdef LIHV
 	public static final short	LIHV_CHG_MIN								= 3900;
-	public static final short	LIHV_CHG_MAX								= 4350;
+	public static final short	LIHV_CHG_MAX								= 4450;
 	public static final short	LIHV_CHG_DEFAULT						= 4350;
 
 	public static final short	LIHV_STO_MIN								= 3700;
