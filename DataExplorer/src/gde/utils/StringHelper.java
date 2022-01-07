@@ -876,6 +876,20 @@ public class StringHelper {
 	}
 
 	/**
+	 * @return 32 bit binary representation
+	 */
+	public static String int2bin_32(long value) {
+		StringBuilder sb = new StringBuilder().append("binary : ");
+		for (int i = 0, j = 0x80000000; i < 32; i++, j /= 2) {
+			if ((value & j) > 0)
+				sb.append("1");
+			else
+				sb.append("0");
+		}
+		return sb.toString();
+	}
+
+	/**
 	 * print memory area as integer representation
 	 * @param name
 	 * @param buffer

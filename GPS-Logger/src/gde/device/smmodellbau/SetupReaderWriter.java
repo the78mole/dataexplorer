@@ -96,13 +96,13 @@ public class SetupReaderWriter {
 	byte 								hottSpeedType								= 0;																										// ..32 //0=auto, 1=GPS-Speed 2=AirSpeed
 	short								jetiExMask_UL								= 0;																										// 33
 	//short[] B = new short[4]; // 34-37
-	byte								mLinkAddressVario						= 0;																										// 38.. 0 - 15, "--"
+	byte								mLinkAddressVarioTec				= 0;																										// 38.. 0 - 15, "--"
 	byte								mLinkAddressVoltageRx				= 16;																										// ..38 0 - 15, "--"
 	byte								mLinkAddressSpeed						= 1;																										// 39..
-	byte								mLinkAddressFree39					= 0;																										// ..39
+	byte								mLinkAddressVario						= 0;																										// ..39
 	byte								mLinkAddressDirection				= 3;																										// 40..
-	byte								mLinkAddressFree40					= 0;																										// ..40
-	byte								mLinkAddressHeight					= 4;																										// 41..
+	byte								mLinkAddressAirSpeed				= 0;																										// ..40
+	byte								mLinkAddressAltitude				= 4;																										// 41..
 	byte								mLinkAddressFree41					= 0;																										// ..41
 	byte								mLinkAddressDistance				= 7;																										// 42..
 	byte								mLinkAddressFree42					= 0;																										// ..42
@@ -124,7 +124,7 @@ public class SetupReaderWriter {
 	byte								mLinkAddressFree50					= 0;																										// ..50
 	byte								mLinkAddressDirectionRel		= 14;																										// 51..
 	byte								smoothAltitudeNulling				= 0;																										// ..51
-	byte								mLinkAddressHeightGain			= 6;																										// 52..
+	byte								mLinkAddressAltitudeGain			= 6;																										// 52..
 	byte								powerBoxP2BusAdresse				= (byte) 188;																						// ..52
 	//short[] C = short int[1]; 																																						// 53
 	short								firmwareVersion							= 126;																									// 54
@@ -199,11 +199,13 @@ public class SetupReaderWriter {
 				this.hottSpeedType					= buffer[63];													// ..32 speed type 0=auto, 1=GPS, 2=AirSpeed
 				this.jetiExMask_UL					= DataParser.parse2Short(buffer, 64);	// 33
 				//B[4]
-				this.mLinkAddressVario 				= buffer[74];		// 38..
-				this.mLinkAddressVario 				= buffer[75];		// ..38
+				this.mLinkAddressVarioTec			= buffer[74];		// 38..
+				this.mLinkAddressVoltageRx		= buffer[75];		// ..38
 				this.mLinkAddressSpeed 				= buffer[76];		// 39..
+				this.mLinkAddressVario   			= buffer[77];		// ..39
 				this.mLinkAddressDirection 		= buffer[78];		// 40..
-				this.mLinkAddressHeight 			= buffer[80];		// 41..
+				this.mLinkAddressAirSpeed 		= buffer[79];		// ..40
+				this.mLinkAddressAltitude 		= buffer[80];		// 41..
 				this.mLinkAddressDistance 		= buffer[82];		// 42..
 				this.mLinkAddressTripLength 	= buffer[84];		// 43..
 				this.mLinkAddressSpeedMax			= buffer[86];		// 44..
@@ -215,7 +217,7 @@ public class SetupReaderWriter {
 				this.mLinkAddressFlightDirection	= buffer[98];// 50..
 				this.mLinkAddressDirectionRel	= buffer[100];	// 51..
 				this.smoothAltitudeNulling		= buffer[101];	// ..51
-				this.mLinkAddressHeightGain		= buffer[102];	// 52..
+				this.mLinkAddressAltitudeGain	= buffer[102];	// 52..
 				this.powerBoxP2BusAdresse			= buffer[103];	// ..52
 				//short[] C 									= short int[1]; // 53..
 				this.firmwareVersion 					= DataParser.parse2Short(buffer, 106);	// 54
@@ -323,13 +325,13 @@ public class SetupReaderWriter {
 				buffer[64] = (byte) (this.jetiExMask_UL & 0x00FF);								// 33
 				buffer[65] = (byte) ((this.jetiExMask_UL & 0xFF00) >> 8);
 				//B[4]
-				buffer[74] = this.mLinkAddressVario;															// 38..
+				buffer[74] = this.mLinkAddressVarioTec;														// 38..
 				buffer[75] = this.mLinkAddressVoltageRx;													// ..38
 				buffer[76] = (byte) (this.mLinkAddressSpeed & 0x00FF);						// 39..
-				buffer[77] = 0;
+				buffer[77] = this.mLinkAddressVario;															// ..39
 				buffer[78] = (byte) (this.mLinkAddressDirection & 0x00FF);				// 40..
-				buffer[79] = 0;
-				buffer[80] = (byte) (this.mLinkAddressHeight & 0x00FF);						// 41..
+				buffer[79] = (byte) (this.mLinkAddressAirSpeed & 0x00FF);  				//..40
+				buffer[80] = (byte) (this.mLinkAddressAltitude & 0x00FF);					// 41..
 				buffer[81] = 0;
 				buffer[82] = (byte) (this.mLinkAddressDistance & 0x00FF);					// 42..
 				buffer[83] = 0;
@@ -351,7 +353,7 @@ public class SetupReaderWriter {
 				buffer[99] = 0;
 				buffer[100] = (byte) (this.mLinkAddressDirectionRel & 0x00FF);		// 51..
 				buffer[101] = this.smoothAltitudeNulling;													// ..51
-				buffer[102] = this.mLinkAddressHeightGain;												// 52..
+				buffer[102] = this.mLinkAddressAltitudeGain;											// 52..
 				buffer[103] = this.powerBoxP2BusAdresse;													// ..52
 				//C [1]																														// 53
 				buffer[106] = (byte) (this.firmwareVersion & 0x00FF);							// 54
@@ -395,9 +397,12 @@ public class SetupReaderWriter {
 	}
 	
 	public int getJetiMeasurementCount() {
-		int count = 30;
+		int count = 37;
 		for (int i = 0; i < GDE.SIZE_BYTES_INTEGER * 8; i++) {
-			count -= (this.jetiExMask >> i) & 0x00000001;
+			count -= ((this.jetiExMask & 0xFFFFFFFF) >> i) & 0x00000001;
+		}
+		for (int i = 0; i < GDE.SIZE_BYTES_INTEGER * 4; i++) {
+			count -= ((this.jetiExMask_UL & 0xFFFF) >> i) & 0x0001;
 		}
 		return count;
 	}

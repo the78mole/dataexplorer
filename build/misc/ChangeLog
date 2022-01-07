@@ -13,6 +13,7 @@ Device specific changes/fixes
 	* Junsi iChargerDX* - fix partially wrong program memory, PB, Ni* max cells
 	* Junsi iChargerDX* - update LiHV maximum charging voltage to 4.45 V
 	* HoTTAdapter*2 - cleanup possible clash AirSpeed Vario, sync update variable Vario/GPS dependencies
+	* GPS-Logger2/3 - update configuration capability Jeti, MPX, HoTT
 
 Version 3.5.2 - 23 DEC 2021
 Generic changes/fixes
