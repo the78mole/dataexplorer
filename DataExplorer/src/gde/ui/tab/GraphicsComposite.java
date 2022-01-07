@@ -867,7 +867,9 @@ public class GraphicsComposite extends Composite {
 		boolean isDrawNumbersInRecordColor = this.settings.isDrawNumbersInRecordColor();
 		
 		boolean isDraw10TicksPerRecord = this.settings.isDraw10TicksPerRecord();
-		if (isDraw10TicksPerRecord && recordSet.getVisibleAndDisplayableRecords().size() > 0)
+		//only change to other record if actual grid record is not visible to guarantee visible grid while switching
+		if (isDraw10TicksPerRecord && recordSet.getVisibleAndDisplayableRecords().size() > 0 
+				&& !recordSet.get(recordSet.getValueGridRecordOrdinal()).isScaleVisible()) 
 			recordSet.setValueGridRecordOrdinal(recordSet.getVisibleAndDisplayableRecords().firstElement().getOrdinal());
 
 		recordSet.syncScaleOfSyncableRecords();
