@@ -617,17 +617,17 @@ public final class RecordSet extends AbstractRecordSet {
 		Vector<Record> displayRecords = new Vector<Record>();
 		// add the record with horizontal grid
 		for (Record record : this.getValues()) {
-			if (record.size() > 0 && record.ordinal == this.valueGridRecordOrdinal && record.hasReasonableData()) displayRecords.add(record);
+			if (record.size() > 0 && record.ordinal == this.valueGridRecordOrdinal) displayRecords.add(record);
 		}
 		// add the scaleSyncMaster records to draw scale of this records first which sets the min/max display values
 		for (int i = 0; i < this.size(); ++i) {
 			final Record record = this.get(i);
-			if (record.size() > 0 && record.ordinal != this.valueGridRecordOrdinal && record.isScaleSyncMaster() && record.hasReasonableData()) displayRecords.add(record);
+			if (record.size() > 0 && record.ordinal != this.valueGridRecordOrdinal && record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 		// add all others
 		for (int i = 0; i < this.size(); ++i) {
 			final Record record = this.get(i);
-			if (record.size() > 0 && record.ordinal != this.valueGridRecordOrdinal && !record.isScaleSyncMaster() && record.hasReasonableData()) displayRecords.add(record);
+			if (record.size() > 0 && record.ordinal != this.valueGridRecordOrdinal && !record.isScaleSyncMaster()) displayRecords.add(record);
 		}
 
 		return displayRecords.toArray(new Record[0]);
