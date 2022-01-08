@@ -6,6 +6,7 @@ Generic changes/fixes
 	* fix a possible error when displaying history graphs calculations with an empty trail record set
 	* cleanup senseless log level OFF or change to level INFO
 	* fix grid line alignment error while toggle to 10 grid lines
+	* update launch4j configuration to allow Java 17
 		
 Device specific changes/fixes
 	* Junsi iChargerUSB - add message box signaling timeout while initializing program memories for dialog
