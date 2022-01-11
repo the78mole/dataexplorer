@@ -1,45 +1,33 @@
-GNU DataExplorer - News - comes with Version 3.5.2 - 23 DEC 2021
+GNU DataExplorer - News - comes with Version 3.5.3 - xx Jan 2022
 
 Generic changes/fixes
-	* correct statistic value formating while two triggers are defined
-	* correct average calculation while two triggers are defined
-	* update jSerialComm to version 2.7.0 to support MAC OS X ARM architecture
-	* update formatting GPS coordinates
-	* update XSD to enable device based request as byte hex array to be written before reading from serial port
-	
+	* add base directory to Linux start scripts
+	* fix a possible error when displaying history graphs calculations with an empty trail record set
+	* cleanup senseless log level OFF or change to level INFO
+	* fix grid line alignment error while toggle to 10 grid lines
+	* update Java version check to allow Java 17
+		
 Device specific changes/fixes
-	* Junsi iChargerUSB - correct energy calculation for continuous recorded data while loading from OSD
-	* Junsi DX* - correct input power values
-	* Junsi DX* - correct system parameter dialog according updated specification
-	* Junsi DX* - add graphics templates
-	* Junsi iChargerDuo* - add missing input source power configuration
-	* Junsi iCharger* - update help documentation related to DX devices
-	* GPS-Logger3 - calculate offset of both pressure sensors while calculating pressure ∆TEC
-	* GPS-Logger3 - calculate average pressure ∆TEC for 40 km/h and 70 km/h and average AirSpeed for pressure ∆TEC 1,0 hPa
-	* HoTTAdapter2 - update graphics template files to have voltage in blue, current in red, ...
-	* OpenTx-Telemetry - correct parsing of GPS tag with coordinates in degree with different decimals
-	* Schulze next - initial implementation (not tested with real hardware)
-	* CSV2SerialAdapter - add capability to write request each time before reading data
+	* Junsi iChargerUSB - add message box signaling timeout while initializing program memories for dialog
+	* Junsi iChargerDX6,S6 - cleanup duplicated BatteryTypesX definition
+	* Junsi iChargerDX* - fix partially wrong program memory, PB, Ni* max cells
+	* Junsi iChargerDX* - update LiHV maximum charging voltage to 4.45 V
+	* HoTTAdapter*2 - cleanup possible clash AirSpeed Vario, sync update variable Vario/GPS dependencies
+	* GPS-Logger2/3 - update configuration capability Jeti, MPX, HoTT
 	
 Generelle Änderungen/Verbesserungen
-    * Formatierung der Werte in der Statistik bei gesetzten Triggern korrigiert
-    * Mittelwertbildung bei zwei gesetzten Triggern korrigiert
-    * Update jSerialComm zu Version 2.7.0, unterstützt MAC OS X ARM Architecture
-    * GPS Koordinaten Formatierung verbessert
-    * Update XMl Schema Definition (XSD), um beim seriellen Port eine Definitio von konfigurierbaren Bytes vor dem Lesen zu ermöglichen
+	* Basisverzeichnis zu Linux Start-Scripts hinzugefügt
+	* möglicher Fehler bei der Anzeige von Historien-Grafen behoben
+	* sinnlose Log-Statements mit Level.OFF nach Level.INFO geändert oder aufgeräumt
+	* Fehler bei der Ausrichtung der Gitterlinien beim Umschalten auf Zehnerteilung behoben
+	* Java-Versionsprüfung aktualisiert, um Java 17 zuzulassen
 
 Geräte spezifische Änderungen/Verbesserungen
-    * Junsi iChargerUSB - Energieberechnung für kontinuierlich aufgenommenen Diagrammen korrigiert
-    * Junsi DX* - Eingangsleistungswerte korrigiert
-    * Junsi DX* - Systemparameter Einstelldialog an Spezifikation angepasst
-    * Junsi DX* - Grafik-Vorlagen hinzugefügt
-    * Junsi iChargerDuo* - fehlende Konfigurationsmöglichkeit der Eingangsleistungsparameter hinzugefügt
-    * Junsi iCharger* - Update Hilfe-Dokumentation bezüglich der DX* Geräte
-    * GPS-Logger3 - Berechnung und Berücksichtigung des Offsets zwischen den beiden Drucksensoren bei Berechnung von Druck ∆TEK
-    * GPS-Logger3 - Berechnung Mittelwerte für Druck ∆TEK bei 40 km/h und 70 km/h, dazu den Mittelwert der AirSpeed bei Druck ∆TEK 1,0 hPa
-    * HoTTAdapter2 - Update Grafik-Vorlagen für Spannungen in blau, Ströme in rot, ...
-    * OpenTx-Telemetry - GPS-Tag-Parsing an aktuellen Firmwarestand angepasst
-    * Schulze next - initiale Implementierung (ungetestet)
-    * CSV2SerialAdapter - Möglichkeit ein Byte-Folge als Anfrage vor dem dem Lesen hinzugefügt
+ 	* Junsi iChargerUSB - Meldungsfensters, bei Zeitüberschreitung beim Initialisieren von Programmspeichern
+	* Junsi iChargerDX6,S6 - unnötig duplizierte BatteryTypesX aufgeräumt
+	* Junsi iChargerDX* - teilweise falschen Programmspeicher korrigiert, PB, Ni* max Zellen
+	* Junsi iChargerUSB* - Aktualisierung der maximalen LiHV-Ladespannung auf 4,45 V
+	* HoTTAdapter*2 - AirSpeed Vario Überschneidung behoben, Update variable Vario/GPS-Abhängigkeiten
+	* GPS-Logger2/3 - Update Konfigurationsmöglichkeiten Jeti, MPX, HoTT
 
 	
