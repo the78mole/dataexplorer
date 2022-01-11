@@ -145,7 +145,13 @@ public class TabAreaContextMenu {
 						TabAreaContextMenu.log.log(Level.FINEST, "toggle displayGridLine10Item action performed! " + e); //$NON-NLS-1$
 						boolean selection = TabAreaContextMenu.this.displayGridLine10Item.getSelection();
 						TabAreaContextMenu.this.settings.setDraw10TicksPerRecord(selection);
-						TabAreaContextMenu.this.application.updateAllTabs(false);
+						if (TabAreaContextMenu.this.settings.isDraw10TicksPerRecord()) {
+							TabAreaContextMenu.this.application.updateAllTabs(false);
+						}
+						else {
+							if (TabAreaContextMenu.this.application.getActiveRecordSet() != null) 
+								TabAreaContextMenu.this.application.getActiveChannel().applyTemplateScaleEndpoints(TabAreaContextMenu.this.application.getActiveRecordSet().getName());
+						}
 					}
 				});
 

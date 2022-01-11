@@ -524,6 +524,34 @@ public class Channel extends HashMap<String, RecordSet> {
 	}
 
 	/**
+	 * method to reset scale end point definition to an record set switching back from 10 scale ticks
+	 * @param recordSetKey
+	 */
+	public void applyTemplateScaleEndpoints(String recordSetKey) {
+		RecordSet recordSet = this.get(recordSetKey);
+		this.activeRecordSet = this.analyzer.getActiveChannel() != null ? this.analyzer.getActiveChannel().getActiveRecordSet() : null;
+		if (recordSet != null) {
+			if (this.template != null && this.template.isAvailable()) {
+				for (int i = 0; i < recordSet.size(); ++i) {
+					Record record = recordSet.get(i);
+					record.setRoundOut(Boolean.parseBoolean(this.template.getProperty(i + Record.IS_ROUND_OUT, "false"))); //$NON-NLS-1$
+				}
+
+				int gridRecordOrdinal = Integer.parseInt(this.template.getProperty(RecordSet.VALUE_GRID_RECORD_ORDINAL, "-1"));
+				if (gridRecordOrdinal >= 0 && gridRecordOrdinal < recordSet.realSize() && recordSet.get(gridRecordOrdinal).isVisible) {
+					recordSet.setValueGridRecordOrdinal(gridRecordOrdinal);
+				}
+				else {
+					recordSet.setValueGridRecordOrdinal(findFirstVisibleRecord(recordSet));
+				}
+			}
+			if (this.activeRecordSet != null && recordSet.getName().equals(this.activeRecordSet.name) && GDE.isWithUi()) {
+				DataExplorer.getInstance().updateGraphicsWindow();
+			}
+		}
+	}
+	
+	/**
 	 * remove active record set and records
 	 * @param deleteRecordSetName
 	 */
