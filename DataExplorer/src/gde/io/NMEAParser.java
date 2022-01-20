@@ -66,7 +66,8 @@ public class NMEAParser implements IDataParser {
 	protected Vector<String>							missingImpleWarned				= new Vector<String>();
 	protected String 											deviceSerialNumber				= GDE.STRING_EMPTY;
 	protected String											firmwareVersion           = GDE.STRING_EMPTY;
-	protected int													sumPressureOffset						= 0;
+	protected boolean											isOffsetSet								= false;
+	protected int													sumPressureOffset					= 0;
 	protected int													pressureOffsetCount				= 0;
 	protected double											rho												= 0;
 	protected int 												avgAirSpeed40							= 0;
@@ -1318,7 +1319,7 @@ public class NMEAParser implements IDataParser {
 		//this.values[22] = Airspeed [km/h];
 		//this.values[23] = static Airpressure [hPa];
 		//this.values[24] = Airpressure TEK [hPa];
-		if (this.values[22] == 0) {
+		if (this.values[22] == 0 && !isOffsetSet) {
 			++pressureOffsetCount;
 			sumPressureOffset += this.values[23]-this.values[24];
 			this.values[24] = 0;
@@ -1329,6 +1330,7 @@ public class NMEAParser implements IDataParser {
 		}
 		else {
 			this.values[24] = this.values[23] - this.values[24] - (pressureOffsetCount > 0 ? sumPressureOffset/pressureOffsetCount : sumPressureOffset);
+			isOffsetSet = true;
 			
 			//uncomment if own airspeed should be calculated and replace Impulse values
 //			if (this.values[7] > 10000) {

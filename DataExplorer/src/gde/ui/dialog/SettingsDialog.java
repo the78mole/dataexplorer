@@ -2235,8 +2235,8 @@ public class SettingsDialog extends Dialog {
 					@Override
 					public void widgetSelected(SelectionEvent evt) {
 						SettingsDialog.log.log(Level.FINEST, "okButton.widgetSelected, event=" + evt); //$NON-NLS-1$
-						SettingsDialog.this.dialogShell.dispose();
-					}
+							SettingsDialog.this.dialogShell.dispose();
+						}
 				});
 			} // end ok button
 
@@ -2248,9 +2248,7 @@ public class SettingsDialog extends Dialog {
 				if (!display.readAndDispatch()) display.sleep();
 			}
 		}
-		catch (
-
-		Exception e) {
+		catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}
