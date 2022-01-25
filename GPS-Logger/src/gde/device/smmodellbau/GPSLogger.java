@@ -269,48 +269,69 @@ public class GPSLogger extends DeviceConfiguration implements IDevice {
 		Vector<String> noneCalculationRecordNames = new Vector<String>();
 
 		try {
-			if (fileRecordsProperties.length != recordKeys.length) {
-				//begin GDE 3.4.9 Ch1=41 measurements, CH2=49 measurements
-				//SMGPS  added 15=GlideRatio 16=SpeedGlideRatio;
-				for (int i = 0, j = 0; i < recordKeys.length; i++) {
-					switch (i) {
-					case 15: //GlideRatio
-					case 16: //SpeedGlideRatio
-						sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
-						recordSet.get(i).setActive(null);
-						break;
-					default:
-						if (j < fileRecordsProperties.length) {
-							HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+			switch (fileRecordsProperties.length) {
+			case 15: //Android GPS-Logger < 1.5.2
+			case 20: //Android GPS-Logger2/3 < 1.5.2
+			case 24: //Android GPS-Logger_UL < 1.5.2
+			case 29: //Android GPS-Logger2/3_UL < 1.5.2
+			case 32: //Android GPS-Logger_UL2 < 1.5.2
+			case 37: //Android GPS-Logger2/3_UL2 < 1.5.2
+				
+			case 17: //Android GPS-Logger >=1.5.2
+			case 26: //Android GPS-Logger_UL >=1.5.2 + Android GPS-Logger2/3 >=1.5.2
+			case 34: //Android GPS-Logger_UL2 >=1.5.2
+			case 35: //Android GPS-Logger2/3_UL >=1.5.2
+			case 43: //Android GPS-Logger2/3_UL2 >=1.5.2
+				for (int i = 0; i < recordSet.size(); ++i) {
+					recordSet.get(i).setName("????"+i); // make names unique to enable update later on
+				}
+				return super.crossCheckMeasurements(fileRecordsProperties, recordSet);
+				
+			default: //GDE handling
+				if (fileRecordsProperties.length != recordKeys.length) {
+					//begin GDE 3.4.9 Ch1=41 measurements, CH2=49 measurements
+					//SMGPS  added 15=GlideRatio 16=SpeedGlideRatio;
+					for (int i = 0, j = 0; i < recordKeys.length; i++) {
+						switch (i) {
+						case 15: //GlideRatio
+						case 16: //SpeedGlideRatio
+							sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
+							recordSet.get(i).setActive(null);
+							break;
+						default:
+							if (j < fileRecordsProperties.length) {
+								HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+								sb.append(String.format("%02d %19s match %19s isAvtive = %s\n", i, recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+								cleanedRecordNames.add(recordKeys[i]);
+								noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+								if (fileRecordsProperties[j].contains("_isActive=false")) recordSet.get(i).setActive(false);
+								++j;
+							}
+							else {//some Android saved record sets contain less fileRecordsProperties, mark rest as calculation
+								sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
+								recordSet.get(i).setActive(null);
+							}
+							break;
+						}
+					}
+				}
+				else { //already adapted record set stored
+					for (int i = 0; i < recordKeys.length; i++) {
+						if (!fileRecordsProperties[i].contains("_isActive")) {
+							sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
+							recordSet.get(i).setActive(null);
+							cleanedRecordNames.add(recordKeys[i]);
+						}
+						else {
+							HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[i], Record.DELIMITER, Record.propertyKeys);
 							sb.append(String.format("%02d %19s match %19s isAvtive = %s\n", i, recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
 							cleanedRecordNames.add(recordKeys[i]);
 							noneCalculationRecordNames.add(recordProps.get(Record.NAME));
-							if (fileRecordsProperties[j].contains("_isActive=false")) recordSet.get(i).setActive(false);
-							++j;
+							if (fileRecordsProperties[i].contains("_isActive=false")) recordSet.get(i).setActive(false);
 						}
-						else {//some Android saved record sets contain less fileRecordsProperties, mark rest as calculation
-							sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
-							recordSet.get(i).setActive(null);
-						}
-						break;
 					}
 				}
-			}
-			else { //already adapted record set stored
-				for (int i = 0; i < recordKeys.length; i++) {
-					if (!fileRecordsProperties[i].contains("_isActive")) {
-						sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
-						recordSet.get(i).setActive(null);
-						cleanedRecordNames.add(recordKeys[i]);
-					}
-					else {
-						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[i], Record.DELIMITER, Record.propertyKeys);
-						sb.append(String.format("%02d %19s match %19s isAvtive = %s\n", i, recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
-						cleanedRecordNames.add(recordKeys[i]);
-						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
-						if (fileRecordsProperties[i].contains("_isActive=false")) recordSet.get(i).setActive(false);
-					}
-				}
+				break;
 			}
 		}
 		catch (Exception e) {

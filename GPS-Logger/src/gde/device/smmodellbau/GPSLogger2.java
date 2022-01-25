@@ -46,7 +46,7 @@ public class GPSLogger2 extends GPSLogger {
 	//CH2-UniLog2
 	//Unilog2 20=voltage_UL 21=current_UL2 22=capacity_UL2 23=power_UL2 24=energy_UL2 25=balance_UL 26=cellVoltage1 27=cellVolt2_ul 28=cellVolltage3_UL 29=cellVoltage4_UL 30=cellVoltage5_UL 31=cellVoltage6_UL 32=revolution_UL 33=a1_UL 34=a2_UL 35=a3_UL 36=temp_UL;
 	//M-LINK 37=valAdd00 38=valAdd01 39=valAdd02 40=valAdd03 41=valAdd04 42=valAdd05 43=valAdd06 44=valAdd07 45=valAdd08 46=valAdd09 47=valAdd10 48=valAdd11 49=valAdd12 50=valAdd13 51=valAdd14;
-	//begin FW1.26
+	//begin FW1.26 GDE 3.4.9
 	//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 	//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
 	//SMGPS2 17=AccelerationX 18=AccelerationY 19=AccelerationZ 20=ENL 21=Impulse 22=AirSpeed 23=pressure static 24=pressure TEK 25=climb TEK
@@ -93,7 +93,7 @@ public class GPSLogger2 extends GPSLogger {
 		//CH2-UniLog2
 		//Unilog2 20=voltage_UL 21=current_UL2 22=capacity_UL2 23=power_UL2 24=energy_UL2 25=balance_UL 26=cellVoltage1 27=cellVolt2_ul 28=cellVolltage3_UL 29=cellVoltage4_UL 30=cellVoltage5_UL 31=cellVoltage6_UL 32=revolution_UL 33=a1_UL 34=a2_UL 35=a3_UL 36=temp_UL;
 		//M-LINK 37=valAdd00 38=valAdd01 39=valAdd02 40=valAdd03 41=valAdd04 42=valAdd05 43=valAdd06 44=valAdd07 45=valAdd08 46=valAdd09 47=valAdd10 48=valAdd11 49=valAdd12 50=valAdd13 51=valAdd14;
-		//begin FW1.26 Ch1=49 measurements, Ch2=57 measurements
+		//GDE 3.4.9 begin FW1.26 Ch1=49 measurements, Ch2=57 measurements
 		//GPS 		0=latitude 1=longitude 2=altitudeGPS 3=numSatelites 4=PDOP 5=HDOP 6=VDOP 7=velocity;
 		//SMGPS 	8=altitudeRel 9=climb 10=voltageRx 11=distanceTotal 12=distanceStart 13=directionStart 14=azimuth/track 15=GlideRatio 16=SpeedGlideRatio;
 		//SMGPS2 17=AccelerationX 18=AccelerationY 19=AccelerationZ 20=ENL 21=Impulse 22=AirSpeed 23=pressure static 24=pressure TEK 25=climb TEK
@@ -113,54 +113,66 @@ public class GPSLogger2 extends GPSLogger {
 		Vector<String> noneCalculationRecordNames = new Vector<String>();
 
 		try {
-			if (fileRecordsProperties.length != recordKeys.length) {
-				//firmware < 126 Ch1=44 measurements, CH2=52 measurements
-				//begin FW1.26 Ch1=50 measurements, Ch2=58 measurements
-				//SMGPS  added 15=GlideRatio 16=SpeedGlideRatio;
-				//SMGPS2 added 22=AirSpeed 23=pressure static 24=pressure TEK 25=climb TEK
-				for (int i = 0, j = 0; i < recordKeys.length; i++) {
-					switch (i) {
-					case 15: //GlideRatio
-					case 16: //SpeedGlideRatio
-					case 22: //AirSpeed
-					case 23: //pressure static
-					case 24: //pressure TEK
-					case 25: //climb TEK
-						sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
-						recordSet.get(i).setActive(null);
-						break;
-					default:
-						if (j < fileRecordsProperties.length) {
-							HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
-							sb.append(String.format("%02d %19s match %19s isAvtive = %s\n", i, recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
-							cleanedRecordNames.add(recordKeys[i]);
-							noneCalculationRecordNames.add(recordProps.get(Record.NAME));
-							if (fileRecordsProperties[j].contains("_isActive=false")) recordSet.get(i).setActive(false);
-							++j;
-						}
-						else {//some Android saved record sets contain less fileRecordsProperties, mark rest as calculation
+			switch (fileRecordsProperties.length) {
+			case 20: //Android GPS-Logger2/3 < 1.5.2
+			case 29: //Android GPS-Logger2/3_UL < 1.5.2
+			case 37: //Android GPS-Logger2/3_UL2 < 1.5.2
+			case 26: //Android GPS-Logger2/3 >=1.5.2
+			case 35: //Android GPS-Logger2/3_UL >=1.5.2
+			case 43: //Android GPS-Logger2/3_UL2 >=1.5.2
+				return super.crossCheckMeasurements(fileRecordsProperties, recordSet);
+				
+			default: //GDE handling
+				if (fileRecordsProperties.length != recordKeys.length) {
+					//GDE 3.4.9 firmware < 126 Ch1=44 measurements, CH2=52 measurements
+					//begin FW1.26 Ch1=50 measurements, Ch2=58 measurements
+					//SMGPS  added 15=GlideRatio 16=SpeedGlideRatio;
+					//SMGPS2 added 22=AirSpeed 23=pressure static 24=pressure TEK 25=climb TEK
+					for (int i = 0, j = 0; i < recordKeys.length; i++) {
+						switch (i) {
+						case 15: //GlideRatio
+						case 16: //SpeedGlideRatio
+						case 22: //AirSpeed
+						case 23: //pressure static
+						case 24: //pressure TEK
+						case 25: //climb TEK
 							sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
 							recordSet.get(i).setActive(null);
+							break;
+						default:
+							if (j < fileRecordsProperties.length) {
+								HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[j], Record.DELIMITER, Record.propertyKeys);
+								sb.append(String.format("%02d %19s match %19s isAvtive = %s\n", i, recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+								cleanedRecordNames.add(recordKeys[i]);
+								noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+								if (fileRecordsProperties[j].contains("_isActive=false")) recordSet.get(i).setActive(false);
+								++j;
+							}
+							else {//some Android saved record sets contain less fileRecordsProperties, mark rest as calculation
+								sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
+								recordSet.get(i).setActive(null);
+							}
+							break;
+							}
 						}
-						break;
 					}
-				}
-			}
-			else { //already adapted record set stored
-				for (int i = 0; i < recordKeys.length; i++) {
-					if (!fileRecordsProperties[i].contains("_isActive")) {
-						sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
-						recordSet.get(i).setActive(null);
-						cleanedRecordNames.add(recordKeys[i]);
+					else { //already adapted record set stored
+						for (int i = 0; i < recordKeys.length; i++) {
+							if (!fileRecordsProperties[i].contains("_isActive")) {
+								sb.append(String.format("%02d added measurement set to isCalculation=true -> %s\n", i, recordKeys[i]));
+								recordSet.get(i).setActive(null);
+								cleanedRecordNames.add(recordKeys[i]);
+							}
+							else {
+								HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[i], Record.DELIMITER, Record.propertyKeys);
+								sb.append(String.format("%02d %19s match %19s isAvtive = %s\n", i, recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
+								cleanedRecordNames.add(recordKeys[i]);
+								noneCalculationRecordNames.add(recordProps.get(Record.NAME));
+								if (fileRecordsProperties[i].contains("_isActive=false")) recordSet.get(i).setActive(false);
+							}
+						}
 					}
-					else {
-						HashMap<String, String> recordProps = StringHelper.splitString(fileRecordsProperties[i], Record.DELIMITER, Record.propertyKeys);
-						sb.append(String.format("%02d %19s match %19s isAvtive = %s\n", i, recordKeys[i], recordProps.get(Record.NAME), recordProps.get(Record.IS_ACTIVE)));
-						cleanedRecordNames.add(recordKeys[i]);
-						noneCalculationRecordNames.add(recordProps.get(Record.NAME));
-						if (fileRecordsProperties[i].contains("_isActive=false")) recordSet.get(i).setActive(false);
-					}
-				}
+					break;
 			}
 		}
 		catch (Exception e) {
