@@ -765,7 +765,8 @@ public class HoTTbinReader {
 
 				if (!HoTTbinReader.pickerParameters.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { // switch into text modus
 					if (HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { // buf 3, 4, tx,rx
-						if (HoTTbinReader.log.isLoggable(Level.FINE)) HoTTbinReader.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+						if (HoTTbinReader.log.isLoggable(Level.INFO)) 
+							HoTTbinReader.log.log(Level.INFO, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
 						((RcvBinParser) HoTTbinReader.rcvBinParser).trackPackageLoss(true);
 						// create and fill sensor specific data record sets
@@ -1159,7 +1160,8 @@ public class HoTTbinReader {
 
 				if (!HoTTbinReader.pickerParameters.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { // switch into text modus
 					if (HoTTbinReader.buf[33] >= 0 && HoTTbinReader.buf[33] <= 4 && HoTTbinReader.buf[3] != 0 && HoTTbinReader.buf[4] != 0) { // buf 3, 4, tx,rx
-						if (HoTTbinReader.log.isLoggable(Level.FINE)) HoTTbinReader.log.log(Level.FINE, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
+						if (HoTTbinReader.log.isLoggable(Level.INFO)) 
+							HoTTbinReader.log.log(Level.INFO, String.format("Sensor %x Blocknummer : %d", HoTTbinReader.buf[7], HoTTbinReader.buf[33]));
 
 						((RcvBinParser) HoTTbinReader.rcvBinParser).trackPackageLoss(true);
 						// create and fill sensor specific data record sets

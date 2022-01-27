@@ -149,8 +149,8 @@ public class HoTTlogReader2 extends HoTTlogReader {
 				//if (!HoTTAdapter.isFilterTextModus || (HoTTbinReader.buf[6] & 0x01) == 0) { //switch into text modus
 				if (HoTTbinReader.buf[8] != 0 && HoTTbinReader.buf[9] != 0) { //buf 8, 9, tx,rx, rx sensitivity data
 					if (HoTTbinReader.buf[24] != 0x1F) {//rx sensitivity data
-						if (log.isLoggable(Level.FINE)) {
-							log.log(Level.FINE, String.format("Sensor %02X", HoTTbinReader.buf[26]));
+						if (log.isLoggable(Level.INFO)) {
+							log.log(Level.INFO, String.format("Sensor %02X", HoTTbinReader.buf[26]));
 						}
 					}
 					reverseChannelPackageLossCounter.add(1);
