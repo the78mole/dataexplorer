@@ -3,6 +3,7 @@ Development history / change log, please read from bottom up
 Version 3.5.4 - xx yyy 2022
 Generic changes/fixes
 	* update MacOS info.plist as well as start shell script
+	* add building md5 hash for download verification
 		
 Device specific changes/fixes
 	* GPS-Logger2/3 - fix error for Android saved OSD files

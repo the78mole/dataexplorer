@@ -1198,10 +1198,10 @@
 		</copy>
 	</target>
 
-	<target name="signature" description="create and verify gpg signature and verify" depends="copy_docu, copy_misc">
+	<target name="signature" description="create and verify gpg signature" depends="copy_docu, copy_misc">
 		<for param="file">
 			<path>
-				<fileset dir="${basedir}/build/target/install" includes="*.sig" />
+				<fileset dir="${basedir}/build/target/install" includes="**/*.sig,**/*.md5" />
 			</path>
 			<sequential>
 				<delete file="@{file}" />
@@ -1210,7 +1210,7 @@
 		<!-- find . -name "*" -type f -exec gpg -b - -use-agent {} \; -->
 		<for param="file">
 			<path>
-				<fileset dir="${basedir}/build/target/install" includes="**" excludes="*.sig" />
+				<fileset dir="${basedir}/build/target/install" includes="**" excludes="**/*.sig" />
 			</path>
 			<sequential>
 				<echo message="signing: @{file}" />
@@ -1223,12 +1223,49 @@
 		<!-- find . -name "*.sig" -type f -exec gpg - -verify {} \; -->
 		<for param="file">
 			<path>
-				<fileset dir="${basedir}/build/target/install" includes="*.sig" />
+				<fileset dir="${basedir}/build/target/install" includes="**/*.sig" />
 			</path>
 			<sequential>
 				<echo message="verify: @{file}" />
 				<exec executable="gpg" dir="${basedir}/build/target/install">
 					<arg value="--verify" />
+					<arg value="@{file}" />
+				</exec>
+			</sequential>
+		</for>
+	</target>
+
+	<target name="md5" description="create and verify md5 checksum" depends="signature">
+		<for param="file">
+			<path>
+				<fileset dir="${basedir}/build/target/install" includes="**/*.md5" />
+			</path>
+			<sequential>
+				<delete file="@{file}" />
+			</sequential>
+		</for>
+		<!-- find . -name "*" -type f -exec md5sum {} \; -->
+		<for param="file">
+			<path>
+				<fileset dir="${basedir}/build/target/install" includes="**" excludes="**/*.md5,**/*.sig" />
+			</path>
+			<sequential>
+				<echo message="build md5 @{file}" />
+				<exec executable="bash" dir="${basedir}/build/target/install">
+					<arg value="-c" />
+					<arg value="md5sum '@{file}' > '@{file}'.md5" />
+				</exec>
+			</sequential>
+		</for>
+		<!-- find . -name "*.md5" -type f -exec md5sum -c {} \; -->
+		<for param="file">
+			<path>
+				<fileset dir="${basedir}/build/target/install" includes="**/*.md5" />
+			</path>
+			<sequential>
+				<echo message="verify: @{file}" />
+				<exec executable="md5sum" dir="${basedir}/build/target/install">
+					<arg value="-c" />
 					<arg value="@{file}" />
 				</exec>
 			</sequential>
