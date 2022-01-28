@@ -2,7 +2,7 @@ Development history / change log, please read from bottom up
 
 Version 3.5.4 - xx yyy 2022
 Generic changes/fixes
-	* 
+	* update MacOS info.plist as well as start shell script
 		
 Device specific changes/fixes
 	* GPS-Logger2/3 - fix error for Android saved OSD files
