@@ -131,7 +131,6 @@ public class GPSHelper {
 			for (; i < recordSize; ++i) {
 				if (recordLatitude.get(i) != 0 && recordLongitude.get(i) != 0) {
 					startIndexGPS = i;
-					++i;
 					break;
 				}
 			}
