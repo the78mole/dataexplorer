@@ -9,6 +9,7 @@ Device specific changes/fixes
 	* GPS-Logger2/3 - fix error for Android saved OSD files
 	* GPS-Logger2/3 - allow AirSpeed tolerance to calculate offset between pressure sensors
 	* HoTTAdapter* - change log level of Sensor and block number to INFO
+	* HoTTAdapter2* - fix wrong GPS time synchronization, wrong record ordinal
 	* JetiAdapter - remove interpolation of values excluding GPS coordinates 
 
 

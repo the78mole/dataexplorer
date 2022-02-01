@@ -2228,7 +2228,7 @@ public class HoTTbinReader {
 			int minute = timeStampGPS_ms/100000 - tmpHH*100;
 			int second = timeStampGPS_ms/1000 - minute*100 - tmpHH*10000;
 			int milliseconds = timeStampGPS_ms - second*1000 - minute*100000 - tmpHH*10000000; 
-			milliseconds += numberDataBlocks_base10_ms == 0 ? 100 : numberDataBlocks_base10_ms * 10; //use 100 ms default correction factor for HoTTAdapter
+			milliseconds -= numberDataBlocks_base10_ms == 0 ? 100 : numberDataBlocks_base10_ms * 10; //use 100 ms default correction factor for HoTTAdapter
 
 			GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day, hour, minute, second);
 			return calendar.getTimeInMillis() + milliseconds;

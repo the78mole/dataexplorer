@@ -2332,7 +2332,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			tmpRecordSet.get(36).setName("ENL");
 			tmpRecordSet.get(36).setUnit("%");
 			if (numberLogEntriesProcessed >= 0)
-				tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(tmpRecordSet.getStartTimeStamp(), tmpRecordSet.get(28).lastElement(), numberLogEntriesProcessed));
+				tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(tmpRecordSet.getStartTimeStamp(), tmpRecordSet.get(33).lastElement(), numberLogEntriesProcessed));
 		}
 		else if (version == 1) { //Graupner GPS #1= 33602/S8437,
 			tmpRecordSet.get(30).setName("velNorth");
@@ -2351,7 +2351,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			tmpRecordSet.get(36).setName("HDOP");
 			tmpRecordSet.get(36).setUnit("dm");
 			if (numberLogEntriesProcessed >= 0)
-				tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(tmpRecordSet.getStartTimeStamp(), tmpRecordSet.get(28).lastElement(), numberLogEntriesProcessed-1));
+				tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(tmpRecordSet.getStartTimeStamp(), tmpRecordSet.get(33).lastElement(), numberLogEntriesProcessed-1));
 		}
 		else if (version == 0) { //Graupner GPS #0=GPS #33600
 			tmpRecordSet.get(33).setName(device.getMeasurementReplacement("time") + " GPS");
@@ -2364,7 +2364,7 @@ public class HoTTAdapter2 extends HoTTAdapter implements IDevice, IHistoDevice {
 			tmpRecordSet.get(35).setUnit("m");
 			tmpRecordSet.get(35).setFactor(1.0);
 			if (numberLogEntriesProcessed >= 0)
-				tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(tmpRecordSet.getStartTimeStamp(), tmpRecordSet.get(28).lastElement(), numberLogEntriesProcessed-1));
+				tmpRecordSet.setStartTimeStamp(HoTTbinReader.getStartTimeStamp(tmpRecordSet.getStartTimeStamp(), tmpRecordSet.get(33).lastElement(), numberLogEntriesProcessed-1));
 		}
 		else {
 			tmpRecordSet.get(30).setName("Byte GPS_1");

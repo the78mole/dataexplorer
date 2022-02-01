@@ -225,7 +225,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 									
 									if (!isGPSdetected) {
 										if (isReasonableData(buf4) && HoTTbinReader2.recordSet.get(33).size() > 0 && HoTTbinReader2.recordSet.get(33).get(HoTTbinReader2.recordSet.get(33).size()-1) != 0) {
-											HoTTAdapter2.updateGpsTypeDependent((buf4[9] & 0xFF), device, HoTTbinReader2.recordSet, HoTTbinReader2.recordSet.getRecordDataSize(true));
+											HoTTAdapter2.updateGpsTypeDependent((buf4[9] & 0xFF), device, HoTTbinReader2.recordSet, (HoTTbinReader2.recordSet.get(33).size()-1) * 5);
 											isGPSdetected = true;
 										}
 									}
@@ -533,7 +533,7 @@ public class HoTTbinReader2 extends HoTTbinReader {
 										
 										if (!isGPSdetected) {
 											if (isReasonableData(buf4) && HoTTbinReader2.recordSet.get(33).size() > 0 && HoTTbinReader2.recordSet.get(33).get(HoTTbinReader2.recordSet.get(33).size()-1) != 0) {
-												HoTTAdapter2.updateGpsTypeDependent((buf4[9] & 0xFF), device, HoTTbinReader2.recordSet, i-1);
+												HoTTAdapter2.updateGpsTypeDependent((buf4[9] & 0xFF), device, HoTTbinReader2.recordSet, (HoTTbinReader2.recordSet.get(33).size()-1) * 5);
 												isGPSdetected = true;
 											}
 										}
