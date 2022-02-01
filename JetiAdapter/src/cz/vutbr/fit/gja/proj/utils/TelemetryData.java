@@ -531,7 +531,7 @@ public class TelemetryData {
 
 		/**
 		 * @param time
-		 * @return integer value matching given time
+		 * @return integer value matching last recent time
 		 */
 		public int getIntAt(double time) {
 			time = time * 1000;
@@ -545,12 +545,40 @@ public class TelemetryData {
 				return this.data.get(0).getInt();
 			}
 			else {
-				//interpolates between the most recent time stamps
+				//retrieve data from most recent time stamps
 				for (int i = 0; i < this.data.size(); i++) {
 					TelemetryItem i1;
 					i1 = this.data.get(i);
 					if (i1.timestamp >= time) {
 						return i1.getInt();
+					}
+				}
+				return 0;
+			}
+		}
+
+		/**
+		 * @param time
+		 * @return integer value matching last recent time
+		 */
+		public int getIntValueAt(double time) {
+			time = time * 1000;
+			if (this.data.size() == 0) {
+				return 0;
+			}
+			else if (time >= this.data.get(this.data.size() - 1).timestamp) {
+				return this.data.get(this.data.size() - 1).getIntValue();
+			}
+			else if (time <= 0) {
+				return this.data.get(0).getIntValue();
+			}
+			else {
+				//retrieve data from most recent time stamps
+				for (int i = 0; i < this.data.size(); i++) {
+					TelemetryItem i1;
+					i1 = this.data.get(i);
+					if (i1.timestamp >= time) {
+						return i1.getIntValue();
 					}
 				}
 				return 0;
@@ -633,8 +661,44 @@ public class TelemetryData {
 				double stupne = (this.value >> 16) & 0xFF;
 				stupne = stupne + minute / 60.0;
 				return stupne * (((this.decimals >> 1) & 1) == 1 ? -1 : 1);
+			case T_TIME:
+				return this.value * 1.;
 			default:
 				return 0.0;
+			}
+		}
+
+		/**
+		 * @return value as integer corrected with decimals (factor) and adapted to GDE
+		 */
+		public int getIntValue() {
+			switch (this.dataType) {
+			case T_DATA8:
+			case T_DATA16:
+			case T_DATA24:
+			case T_DATA32:
+			case T_DATA37:
+				switch (this.decimals) {
+				case 0: //1.0
+					return (int) (this.value * 1000);
+				case 1: //0.1
+					return (int) (this.value * 100);
+				case 2: //0.01
+					return (int) (this.value * 10);
+				case 3: //0.001
+					return (int) (this.value * 1);
+				default:
+					return (int) (this.value * Math.pow(10, -this.decimals) * 1000);
+				}
+			case T_GPS:
+				double minute = (this.value & 0xFFFF) / 1000.0;
+				double stupne = (this.value >> 16) & 0xFF;
+				stupne = stupne + minute / 60.0;
+				return (int) (stupne * (((this.decimals >> 1) & 1) == 1 ? -1 : 1) * 1000000);
+			case T_TIME:
+				return this.value * 1000;
+			default:
+				return 0;
 			}
 		}
 

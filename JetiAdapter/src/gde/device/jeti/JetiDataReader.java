@@ -45,6 +45,7 @@ import gde.exception.DevicePropertiesInconsistenceException;
 import gde.exception.MissMatchDeviceException;
 import gde.exception.NotSupportedFileFormatException;
 import gde.io.CSVSerialDataReaderWriter;
+import gde.log.Level;
 import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.ui.DataExplorer;
@@ -113,14 +114,14 @@ public class JetiDataReader {
 				//$recordSetNumber;stateNumber;timeStepSeconds;firstIntValue;secondIntValue;.....;checkSumIntValue;
 				int measurementSize = device.getNumberOfMeasurements(activeChannelConfigNumber);
 				int dataBlockSize = device.getDataBlockSize(InputTypes.FILE_IO); // measurements size must not match data block size, there are some measurements which are result of calculation
-				JetiDataReader.log.log(java.util.logging.Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
+				JetiDataReader.log.log(Level.FINE, "measurementSize = " + measurementSize + "; dataBlockSize = " + dataBlockSize); //$NON-NLS-1$ //$NON-NLS-2$
 				if (measurementSize < Math.abs(dataBlockSize)) throw new DevicePropertiesInconsistenceException(Messages.getString(MessageIds.GDE_MSGE0041, new String[] { filePath }));
 				StringBuilder reverseChannelStatistics = new StringBuilder();
 				
 				TelemetryData data = new TelemetryData();
 				if (data.loadData(filePath)) {
 					TreeSet<TelemetrySensor> recordSetData = data.getData();
-					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "Modell name = " + data.getModelName());
+					if (JetiDataReader.log.isLoggable(Level.FINE)) JetiDataReader.log.log(Level.FINE, "Modell name = " + data.getModelName());
 					if (JetiDataReader.application.getMenuBar() != null) device.matchModelNameObjectKey(data.getModelName());
 
 					//find best fit number of values to time step
@@ -130,24 +131,25 @@ public class JetiDataReader {
 						boolean isTimeStepEvaluated = false;
 						//System.out.println(telemetrySensor.getName() + " - ");
 						for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
-							//System.out.println(dataVar.getName());
+							int dataItemsSize = dataVar.getItems().size();
+							//System.out.println(dataVar.getName() + " data items size = " + dataItemsSize);
 							if (dataVar.getItems().size() > 3) { //Alarm has 3 values start time, alarm time , end time
-								if (valuesMap.containsKey(dataVar.getItems().size()) && dataVar.getItems().size() > 1) {
-									valuesMap.put(dataVar.getItems().size(), valuesMap.get(dataVar.getItems().size()) + 1);
-									maxHit = Math.max(maxHit, valuesMap.get(dataVar.getItems().size()));
+								if (valuesMap.containsKey(dataItemsSize) && dataItemsSize > 1) {
+									valuesMap.put(dataItemsSize, valuesMap.get(dataItemsSize) + 1);
+									maxHit = Math.max(maxHit, valuesMap.get(dataItemsSize));
 									if (!isTimeStepEvaluated && dataVar.getTimeSteps().size() > 0) {
-										if (telemetrySensor.getName().length() <= 5 )
+										if (telemetrySensor.getName().length() <= 8 )
 											reverseChannelStatistics.append(String.format(Locale.getDefault(), "%s\t\tmin %.3fsec avg %.3fsec max %.3fsec at %s", telemetrySensor.getName(), dataVar.getTimeSteps().getMinValue()/1000., dataVar.getTimeSteps().getAvgValue()/1000., dataVar.getTimeSteps().getMaxValue()/1000., TimeLine.getFomatedTimeWithUnit(dataVar.getTimeSteps().getMaxValueTimeStamp()))).append(GDE.CHAR_NEW_LINE);
 										else 
 											reverseChannelStatistics.append(String.format(Locale.getDefault(), "%s\tmin %.3fsec avg %.3fsec max %.3fsec at %s", telemetrySensor.getName(), dataVar.getTimeSteps().getMinValue()/1000., dataVar.getTimeSteps().getAvgValue()/1000., dataVar.getTimeSteps().getMaxValue()/1000., TimeLine.getFomatedTimeWithUnit(dataVar.getTimeSteps().getMaxValueTimeStamp()))).append(GDE.CHAR_NEW_LINE);
-										//JetiDataReader.log.log(java.util.logging.Level.OFF, String.format(Locale.getDefault(), "%10s: min %.3fsec avg %.3fsec max %.3fsec at %s", telemetrySensor.getName(), dataVar.getTimeSteps().getMinValue()/1000., dataVar.getTimeSteps().getAvgValue()/1000., dataVar.getTimeSteps().getMaxValue()/1000., TimeLine.getFomatedTimeWithUnit(dataVar.getTimeSteps().getMaxValueTimeStamp())));
+										JetiDataReader.log.log(Level.INFO, String.format(Locale.getDefault(), "%10s: min %.3fsec avg %.3fsec max %.3fsec at %s", telemetrySensor.getName(), dataVar.getTimeSteps().getMinValue()/1000., dataVar.getTimeSteps().getAvgValue()/1000., dataVar.getTimeSteps().getMaxValue()/1000., TimeLine.getFomatedTimeWithUnit(dataVar.getTimeSteps().getMaxValueTimeStamp())));
 										isTimeStepEvaluated = true;
 									}
 								}
 								else
-									valuesMap.put(dataVar.getItems().size(), 1);
+									valuesMap.put(dataItemsSize, 1);
 							}
-							if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, String.format("%10s [%s]", dataVar.getName(), dataVar.getUnit()));
+							if (JetiDataReader.log.isLoggable(Level.FINE)) JetiDataReader.log.log(Level.FINE, String.format("%10s [%s]", dataVar.getName(), dataVar.getUnit()));
 						}
 					}
 					Integer[] occurrence = valuesMap.values().toArray(new Integer[1]);
@@ -158,9 +160,9 @@ public class JetiDataReader {
 							break;
 						}
 					}
-					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "best fit # values = " + numValues);
+					if (JetiDataReader.log.isLoggable(Level.FINE)) JetiDataReader.log.log(Level.FINE, "best fit # values = " + numValues);
 					timeStep_ms = data.getMaxTimestamp() * 1000.0 / numValues;
-					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, String.format("best fit timeStep_ms = %.1f", timeStep_ms));
+					if (JetiDataReader.log.isLoggable(Level.FINE)) JetiDataReader.log.log(Level.FINE, String.format("best fit timeStep_ms = %.1f", timeStep_ms));
 
 					try {
 						recordSetNameExtend = device.getRecordSetStateNameReplacement(1); // state name
@@ -192,8 +194,8 @@ public class JetiDataReader {
 									newRecordName = String.format("%s %s", newRecordName, telemetrySensor.getName());
 								}
 								vecRecordNames.add(newRecordName);
-								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) 
-									JetiDataReader.log.log(java.util.logging.Level.FINE, String.format("add new record = %s [%s]", newRecordName, dataVar.getUnit()));
+								if (JetiDataReader.log.isLoggable(Level.FINE)) 
+									JetiDataReader.log.log(Level.FINE, String.format("add new record = %s [%s]", newRecordName, dataVar.getUnit()));
 
 								device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
 								device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
@@ -217,7 +219,7 @@ public class JetiDataReader {
 								else if ((dataVar.getName().toLowerCase().contains("speed") || dataVar.getName().toLowerCase().contains("geschw")) && (dataVar.getUnit().equals("km/h") || dataVar.getUnit().equals("kmh") || dataVar.getUnit().equals("kph") || dataVar.getUnit().equals("m/s"))) {
 									mapRecordType.put(index, Record.DataType.GPS_SPEED);
 								}
-								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "param = " + dataVar.getParam());
+								if (JetiDataReader.log.isLoggable(Level.FINE)) JetiDataReader.log.log(Level.FINE, "param = " + dataVar.getParam());
 								++index;
 							}
 						}
@@ -231,7 +233,7 @@ public class JetiDataReader {
 									newRecordName = newRecordName + "'";
 								}
 								vecRecordNames.add(newRecordName);
-								if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE)) JetiDataReader.log.log(java.util.logging.Level.FINE, "add new record name = " + newRecordName);
+								if (JetiDataReader.log.isLoggable(Level.FINE)) JetiDataReader.log.log(Level.FINE, "add new record name = " + newRecordName);
 
 								device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
 								device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
@@ -268,24 +270,27 @@ public class JetiDataReader {
 					activeChannel.put(recordSetName, recordSet);
 
 					index = 0;
-					if (JetiDataReader.log.isLoggable(java.util.logging.Level.FINE))
-						JetiDataReader.log.log(java.util.logging.Level.FINE, device.getNumberOfMeasurements(activeChannelConfigNumber) + " - " + recordSet.size());
+					if (JetiDataReader.log.isLoggable(Level.FINE))
+						JetiDataReader.log.log(Level.FINE, device.getNumberOfMeasurements(activeChannelConfigNumber) + " - " + recordSet.size());
 					int[] points = new int[recordNames.length];
 					for (int i = 0; i < numValues; i++) {
 						for (TelemetrySensor telemetrySensor : recordSetData) {
 							if (telemetrySensor.getId() != 0) {
 								for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
-									//TODO System.out.print(String.format("%s ", dataVar.getName()));
-									points[index++] = (int) (dataVar.getDoubleAt(time_ms / 1000) * (dataVar.getType() == TelemetryData.T_GPS ? 1000000 : 1000));
+									//System.out.print(String.format("%s ", dataVar.getName()));
+									if (dataVar.getType() == TelemetryData.T_GPS)
+											points[index++] = (int) (dataVar.getDoubleAt(time_ms / 1000) * 1000000);
+									else	
+										points[index++] = dataVar.getIntValueAt(time_ms / 1000);									
 									//System.out.print(String.format("%3.2f ", (points[index-1]/1000.0)));
 								}
 							}
 						}
 						for (TelemetrySensor telemetrySensor : recordSetData) {
-							if (telemetrySensor.getId() == 0) {
+							if (telemetrySensor.getId() == 0) { // Warnings, Events, ..
 								for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
-									//System.out.print(String.format("%s ", dataVar.getName()));
-									points[index++] = (int) (dataVar.getDoubleAt(time_ms / 1000) * (dataVar.getType() == TelemetryData.T_GPS ? 1000000 : 1000));
+									//System.out.print(String.format("%s \n", dataVar.getName()));
+									points[index++] = dataVar.getIntValueAt(time_ms / 1000);									
 									//System.out.print(String.format("%3.2f ", (points[index-1]/1000.0)));
 								}
 							}
@@ -342,7 +347,7 @@ public class JetiDataReader {
 			}
 			// now display the error message
 			String msg = filePath + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGE0045, new Object[] { e.getMessage(), lineNumber });
-			JetiDataReader.log.log(java.util.logging.Level.WARNING, msg, e);
+			JetiDataReader.log.log(Level.WARNING, msg, e);
 			JetiDataReader.application.openMessageDialog(msg);
 		}
 		//		finally {
