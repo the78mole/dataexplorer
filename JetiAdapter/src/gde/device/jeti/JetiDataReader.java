@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -87,6 +89,8 @@ public class JetiDataReader {
 		Channel activeChannel = null;
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
 		boolean isOutdated = false;
+		boolean isActualTime = false, isActualDate = false;
+		int indexTimeRecord = -1, indexDateRecord = -1;
 		int lineNumber = 0;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
 		String recordSetNameExtend = device.getRecordSetStemNameReplacement();
@@ -207,6 +211,16 @@ public class JetiDataReader {
 									isActualgps = true;
 									mapRecordType.put(index, Record.DataType.GPS_LONGITUDE);
 								}
+								if (dataVar.getType() == (TelemetryData.T_TIME) && (dataVar.getDecimals() & 1) == 0) {
+									mapRecordType.put(index, Record.DataType.GPS_TIME);
+									isActualTime = true;
+									indexTimeRecord = index;
+								}
+								else if (dataVar.getType() == (TelemetryData.T_TIME) && (dataVar.getDecimals() & 1) == 1) {
+									mapRecordType.put(index, Record.DataType.DATE_TIME);
+									isActualDate = true;
+									indexDateRecord = index;
+								}
 								else if (isActualgps && dataVar.getUnit().contains("°") && dataVar.getParam() == 10) {
 									mapRecordType.put(index, Record.DataType.GPS_AZIMUTH);
 								}
@@ -309,6 +323,36 @@ public class JetiDataReader {
 					device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 					if (!isOutdated) {
 						long startTimeStamp = (long) (new File(filePath).lastModified() - activeChannel.get(recordSetName).getMaxTime_ms());
+						if (isActualTime && indexTimeRecord >= 0 
+								&& activeChannel.get(recordSetName).get(indexTimeRecord).size() > 1 
+								&& activeChannel.get(recordSetName).get(indexTimeRecord).get(0) != 0) {
+							int timeValue = activeChannel.get(recordSetName).get(indexTimeRecord).get(0) / 1000;
+							int tmpHH = timeValue/10000;
+							int tmpMM = timeValue/100 - tmpHH*100;
+							int tmpSS = timeValue - tmpMM*100 - tmpHH*10000;
+
+							Calendar cal = new GregorianCalendar();
+							cal.setTimeInMillis(startTimeStamp);
+							cal.set(Calendar.HOUR_OF_DAY, tmpHH);
+							cal.set(Calendar.MINUTE, tmpMM);
+							cal.set(Calendar.SECOND, tmpSS);
+							startTimeStamp = cal.getTimeInMillis();						
+						}
+						if (isActualDate && indexDateRecord >= 0 
+								&& activeChannel.get(recordSetName).get(indexDateRecord).size() > 11 
+								&& activeChannel.get(recordSetName).get(indexDateRecord).get(0) != 0) {
+							int dateValue = activeChannel.get(recordSetName).get(indexDateRecord).get(10) / 1000;
+							int tmpYY = dateValue/10000;
+							int tmpMM = dateValue/100 - tmpYY*100;
+							int tmpDD = dateValue - tmpMM*100 - tmpYY*10000;
+
+							Calendar cal = new GregorianCalendar();
+							cal.setTimeInMillis(startTimeStamp);
+							cal.set(Calendar.YEAR, tmpYY + 2000);
+							cal.set(Calendar.MONTH, tmpMM - 1);
+							cal.set(Calendar.DAY_OF_MONTH, tmpDD);
+							startTimeStamp = cal.getTimeInMillis();						
+						}
 						activeChannel.get(recordSetName).setRecordSetDescription(
 								device.getName() + GDE.STRING_MESSAGE_CONCAT + Messages.getString(MessageIds.GDE_MSGT0129) + new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(startTimeStamp));
 						activeChannel.get(recordSetName).setStartTimeStamp(startTimeStamp);
@@ -350,11 +394,6 @@ public class JetiDataReader {
 			JetiDataReader.log.log(Level.WARNING, msg, e);
 			JetiDataReader.application.openMessageDialog(msg);
 		}
-		//		finally {
-		//			if (application.getStatusBar() != null) {
-		//				application.setStatusMessage(GDE.STRING_EMPTY);
-		//			}
-		//		}
 
 		return recordSet;
 	}

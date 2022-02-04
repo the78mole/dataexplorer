@@ -669,7 +669,7 @@ public class TelemetryData {
 		}
 
 		/**
-		 * @return value as integer corrected with decimals (factor) and adapted to GDE
+		 * @return value as integer corrected with decimals (factor) and adapted to GDE data model
 		 */
 		public int getIntValue() {
 			switch (this.dataType) {
@@ -696,7 +696,14 @@ public class TelemetryData {
 				stupne = stupne + minute / 60.0;
 				return (int) (stupne * (((this.decimals >> 1) & 1) == 1 ? -1 : 1) * 1000000);
 			case T_TIME:
-				return this.value * 1000;
+				switch (this.decimals) {
+				case 0: //time
+					return (((this.value >> 16) * 10000) + ((this.value >> 8 & 0x00FF) * 100) + (this.value & 0x0000FF)) * 1000;
+				case 1: //date
+					return (((this.value & 0x0000FF) * 10000) + ((this.value >> 8 & 0x00FF) * 100) + (this.value >> 16)) * 1000;
+				default:
+					return this.value * 1000;
+				}
 			default:
 				return 0;
 			}

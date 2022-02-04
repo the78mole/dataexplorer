@@ -279,11 +279,14 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 				case GPS_LATITUDE:
 				case GPS_LONGITUDE:
 					dataTableRow[index + 1] = String.format("%.6f", (record.get(rowIndex) / 1000000.0));
-					//				double value = (record.realGet(rowIndex) / 1000000.0);
-					//				int grad = (int)value;
-					//				double minuten = (value - grad) * 100;
-					//				dataTableRow[j + 1] = String.format("%.6f", (grad + minuten / 60)); //$NON-NLS-1$
 					break;
+					
+					case GPS_TIME:
+						dataTableRow[index + 1] = JetiAdapter.getFormattedTime(record.realGet(rowIndex));
+						break;
+					case DATE_TIME:
+						dataTableRow[index + 1] = JetiAdapter.getFormattedDate(record.realGet(rowIndex));
+						break;
 
 				case DEFAULT:
 				default:
@@ -300,6 +303,28 @@ public class JetiAdapter extends DeviceConfiguration implements IDevice {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return dataTableRow;
+	}
+
+	/**
+	 * @param timeValue
+	 * @return formatted time HH:mm:ss
+	 */
+	public static String getFormattedTime(final int timeValue) {
+		int tmpHH = timeValue/10000000;
+		int tmpMM = timeValue/100000 - tmpHH*100;
+		int tmpSS = timeValue/1000 - tmpMM*100 - tmpHH*10000;
+		return String.format("%02d:%02d:%02d", tmpHH, tmpMM, tmpSS); //$NON-NLS-1$;
+	}
+
+	/**
+	 * @param dateValue
+	 * @return formatted date yy-MM-dd
+	 */
+	public static String getFormattedDate(int dateValue) {
+		int tmpYY = dateValue/10000000;
+		int tmpMM = dateValue/100000 - tmpYY*100;
+		int tmpDD = dateValue/1000 - tmpMM*100 - tmpYY*10000;
+		return String.format("%02d-%02d-%02d", tmpYY, tmpMM, tmpDD); //$NON-NLS-1$
 	}
 
 	/**

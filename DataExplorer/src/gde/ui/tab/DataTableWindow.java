@@ -521,7 +521,7 @@ public class DataTableWindow extends CTabItem {
 					column.setWidth(sb.length() * extentFactor);
 					column.setText(sb.toString());
 				}
-				if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { // add aditional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				if (System.getProperty("os.name", "").toLowerCase().startsWith("linux")) { // add additional header field for padding //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
 					column.setWidth(100);
 				}
