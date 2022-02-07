@@ -11,6 +11,7 @@ Device specific changes/fixes
 	* HoTTAdapter* - change log level of Sensor and block number to INFO
 	* HoTTAdapter2* - fix wrong GPS time synchronization, wrong record ordinal
 	* JetiAdapter - remove interpolation of values excluding GPS coordinates 
+	* JetiAdapter - find start index of GPS data to avoid interpolation which disturb GPS track visualization
 	* JetiAdapter - parse time and date and use for synchronization
 
 

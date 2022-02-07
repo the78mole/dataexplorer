@@ -462,15 +462,14 @@ public class TelemetryData {
 		/**
 		 * @return the value  approximated to the given time
 		 */
-		public double getDoubleAt(double time) {
-			time = time * 1000;
+		public double getDoubleAt(double time_ms) {
 			if (this.data.size() == 0) {
 				return 0;
 			}
-			else if (time >= this.data.get(this.data.size() - 1).timestamp) {
+			else if (time_ms >= this.data.get(this.data.size() - 1).timestamp) {
 				return this.data.get(this.data.size() - 1).getDouble();
 			}
-			else if (time <= 0) {
+			else if (time_ms <= 0) {
 				return this.data.get(0).getDouble();
 			}
 			else {
@@ -479,12 +478,12 @@ public class TelemetryData {
 					TelemetryItem i1, i2;
 					i1 = this.data.get(i);
 					i2 = this.data.get(i + 1);
-					if (i1.timestamp <= time && i2.timestamp > time) {
+					if (i1.timestamp <= time_ms && i2.timestamp > time_ms) {
 						if (i1.timestamp == i2.timestamp) {
 							return i1.getDouble();
 						}
 
-						double interv = (time - i1.timestamp) / (i2.timestamp - i1.timestamp);
+						double interv = (time_ms - i1.timestamp) / (i2.timestamp - i1.timestamp);
 						return i1.getDouble() + interv * (i2.getDouble() - i1.getDouble());
 					}
 				}
@@ -493,18 +492,17 @@ public class TelemetryData {
 		}
 
 		/**
-		 * @param time
+		 * @param time_ms
 		 * @return potential course
 		 */
-		public double getDoubleCourseAt(double time) {
-			time = time * 1000;
+		public double getDoubleCourseAt(double time_ms) {
 			if (this.data.size() == 0) {
 				return 0;
 			}
-			else if (time >= this.data.get(this.data.size() - 1).timestamp) {
+			else if (time_ms >= this.data.get(this.data.size() - 1).timestamp) {
 				return this.data.get(this.data.size() - 1).getDouble();
 			}
-			else if (time <= 0) {
+			else if (time_ms <= 0) {
 				return this.data.get(0).getDouble();
 			}
 
@@ -513,11 +511,11 @@ public class TelemetryData {
 				TelemetryItem i1, i2;
 				i1 = this.data.get(i);
 				i2 = this.data.get(i + 1);
-				if (i1.timestamp <= time && i2.timestamp > time) {
+				if (i1.timestamp <= time_ms && i2.timestamp > time_ms) {
 					if (i1.timestamp == i2.timestamp) {
 						return i1.getDouble();
 					}
-					double interv = (time - i1.timestamp) / (i2.timestamp - i1.timestamp);
+					double interv = (time_ms - i1.timestamp) / (i2.timestamp - i1.timestamp);
 					double d1 = i1.getDouble();
 					double d2 = i2.getDouble();
 					if (Math.abs(d2 - d1) > 180) {
@@ -530,26 +528,29 @@ public class TelemetryData {
 		}
 
 		/**
-		 * @param time
+		 * @param time_ms
 		 * @return integer value matching last recent time
 		 */
-		public int getIntAt(double time) {
-			time = time * 1000;
+		public int getNextIntFrom(double time_ms) {
 			if (this.data.size() == 0) {
 				return 0;
 			}
-			else if (time >= this.data.get(this.data.size() - 1).timestamp) {
+			else if (time_ms >= this.data.get(this.data.size() - 1).timestamp) {
 				return this.data.get(this.data.size() - 1).getInt();
 			}
-			else if (time <= 0) {
+			else if (time_ms <= 0) {
 				return this.data.get(0).getInt();
 			}
 			else {
 				//retrieve data from most recent time stamps
-				for (int i = 0; i < this.data.size(); i++) {
-					TelemetryItem i1;
+				for (int i = 0; i < this.data.size() - 1; i++) {
+					TelemetryItem i1, i2;
 					i1 = this.data.get(i);
-					if (i1.timestamp >= time) {
+					i2 = this.data.get(i + 1);
+					if (i1.timestamp <= time_ms && i2.timestamp > time_ms) {
+						if (i1.timestamp == i2.timestamp) {
+							return i1.getInt();
+						}
 						return i1.getInt();
 					}
 				}
@@ -558,18 +559,44 @@ public class TelemetryData {
 		}
 
 		/**
-		 * @param time
+		 * @param time_ms
 		 * @return integer value matching last recent time
 		 */
-		public int getIntValueAt(double time) {
-			time = time * 1000;
+		public int getIntAt(double time_ms) {
 			if (this.data.size() == 0) {
 				return 0;
 			}
-			else if (time >= this.data.get(this.data.size() - 1).timestamp) {
+			else if (time_ms >= this.data.get(this.data.size() - 1).timestamp) {
+				return this.data.get(this.data.size() - 1).getInt();
+			}
+			else if (time_ms <= 0) {
+				return this.data.get(0).getInt();
+			}
+			else {
+				//retrieve data from most recent time stamps
+				for (int i = 0; i < this.data.size(); i++) {
+					TelemetryItem i1;
+					i1 = this.data.get(i);
+					if (i1.timestamp >= time_ms) {
+						return i1.getInt();
+					}
+				}
+				return 0;
+			}
+		}
+
+		/**
+		 * @param time_ms
+		 * @return integer value matching last recent time
+		 */
+		public int getIntValueAt(double time_ms) {
+			if (this.data.size() == 0) {
+				return 0;
+			}
+			else if (time_ms >= this.data.get(this.data.size() - 1).timestamp) {
 				return this.data.get(this.data.size() - 1).getIntValue();
 			}
-			else if (time <= 0) {
+			else if (time_ms <= 0) {
 				return this.data.get(0).getIntValue();
 			}
 			else {
@@ -577,7 +604,7 @@ public class TelemetryData {
 				for (int i = 0; i < this.data.size(); i++) {
 					TelemetryItem i1;
 					i1 = this.data.get(i);
-					if (i1.timestamp >= time) {
+					if (i1.timestamp >= time_ms) {
 						return i1.getIntValue();
 					}
 				}

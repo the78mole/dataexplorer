@@ -88,9 +88,9 @@ public class JetiDataReader {
 		RecordSet recordSet = null;
 		Channel activeChannel = null;
 		String dateTime = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss").format(new File(filePath).lastModified()); //$NON-NLS-1$
-		boolean isOutdated = false;
+		boolean isOutdated = false, isStartIndexGPS = false;
 		boolean isActualTime = false, isActualDate = false;
-		int indexTimeRecord = -1, indexDateRecord = -1;
+		int ordinalTimeRecord = -1, ordinalDateRecord = -1;
 		int lineNumber = 0;
 		int activeChannelConfigNumber = 1; // at least each device needs to have one channelConfig to place record sets
 		String recordSetNameExtend = device.getRecordSetStemNameReplacement();
@@ -211,15 +211,15 @@ public class JetiDataReader {
 									isActualgps = true;
 									mapRecordType.put(index, Record.DataType.GPS_LONGITUDE);
 								}
-								if (dataVar.getType() == (TelemetryData.T_TIME) && (dataVar.getDecimals() & 1) == 0) {
+								else if (dataVar.getType() == (TelemetryData.T_TIME) && (dataVar.getDecimals() & 1) == 0) {
 									mapRecordType.put(index, Record.DataType.GPS_TIME);
 									isActualTime = true;
-									indexTimeRecord = index;
+									ordinalTimeRecord = index;
 								}
 								else if (dataVar.getType() == (TelemetryData.T_TIME) && (dataVar.getDecimals() & 1) == 1) {
 									mapRecordType.put(index, Record.DataType.DATE_TIME);
 									isActualDate = true;
-									indexDateRecord = index;
+									ordinalDateRecord = index;
 								}
 								else if (isActualgps && dataVar.getUnit().contains("°") && dataVar.getParam() == 10) {
 									mapRecordType.put(index, Record.DataType.GPS_AZIMUTH);
@@ -282,7 +282,7 @@ public class JetiDataReader {
 					}
 
 					activeChannel.put(recordSetName, recordSet);
-
+					
 					index = 0;
 					if (JetiDataReader.log.isLoggable(Level.FINE))
 						JetiDataReader.log.log(Level.FINE, device.getNumberOfMeasurements(activeChannelConfigNumber) + " - " + recordSet.size());
@@ -292,10 +292,11 @@ public class JetiDataReader {
 							if (telemetrySensor.getId() != 0) {
 								for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
 									//System.out.print(String.format("%s ", dataVar.getName()));
-									if (dataVar.getType() == TelemetryData.T_GPS)
-											points[index++] = (int) (dataVar.getDoubleAt(time_ms / 1000) * 1000000);
+									if (dataVar.getType() == TelemetryData.T_GPS && (isStartIndexGPS || (isStartIndexGPS = dataVar.getNextIntFrom(time_ms) > 0))) {
+										points[index++] = (int) (dataVar.getDoubleAt(time_ms) * 1000000);
+									}
 									else	
-										points[index++] = dataVar.getIntValueAt(time_ms / 1000);									
+										points[index++] = dataVar.getIntValueAt(time_ms);									
 									//System.out.print(String.format("%3.2f ", (points[index-1]/1000.0)));
 								}
 							}
@@ -304,7 +305,7 @@ public class JetiDataReader {
 							if (telemetrySensor.getId() == 0) { // Warnings, Events, ..
 								for (TelemetryData.TelemetryVar dataVar : telemetrySensor.getVariables()) {
 									//System.out.print(String.format("%s \n", dataVar.getName()));
-									points[index++] = dataVar.getIntValueAt(time_ms / 1000);									
+									points[index++] = dataVar.getIntValueAt(time_ms);									
 									//System.out.print(String.format("%3.2f ", (points[index-1]/1000.0)));
 								}
 							}
@@ -323,10 +324,10 @@ public class JetiDataReader {
 					device.updateVisibilityStatus(activeChannel.get(recordSetName), true);
 					if (!isOutdated) {
 						long startTimeStamp = (long) (new File(filePath).lastModified() - activeChannel.get(recordSetName).getMaxTime_ms());
-						if (isActualTime && indexTimeRecord >= 0 
-								&& activeChannel.get(recordSetName).get(indexTimeRecord).size() > 1 
-								&& activeChannel.get(recordSetName).get(indexTimeRecord).get(0) != 0) {
-							int timeValue = activeChannel.get(recordSetName).get(indexTimeRecord).get(0) / 1000;
+						if (isActualTime && ordinalTimeRecord >= 0 
+								&& activeChannel.get(recordSetName).get(ordinalTimeRecord).size() > 1 
+								&& activeChannel.get(recordSetName).get(ordinalTimeRecord).get(0) != 0) {
+							int timeValue = activeChannel.get(recordSetName).get(ordinalTimeRecord).get(0) / 1000;
 							int tmpHH = timeValue/10000;
 							int tmpMM = timeValue/100 - tmpHH*100;
 							int tmpSS = timeValue - tmpMM*100 - tmpHH*10000;
@@ -338,10 +339,10 @@ public class JetiDataReader {
 							cal.set(Calendar.SECOND, tmpSS);
 							startTimeStamp = cal.getTimeInMillis();						
 						}
-						if (isActualDate && indexDateRecord >= 0 
-								&& activeChannel.get(recordSetName).get(indexDateRecord).size() > 11 
-								&& activeChannel.get(recordSetName).get(indexDateRecord).get(0) != 0) {
-							int dateValue = activeChannel.get(recordSetName).get(indexDateRecord).get(10) / 1000;
+						if (isActualDate && ordinalDateRecord >= 0 
+								&& activeChannel.get(recordSetName).get(ordinalDateRecord).size() > 11 
+								&& activeChannel.get(recordSetName).get(ordinalDateRecord).get(0) != 0) {
+							int dateValue = activeChannel.get(recordSetName).get(ordinalDateRecord).get(10) / 1000;
 							int tmpYY = dateValue/10000;
 							int tmpMM = dateValue/100 - tmpYY*100;
 							int tmpDD = dateValue - tmpMM*100 - tmpYY*10000;
