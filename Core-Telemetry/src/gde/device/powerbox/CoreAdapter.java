@@ -313,7 +313,7 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
-			newValue = value / 10000.0;
+			newValue = value / 1000.0;
 			break;
 
 		case DEFAULT:
@@ -356,7 +356,7 @@ public class CoreAdapter extends DeviceConfiguration implements IDevice {
 		switch (record.getDataType()) {
 		case GPS_LATITUDE:
 		case GPS_LONGITUDE:
-			newValue = value * 10000.0;
+			newValue = value * 1000.0;
 			break;
 
 		case DEFAULT:

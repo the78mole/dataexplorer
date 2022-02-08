@@ -200,16 +200,16 @@ public class CoreDataReader {
 												vecRecordNames.add(newRecordName);
 												if (CoreDataReader.log.isLoggable(Level.INFO)) CoreDataReader.log.log(Level.INFO, String.format("add new record = %s [%s]", newRecordName, dataVar.getUnit()));
 
-												device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
-												device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
 												if (dataVar.getDataType() == TelemetryData.T_GPS) {
 													if (dataVar.getName().toLowerCase().startsWith("lon") || dataVar.getName().toLowerCase().startsWith("län")) {
 														isActualgps = true;
 														mapRecordType.put(index, Record.DataType.GPS_LATITUDE);
+														dataVar.unit = "°";
 													}
 													else if (dataVar.getName().toLowerCase().startsWith("lat") || dataVar.getName().toLowerCase().startsWith("breit")) {
 														isActualgps = true;
 														mapRecordType.put(index, Record.DataType.GPS_LONGITUDE);
+														dataVar.unit = "°";
 													}
 												}
 												else if (isActualgps && dataVar.getUnit().contains("°") && dataVar.getParam() == 10) {
@@ -225,6 +225,8 @@ public class CoreDataReader {
 													mapRecordType.put(index, Record.DataType.GPS_SPEED);
 												}
 												if (CoreDataReader.log.isLoggable(Level.FINE)) CoreDataReader.log.log(Level.FINE, "param = " + dataVar.getParam());
+												device.setMeasurementName(activeChannelConfigNumber, index, dataVar.getName());
+												device.setMeasurementUnit(activeChannelConfigNumber, index, dataVar.getUnit());
 												++index;
 											}
 										}
@@ -465,7 +467,7 @@ public class CoreDataReader {
 							case 10: //GPS coordinate
 								//log.log(Level.INFO, paramId + " param = " + param);
 								dataType = TelemetryData.T_GPS;
-								val = Integer.parseInt(param.substring(2), 16);
+								val = Integer.parseInt(param.substring(2), 16) / 10; //make GPS coordinates homogeneous for GDE
 								break;
 
 							case 6: //GPS other value
