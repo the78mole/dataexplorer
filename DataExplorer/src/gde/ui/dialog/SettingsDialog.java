@@ -185,13 +185,14 @@ public class SettingsDialog extends Dialog {
 	Button															createLauncherButton;
 	Button															partialDataTableButton, blankChargeDischargeButton, continiousRecordSetButton;
 	Button															drawScaleInRecordColorButton, drawNameInRecordColorButton, drawNumbersInRecordColorButton, draw10TicksPerRecordButton, addChannelConfigNameCurveCompareButton;
-	ParameterConfigControl							fontSizeCorrectionSlider;
+	ParameterConfigControl							fontSizeCorrectionSlider, kmzExportTimeStepSlider;
 	int[]																fontCorrection					= new int[1];
+	int[]																exportTimeStep_ms				= new int[1];
 	Composite														osMiscComposite;
 	Composite														histoComposite, miscComposite;
 	Group																shellMimeType;
 	Group																desktopLauncher;
-	Group																fontSizeGroup, dataTableGroup, chargerSpecials, graphicsView;
+	Group																fontSizeGroup, kmzExportGroup, dataTableGroup, chargerSpecials, graphicsView;
 	CTabItem														osMiscTabItem;
 	CTabItem														miscTabItem;
 	CLabel															fileIOLevelLabel;
@@ -1365,16 +1366,16 @@ public class SettingsDialog extends Dialog {
 							this.fontSizeGroup.setLayoutData(fontSizeGroupLData);
 							this.fontSizeGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
 							this.fontSizeGroup.setText(Messages.getString(MessageIds.GDE_MSGT0727));
-							{
-								Label label = new Label(this.fontSizeGroup, SWT.LEFT);
-								RowData labelLData = new RowData();
-								labelLData.width = 400;
-								labelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
-								label.setLayoutData(labelLData);
-								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-								label.setText(Messages.getString(MessageIds.GDE_MSGT0276));
-								label.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0953));
-							}
+//							{
+//								Label label = new Label(this.fontSizeGroup, SWT.LEFT);
+//								RowData labelLData = new RowData();
+//								labelLData.width = 400;
+//								labelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+//								label.setLayoutData(labelLData);
+//								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+//								label.setText(Messages.getString(MessageIds.GDE_MSGT0276));
+//								label.setToolTipText(Messages.getString(MessageIds.GDE_MSGT0953));
+//							}
 							{
 								this.fontSizeCorrectionSlider = new ParameterConfigControl(this.fontSizeGroup, this.fontCorrection, 0, GDE.STRING_EMPTY, String.format("%s / 10", Messages.getString(MessageIds.GDE_MSGT0276)), 140, GDE.STRING_EMPTY, 0, true, 
 										30,	250, 10, GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18);
@@ -1536,16 +1537,16 @@ public class SettingsDialog extends Dialog {
 							//dataTableGroupLData.height = 70;
 							this.dataTableGroup.setLayoutData(dataTableGroupLData);
 							this.dataTableGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.dataTableGroup.setText(Messages.getString(MessageIds.GDE_MSGT0702));
-							{
-								Label label = new Label(this.dataTableGroup, SWT.LEFT);
-								RowData labelLData = new RowData();
-								labelLData.width = 400;
-								labelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
-								label.setLayoutData(labelLData);
-								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-								label.setText(Messages.getString(MessageIds.GDE_MSGT0703));
-							}
+							this.dataTableGroup.setText(Messages.getString(MessageIds.GDE_MSGT0703));
+//							{
+//								Label label = new Label(this.dataTableGroup, SWT.LEFT);
+//								RowData labelLData = new RowData();
+//								labelLData.width = 400;
+//								labelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+//								label.setLayoutData(labelLData);
+//								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+//								label.setText(Messages.getString(MessageIds.GDE_MSGT0703));
+//							}
 							{
 								this.partialDataTableButton = new Button(this.dataTableGroup, SWT.CHECK);
 								this.partialDataTableButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
@@ -1569,6 +1570,34 @@ public class SettingsDialog extends Dialog {
 							this.dataTableGroup.layout();
 						}
 						{
+							this.kmzExportGroup = new Group(this.miscComposite, SWT.NONE);
+							RowLayout kmzExportGroupLayout = new RowLayout(SWT.HORIZONTAL);
+							kmzExportGroupLayout.center = true;
+							kmzExportGroupLayout.marginTop = 2;
+							kmzExportGroupLayout.marginWidth = 20;
+							kmzExportGroupLayout.spacing = 5;
+							this.kmzExportGroup.setLayout(kmzExportGroupLayout);
+							RowData kmzExportGroupLData = new RowData();
+							kmzExportGroupLData.width = 478;
+							//kmzExportGroupLData.height = 70;
+							this.kmzExportGroup.setLayoutData(kmzExportGroupLData);
+							this.kmzExportGroup.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
+							this.kmzExportGroup.setText("KML/KMZ Export");
+							{
+								this.kmzExportTimeStepSlider = new ParameterConfigControl(this.kmzExportGroup, this.exportTimeStep_ms, 0, GDE.STRING_EMPTY, String.format("%s", "time step [ms]"), 100, GDE.STRING_EMPTY, 0, true, 
+										40,	250, 10, 1000);
+								this.kmzExportTimeStepSlider.setSliderSelection(this.settings.getKmzExportTimeStep_ms());
+								this.kmzExportGroup.addListener(SWT.Selection, new Listener() {
+									@Override
+									public void handleEvent(Event evt) {
+										SettingsDialog.this.settings.setKmzExportTimeStep_ms(SettingsDialog.this.exportTimeStep_ms[0]);
+									}
+								});
+							}
+							this.kmzExportGroup.layout();
+						}
+
+						{
 							this.chargerSpecials = new Group(this.miscComposite, SWT.NONE);
 							RowLayout chargerSpecialsLayout = new RowLayout(SWT.HORIZONTAL);
 							chargerSpecialsLayout.center = true;
@@ -1581,16 +1610,16 @@ public class SettingsDialog extends Dialog {
 							//chargerSpecialsLData.height = 80;
 							this.chargerSpecials.setLayoutData(chargerSpecialsLData);
 							this.chargerSpecials.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));
-							this.chargerSpecials.setText(Messages.getString(MessageIds.GDE_MSGT0690));
-							{
-								Label label = new Label(this.chargerSpecials, SWT.LEFT);
-								RowData labelLData = new RowData();
-								labelLData.width = 400;
-								labelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
-								label.setLayoutData(labelLData);
-								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
-								label.setText(Messages.getString(MessageIds.GDE_MSGT0698));
-							}
+							this.chargerSpecials.setText(Messages.getString(MessageIds.GDE_MSGT0698));
+//							{
+//								Label label = new Label(this.chargerSpecials, SWT.LEFT);
+//								RowData labelLData = new RowData();
+//								labelLData.width = 400;
+//								labelLData.height = GDE.IS_LINUX ? 22 : GDE.IS_MAC ? 20 : 18;
+//								label.setLayoutData(labelLData);
+//								label.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE + 1, SWT.NORMAL));
+//								label.setText(Messages.getString(MessageIds.GDE_MSGT0698));
+//							}
 							{
 								this.blankChargeDischargeButton = new Button(this.chargerSpecials, SWT.CHECK);
 								this.blankChargeDischargeButton.setFont(SWTResourceManager.getFont(GDE.WIDGET_FONT_NAME, GDE.WIDGET_FONT_SIZE, SWT.NORMAL));

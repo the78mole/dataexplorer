@@ -39,6 +39,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 
 import gde.GDE;
+import gde.config.Settings;
 import gde.data.Channels;
 import gde.data.ObjectData;
 import gde.data.Record;
@@ -284,6 +285,7 @@ public class KMZWriter {
 		StringBuilder sb = new StringBuilder();
 		double height0 = 0.0, altitudeDelta = 0.0;
 		long startTime = new Date().getTime();
+		int timeStep_ms = Settings.getInstance().getKmzExportTimeStep_ms();
 		ZipOutputStream zipWriter = null;
 		IDevice device = DataExplorer.getInstance().getActiveDevice();
 
@@ -553,7 +555,7 @@ public class KMZWriter {
 			long recordSetStartTimeStamp = recordSet.getTime(recordSet.isZoomMode() ? 0 : startIndex) / 10;
 			for (i = recordSet.isZoomMode() ? 0 : startIndex; isPositionWritten && i < dataSize; i++) {
 				timeStamp = recordSet.getTime(i) / 10 + recordSetStartTimeStamp;
-				if ((timeStamp - lastTimeStamp) >= 500 || lastTimeStamp == -1) {// write a point all ~1000 ms
+				if ((timeStamp - lastTimeStamp) >= timeStep_ms || lastTimeStamp == -1) {// write a point all ~500 ms
 					int velocity = recordMeasurement == null ? 0 : (int) device.translateValue(recordMeasurement, recordMeasurement.get(i) / 1000.0);
 					if (recordMeasurement != null && !((velocity < measurementLowerLimit && velocityRange == 0) || (velocity >= measurementLowerLimit && velocity <= velocityUpperLimit && velocityRange == 1) || (velocity > velocityUpperLimit && velocityRange == 2))) {
 						velocityRange = switchColor(zipWriter, recordMeasurement, velocity, measurementLowerLimit, velocityUpperLimit, velocityColors, velocityRange, altitudeMode, isExtrude, randomColor);
@@ -634,7 +636,7 @@ public class KMZWriter {
 			lastTimeStamp = -1;
 			for (i = recordSet.isZoomMode() ? 0 : startIndex; isPositionWritten && i < dataSize; i++) {
 				timeStamp = recordSet.getTime(i) / 10 + recordSetStartTimeStamp;
-				if ((timeStamp - lastTimeStamp) >= 500 || lastTimeStamp == -1) {// write a point all ~1000 ms
+				if ((timeStamp - lastTimeStamp) >= timeStep_ms || lastTimeStamp == -1) {// write a point all ~500 ms
 					double speed = recordMeasurement == null ? 0 : device.translateValue(recordMeasurement, recordMeasurement.get(i) / 1000.0);
 					double slope = recordSlope == null ? 0 : device.translateValue(recordSlope, recordSlope.get(i) / 1000.0);
 					double slopeLast = i==0 ? slope : recordSlope == null ? 0 : device.translateValue(recordSlope, recordSlope.get(i-1) / 1000.0);

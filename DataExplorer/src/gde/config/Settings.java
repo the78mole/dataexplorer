@@ -131,6 +131,7 @@ public final class Settings extends Properties {
 	final static String							OBJECT_DESC_INNER_BACKGROUND		= "object_desciption_inner_background";																														//$NON-NLS-1$
 	final static String							OBJECT_DESC_SURROUND_BACKGRD		= "object_desciption_surround_backgrd";																														//$NON-NLS-1$
 	final static String							DISPLAY_DENSITY_FONT_CORRECT		= "display_density_font_correction";
+	final static String							KMZ_EXPORT_TIME_STEP_MS					= "kmz_export_time_step_ms";
 	public final static String			SKIN_COLOR_SCHEMA								= "skin_color_schema";
 	public final static String			COLOR_SCHEMA_SYSTEM							= "color_schema_system";
 	public final static String			COLOR_SCHEMA_LIGHT							= "color_schema_light";
@@ -711,6 +712,7 @@ public final class Settings extends Properties {
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.RECORD_COMMENT_VISIBLE, isRecordCommentVisible())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRAPHICS_HEADER_VISIBLE, isGraphicsHeaderVisible())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.DISPLAY_DENSITY_FONT_CORRECT, getFontDisplayDensityAdaptionFactor())); //$NON-NLS-1$
+			writer.write(String.format("%-40s \t=\t %s\n", Settings.KMZ_EXPORT_TIME_STEP_MS, getKmzExportTimeStep_ms())); //$NON-NLS-1$
 
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_DASH_STYLE, getGridDashStyleAsString())); //$NON-NLS-1$
 			writer.write(String.format("%-40s \t=\t %s\n", Settings.GRID_COMPARE_WINDOW_HOR_TYPE, getGridCompareWindowHorizontalType())); //$NON-NLS-1$
@@ -2407,6 +2409,20 @@ public final class Settings extends Properties {
 	 */
 	public double getFontDisplayDensityAdaptionFactor() {
 		return Double.valueOf(this.getProperty(Settings.DISPLAY_DENSITY_FONT_CORRECT, "1.0")); //$NON-NLS-1$ ;
+	}
+
+	/**
+	 * set the time step in milliseconds to be used for KMZ/KML export
+	 */
+	public void setKmzExportTimeStep_ms(int newTimeStepValue) {
+		this.setProperty(Settings.KMZ_EXPORT_TIME_STEP_MS, GDE.STRING_EMPTY + newTimeStepValue);
+	}
+
+	/**
+	 * @return time step in milliseconds to be used for KMZ/KML export
+	 */
+	public int getKmzExportTimeStep_ms() {
+		return Integer.valueOf(this.getProperty(Settings.KMZ_EXPORT_TIME_STEP_MS, "500")); //$NON-NLS-1$ ;
 	}
 
 	/**
