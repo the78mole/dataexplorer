@@ -451,7 +451,7 @@ public class DataTableWindow extends CTabItem {
 	/**
 	 * method to set up new header according device properties
 	 */
-	public synchronized void setHeader() {
+	public void setHeader() {
 		// clean old header
 		this.dataTable.removeAll();
 		TableColumn[] columns = this.dataTable.getColumns();
@@ -470,44 +470,47 @@ public class DataTableWindow extends CTabItem {
 		if (activeChannel != null) {
 			RecordSet activeRecordSet = activeChannel.getActiveRecordSet();
 			if (activeRecordSet != null) {
-				if (this.settings.isPartialDataTable()) {
-					for (final Record record : activeRecordSet.getVisibleAndDisplayableRecordsForTable()) {
-						StringBuilder sb = new StringBuilder();
-						sb.append(record.getName()).append(GDE.STRING_BLANK_LEFT_BRACKET).append(record.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
-						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-						column.setWidth(sb.length() * extentFactor);
-						column.setText(sb.toString());
+				synchronized (activeRecordSet) {
+
+					if (this.settings.isPartialDataTable()) {
+						for (final Record record : activeRecordSet.getVisibleAndDisplayableRecordsForTable()) {
+							StringBuilder sb = new StringBuilder();
+							sb.append(record.getName()).append(GDE.STRING_BLANK_LEFT_BRACKET).append(record.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
+							TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+							column.setWidth(sb.length() * extentFactor);
+							column.setText(sb.toString());
+						}
 					}
-				}
-				else {
-					for (int i = 0; i < activeRecordSet.size(); i++) {
-						Record record = activeRecordSet.get(i);
-						StringBuilder sb = new StringBuilder();
-						sb.append(record.getName()).append(GDE.STRING_BLANK_LEFT_BRACKET).append(record.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
-						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-						column.setWidth(sb.length() * extentFactor);
-						column.setText(sb.toString());
+					else {
+						for (int i = 0; i < activeRecordSet.size(); i++) {
+							Record record = activeRecordSet.get(i);
+							StringBuilder sb = new StringBuilder();
+							sb.append(record.getName()).append(GDE.STRING_BLANK_LEFT_BRACKET).append(record.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
+							TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+							column.setWidth(sb.length() * extentFactor);
+							column.setText(sb.toString());
+						}
 					}
-				}
-				if (this.settings.isHistoActive() && this.settings.isDataTableTransitions()) {
-					TransitionTableMapper mapper = new TransitionTableMapper(DataTableWindow.this.application.getActiveRecordSet(), Analyzer.getInstance());
-					for (SettlementType settlementType : mapper.defineActiveAndDisplayableSettlements().values()) {
-						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-						String recordName = this.xmlResource.getReplacement(settlementType.getName());
-						StringBuilder sb = new StringBuilder();
-						sb.append(recordName).append(GDE.STRING_BLANK_LEFT_BRACKET).append(settlementType.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
-						column.setWidth(sb.length() > 11 ? 11 * extentFactor : sb.length() * extentFactor);
-						column.setText(sb.toString());
-					}
-					IDevice device = this.application.getActiveDevice();
-					HashMap<Integer, TransitionGroupType> transitionGroups = device.getDeviceConfiguration().getChannel(this.channels.getActiveChannelNumber()).getTransitionGroups();
-					for (Entry<Integer, TransitionGroupType> transitionGroupEntry : transitionGroups.entrySet()) {
-						TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
-						column.setWidth(6 * extentFactor);
-						if (transitionGroupEntry.getValue().getComment() != null)
-							column.setText(String.format("TG%d: %-22s", transitionGroupEntry.getKey(), transitionGroupEntry.getValue().getComment()));
-						else
-							column.setText(String.format("TG%d", transitionGroupEntry.getKey()));
+					if (this.settings.isHistoActive() && this.settings.isDataTableTransitions()) {
+						TransitionTableMapper mapper = new TransitionTableMapper(DataTableWindow.this.application.getActiveRecordSet(), Analyzer.getInstance());
+						for (SettlementType settlementType : mapper.defineActiveAndDisplayableSettlements().values()) {
+							TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+							String recordName = this.xmlResource.getReplacement(settlementType.getName());
+							StringBuilder sb = new StringBuilder();
+							sb.append(recordName).append(GDE.STRING_BLANK_LEFT_BRACKET).append(settlementType.getUnit()).append(GDE.STRING_RIGHT_BRACKET);
+							column.setWidth(sb.length() > 11 ? 11 * extentFactor : sb.length() * extentFactor);
+							column.setText(sb.toString());
+						}
+						IDevice device = this.application.getActiveDevice();
+						HashMap<Integer, TransitionGroupType> transitionGroups = device.getDeviceConfiguration().getChannel(this.channels.getActiveChannelNumber()).getTransitionGroups();
+						for (Entry<Integer, TransitionGroupType> transitionGroupEntry : transitionGroups.entrySet()) {
+							TableColumn column = new TableColumn(this.dataTable, SWT.CENTER);
+							column.setWidth(6 * extentFactor);
+							if (transitionGroupEntry.getValue().getComment() != null)
+								column.setText(String.format("TG%d: %-22s", transitionGroupEntry.getKey(), transitionGroupEntry.getValue().getComment()));
+							else
+								column.setText(String.format("TG%d", transitionGroupEntry.getKey()));
+						}
 					}
 				}
 			}
