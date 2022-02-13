@@ -18,6 +18,13 @@
 ****************************************************************************************/
 package gde.io;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Vector;
+import java.util.logging.Logger;
+
 import gde.GDE;
 import gde.config.Settings;
 import gde.device.CheckSumTypes;
@@ -28,13 +35,8 @@ import gde.messages.MessageIds;
 import gde.messages.Messages;
 import gde.utils.Checksum;
 import gde.utils.StringHelper;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Vector;
-import java.util.logging.Logger;
+import gde.utils.ValueCollector;
+import gde.utils.ValueEventCollector;
 
 /**
  * Class to parse comma separated input line from a comma separated textual line which simulates serial data 
@@ -66,6 +68,7 @@ public class NMEAParser implements IDataParser {
 	protected Vector<String>							missingImpleWarned				= new Vector<String>();
 	protected String 											deviceSerialNumber				= GDE.STRING_EMPTY;
 	protected String											firmwareVersion           = GDE.STRING_EMPTY;
+	protected ValueEventCollector 				airPressures 							= new ValueEventCollector();
 	protected boolean											isOffsetSet								= false;
 	protected int													sumPressureOffset					= 0;
 	protected int													avgPressureOffset					= 0;
@@ -323,7 +326,7 @@ public class NMEAParser implements IDataParser {
 					if (this.deviceName.equals("UniLog2")) {
 						//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
 						//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
-						//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
+						//20=ValueCollector, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 						//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 						//inOutMapping  000, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011, 012, 013, 014, 015, 016, 017, 018, 019, 020, 021, 022, 023, 024, 025
 						int[] in2out = { -1,  -1,  -1,  -1,   1,   2,  15,  16,   4,  13,   0,   3,   5,  17,  18,  19,   7,   8,   9,  10,  11,  12,  20,  21,  22,  23};
@@ -1318,56 +1321,58 @@ public class NMEAParser implements IDataParser {
 		//this.values[19] = acceleration z;
 		//this.values[20] = noise level;
 		//this.values[21] = Impulse;
-		//this.values[22] = Airspeed [km/h];
-		//this.values[23] = static Airpressure [hPa];
-		//this.values[24] = Airpressure TEK [hPa];
-		if (!isOffsetSet && this.values[22] >= 0 && this.values[22] <= 1000 
-				&& (initialPressure == 0 || (this.values[23] <= initialPressure + 10 && this.values[23] >= initialPressure - 10))) {
-			++pressureOffsetCount;
-			sumPressureOffset += this.values[23]-this.values[24];
-			this.values[24] = 0;
-			this.avgPressureOffset = sumPressureOffset/pressureOffsetCount;
-			
-			if (initialPressure == 0)
-				this.initialPressure = this.values[23];
-			//log.log(Level.OFF, String.format("offset = %d/%d = %d", sumPressureOffset, pressureOffsetCount, sumPressureOffset/pressureOffsetCount));
-			
-			//uncomment if own airspeed should be calculated and replace Impulse values
-//			this.values[21] = this.values[7]; 
+		
+		if (strValues.length > 6) {
+			//this.values[22] = Airspeed [km/h];
+			//this.values[23] = static Airpressure [hPa];
+			//this.values[24] = Airpressure TEK [hPa];
+			if (!isOffsetSet && this.values[22] >= 0 && this.values[22] <= 1000
+					&& (initialPressure == 0 || (this.values[23] <= initialPressure + 20 && this.values[23] >= initialPressure - 20))) {
+				if (airPressures.get(this.values[23]) == null)
+					airPressures.put(this.values[23], new ValueCollector(this.values[23], this.values[24]));
+				else
+					airPressures.get(this.values[23]).add(this.values[23], this.values[24]);
+
+				this.values[24] = 0;
+				if (initialPressure == 0) this.initialPressure = this.values[23];
+
+				//uncomment if own airspeed should be calculated and replace Impulse values
+				//			this.values[21] = this.values[7]; 
+			}
+			else {
+				this.values[24] = this.values[23] - this.values[24] - airPressures.getAvgDiffMaxCount();
+				isOffsetSet = true;
+
+				//uncomment if own airspeed should be calculated and replace Impulse values
+				//			if (this.values[7] > 10000) {
+				//				rho = this.values[23] / (287.058 * (20 + 273.15)) / 10;
+				//				this.values[21] = (int) (Math.sqrt( 2.0 * this.values[24]/1000 / rho ) * 36000);
+				//			}
+				//			else 
+				//				this.values[21] = this.values[7];
+			}
+			//build sum of AirSpeed values between 39,5 and 40,5 km/h as well as sum of matching ∆TEC pressure
+			if (this.values[22] >= 39500 && this.values[22] <= 40500) {
+				avgAirSpeed40 += this.values[22];
+				avgPressureDeltaTec40 += this.values[24];
+				countAvg40 += 1;
+				//log.log(Level.OFF, String.format("presOffset=%.3f AirSpeed=%.2f PresDeltaTec=%.2f countAvg40=%d sumAirSpeed40=%.2f sumPresDeltaTec40=%.2f", 
+				//		this.sumPressureOffset/this.pressureOffsetCount/1000., this.values[22]/1000., this.values[24]/1000., countAvg40, avgAirSpeed40/1000., avgPressureDeltaTec40/1000.));
+			}
+			//build sum of ∆TEC pressure values between 0,95 and 1,05 km/h as well as sum of matching ∆TEC pressure
+			if (this.values[24] >= 950 && this.values[24] <= 1050) {
+				avgAirSpeedDp1 += this.values[22];
+				avgPressureDeltaTecDp1 += this.values[24];
+				countAvgDp1 += 1;
+			}
+			//build sum of AirSpeed values between 69,5 and 70,5 km/h as well as sum of matching ∆TEC pressure
+			if (this.values[22] >= 69500 && this.values[22] <= 70500) {
+				avgAirSpeed70 += this.values[22];
+				avgPressureDeltaTec70 += this.values[24];
+				countAvg70 += 1;
+			}
+			//this.values[25] = Vario TEK [m/s];
 		}
-		else {
-			this.values[24] = this.values[23] - this.values[24] - avgPressureOffset;
-			isOffsetSet = true;
-			
-			//uncomment if own airspeed should be calculated and replace Impulse values
-//			if (this.values[7] > 10000) {
-//				rho = this.values[23] / (287.058 * (20 + 273.15)) / 10;
-//				this.values[21] = (int) (Math.sqrt( 2.0 * this.values[24]/1000 / rho ) * 36000);
-//			}
-//			else 
-//				this.values[21] = this.values[7];
-		}
-		//build sum of AirSpeed values between 39,5 and 40,5 km/h as well as sum of matching ∆TEC pressure
-		if (this.values[22] >= 39500 && this.values[22] <= 40500) {
-			avgAirSpeed40 += this.values[22];
-			avgPressureDeltaTec40 += this.values[24];
-			countAvg40 += 1;
-			//log.log(Level.OFF, String.format("presOffset=%.3f AirSpeed=%.2f PresDeltaTec=%.2f countAvg40=%d sumAirSpeed40=%.2f sumPresDeltaTec40=%.2f", 
-			//		this.sumPressureOffset/this.pressureOffsetCount/1000., this.values[22]/1000., this.values[24]/1000., countAvg40, avgAirSpeed40/1000., avgPressureDeltaTec40/1000.));
-		}
-		//build sum of ∆TEC pressure values between 0,95 and 1,05 km/h as well as sum of matching ∆TEC pressure
-		if (this.values[24] >= 950 && this.values[24] <= 1050) {
-			avgAirSpeedDp1 += this.values[22];
-			avgPressureDeltaTecDp1 += this.values[24];
-			countAvgDp1 += 1;
-		}
-		//build sum of AirSpeed values between 69,5 and 70,5 km/h as well as sum of matching ∆TEC pressure
-		if (this.values[22] >= 69500 && this.values[22] <= 70500) {
-			avgAirSpeed70 += this.values[22];
-			avgPressureDeltaTec70 += this.values[24];
-			countAvg70 += 1;
-		}
-		//this.values[25] = Vario TEK [m/s];
 	}
 
 	/**
@@ -1768,7 +1773,7 @@ public class NMEAParser implements IDataParser {
 		else if (this.deviceName.equals("UniLog2")) {
 			//0=VoltageRx, 1=Voltage, 2=Current, 3=Capacity, 4=Power, 5=Energy, 6=CellBalance, 7=CellVoltage1, 8=CellVoltage2, 9=CellVoltage3, 
 			//10=CellVoltage4, 11=CellVoltage5, 12=CellVoltage6, 13=Revolution, 14=Efficiency, 15=Altitude, 16=Climb, 17=ValueA1, 18=ValueA2, 19=ValueA3,
-			//20=AirPressure, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
+			//20=ValueCollector, 21=InternTemperature, 22=ServoImpuls In, 23=ServoImpuls Out, 
 			//M-LINK 24=valAdd00 25=valAdd01 26=valAdd02 27=valAdd03 28=valAdd04 29=valAdd05 30=valAdd06 31=valAdd07 32=valAdd08 33=valAdd09 34=valAdd10 35=valAdd11 36=valAdd12 37=valAdd13 38=valAdd14;
 			for (int i = 1; i < strValues.length && i <= 15; i++) {
 				try {
