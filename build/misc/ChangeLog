@@ -5,6 +5,7 @@ Generic changes/fixes
 	* update MacOS info.plist as well as start shell script
 	* add building md5 hash for download verification
 	* make KML/KMZ export time step adjustable
+	* remove unused IGCDLL handling
 		
 Device specific changes/fixes
 	* GPS-Logger2/3 - fix error for Android saved OSD files
