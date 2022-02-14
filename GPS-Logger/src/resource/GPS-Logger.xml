@@ -511,7 +511,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property  type="Integer" value="32" name="scale_sync_ref_ordinal"/>
+                <property  type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>cell_voltage 3_UL</name>
@@ -519,7 +519,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property  type="Integer" value="32" name="scale_sync_ref_ordinal"/>
+                <property  type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>cell_voltage 4_UL</name>
@@ -527,7 +527,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property  type="Integer" value="32" name="scale_sync_ref_ordinal"/>
+                <property  type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>cell_voltage 5_UL</name>
@@ -535,7 +535,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property  type="Integer" value="32" name="scale_sync_ref_ordinal"/>
+                <property  type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>cell_voltage 6_UL</name>
@@ -543,7 +543,7 @@
                 <unit>V</unit>
                 <active>true</active>
                 <statistics sigma="true" avg="true" max="true" min="true"/>
-                <property  type="Integer" value="32" name="scale_sync_ref_ordinal"/>
+                <property  type="Integer" value="23" name="scale_sync_ref_ordinal"/>
             </Measurement>
             <Measurement>
                 <name>runs_per_minute_UL</name>
