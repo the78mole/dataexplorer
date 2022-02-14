@@ -1,33 +1,38 @@
-GNU DataExplorer - News - comes with Version 3.5.3 - 20 Jan 2022
+GNU DataExplorer - News - comes with Version 3.5.4 - 14 Feb 2022
 
 Generic changes/fixes
-	* add base directory to Linux start scripts
-	* fix a possible error when displaying history graphs calculations with an empty trail record set
-	* cleanup senseless log level OFF or change to level INFO
-	* fix grid line alignment error while toggle to 10 grid lines
-	* update Java version check to allow Java 17
+	* update MacOS info.plist as well as start shell script
+	* add building md5 hash for download verification
+	* make KML/KMZ export time step adjustable
+	* remove unused IGCDLL handling
 		
 Device specific changes/fixes
-	* Junsi iChargerUSB - add message box signaling timeout while initializing program memories for dialog
-	* Junsi iChargerDX6,S6 - cleanup duplicated BatteryTypesX definition
-	* Junsi iChargerDX* - fix partially wrong program memory, PB, Ni* max cells
-	* Junsi iChargerDX* - update LiHV maximum charging voltage to 4.45 V
-	* HoTTAdapter*2 - cleanup possible clash AirSpeed Vario, sync update variable Vario/GPS dependencies
-	* GPS-Logger2/3 - update configuration capability Jeti, MPX, HoTT
+	* GPS-Logger2/3 - fix error for Android saved OSD files
+	* GPS-Logger2/3 - define AirSpeed tolerance and  static pressure to calculate offset between pressure sensors
+	* GPS-Logger2/3 - enhance pressure offset calculation using pressure values of equal value
+	* HoTTAdapter* - change log level of Sensor and block number to INFO
+	* HoTTAdapter2* - fix wrong GPS time synchronization, wrong record ordinal
+	* JetiAdapter - remove interpolation of values excluding GPS coordinates 
+	* JetiAdapter - find start index of GPS data to avoid interpolation which disturb GPS track visualization
+	* JetiAdapter - parse time and date and use for synchronization
+	* Core-Telemetry - make GPS coordinates homogeneous to GDE data model
 	
 Generelle Änderungen/Verbesserungen
-	* Basisverzeichnis zu Linux Start-Scripts hinzugefügt
-	* möglicher Fehler bei der Anzeige von Historien-Grafen behoben
-	* sinnlose Log-Statements mit Level.OFF nach Level.INFO geändert oder aufgeräumt
-	* Fehler bei der Ausrichtung der Gitterlinien beim Umschalten auf Zehnerteilung behoben
-	* Java-Versionsprüfung aktualisiert, um Java 17 zuzulassen
+    * Update MacOS info.plist und das Start-Script
+    * MD5 Hash zur Download Verifikation hinzugefügt
+    * KML/KMZ Export jetzt mit konfigurierbarem Zeit-Schritt
+    * Unbenutztes IGCDLL Handling entfernt
 
 Geräte spezifische Änderungen/Verbesserungen
- 	* Junsi iChargerUSB - Meldungsfensters, bei Zeitüberschreitung beim Initialisieren von Programmspeichern
-	* Junsi iChargerDX6,S6 - unnötig duplizierte BatteryTypesX aufgeräumt
-	* Junsi iChargerDX* - teilweise falschen Programmspeicher korrigiert, PB, Ni* max Zellen
-	* Junsi iChargerUSB* - Aktualisierung der maximalen LiHV-Ladespannung auf 4,45 V
-	* HoTTAdapter*2 - AirSpeed Vario Überschneidung behoben, Update variable Vario/GPS-Abhängigkeiten
-	* GPS-Logger2/3 - Update Konfigurationsmöglichkeiten Jeti, MPX, HoTT
+    * GPS-Logger2/3 - Fehler für ODS Dateien mit Android App gesichert behoben
+    * GPS-Logger2/3 - AirSpeed und statischer Druck haben nun eine Toleranz zur besseren Druck-Offset Berechnung
+    * GPS-Logger2/3 - Druck-Offset Berechnung, durch Verwendung gleicher Werte, verbessert
+    * HoTTAdapter* - Ausgabe von Blocknummer und Sensor ID mit Trace-Log Level INFO möglich
+    * HoTTAdapter2* - Fehler in GPS-Zeit-Synchronisation korrigiert
+    * JetiAdapter - Generelle Werte Interpolation bis auf die GPS-Koordinaten entfernt
+    * JetiAdapter - Suche nach Start-Index der GPS-Koordinaten als Start der Interpolation verbessert
+    * JetiAdapter - Synchronisation mit GPS Zeit und Datum, falls vorhanden
+    * Core-Telemetry - GPS Koordinaten harmonisiert mit dem GDE Datenmodell
 
+	
 	

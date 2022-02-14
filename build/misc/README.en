@@ -17,7 +17,7 @@ Hint: It is planned to use the DataExplorer on different operating systems and s
 (conversion ISO-8859-1 to UTF-8 and vice versa). File links are different on the supported operating systems. Object related data files don't get duplicated,
 they get referenced using file links. Before you move data files to a different operating system, remove the object related file links and re-create afterwards.
 Please use the preferences dialog with the miscellaneous tab with the related buttons.
-To create DataExplorer.exe a java wrapper,launch4j, get used. If there are startup errors it meight be helpful to lauch the application
+To create DataExplorer.exe a java wrapper,launch4j, get used. If there are startup errors it might be helpful to launch the application
 using "DataExplorer.exe --l4j-debug". This will generate a launch4j.log with meaningful informations.
 
 

@@ -76,7 +76,7 @@ public class LogViewReaderTester extends TestSuperClass {
 	"LogView/Picolario/2006_05_12(2).lov",
 	"LogView/Picolario/2006_06_07(2).lov",
 	"LogView/UniLog/2008_13_04_ASW27_LiPo_Westhang.lov",
-	"LogViewOBJ/ASW-27/ASW-27 23.5.3008 19.32.lov",
+	"LogViewOBJ/ASW-27/ASW-27 23.5.2008 19.32.lov",
 	"LogViewOBJ/ASW-27/ASW-27 24.5.2008 15.44.lov",
 	};
 
@@ -126,7 +126,7 @@ public class LogViewReaderTester extends TestSuperClass {
 			"LogView/UniLog/Starling electro 20071010 UniLog.lov",
 			"LogView/UniLog/Starling electro 20071014 UniLog.lov",
 			
-			"LogViewOBJ/ASW-27/ASW-27 23.5.3008 19.32.lov",
+			"LogViewOBJ/ASW-27/ASW-27 23.5.2008 19.32.lov",
 			"LogViewOBJ/ASW-27/ASW-27 24.5.2008 15.44.lov",
 			
 			"LogView/Htronic Akkumaster C4/2007-05-23-FlugakkuA(1.5 ALPHA).lov",
