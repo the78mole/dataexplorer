@@ -6,6 +6,7 @@ Generic changes/fixes
 		
 Device specific changes/fixes
 	* GPS-Logger3 - reuse ValueCollector to calculate average values at dedicated AirSpeed and TEC pressure
+	* OpenTx-Telemetry - proposal to react on skipped evaluation due to to less log entries (actually comment out)
 
 
 Version 3.5.4 - 14 Feb 2022
