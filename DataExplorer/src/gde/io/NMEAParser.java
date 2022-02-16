@@ -123,8 +123,7 @@ public class NMEAParser implements IDataParser {
 		if (this.device.getName().endsWith("Logger3")) {
 			vcAirSpeed40 = new ValueCollector();
 			vcAirSpeedDp1 = new ValueCollector();
-			vcAirSpeed70 = new ValueCollector();
-			
+			vcAirSpeed70 = new ValueCollector();			
 		}
 	}
 	
@@ -1323,10 +1322,7 @@ public class NMEAParser implements IDataParser {
 			//this.values[24] = Airpressure TEK [hPa];
 			if (!isOffsetSet && this.values[22] >= 0 && this.values[22] <= 1000
 					&& (initialPressure == 0 || (this.values[23] <= initialPressure + 20 && this.values[23] >= initialPressure - 20))) {
-				if (airPressures.get(this.values[23]) == null)
-					airPressures.put(this.values[23], new ValueCollector(this.values[23], this.values[24]));
-				else
-					airPressures.get(this.values[23]).add(this.values[23], this.values[24]);
+				airPressures.addValuePair(this.values[23], this.values[24]);
 
 				this.values[24] = 0;
 				if (initialPressure == 0) this.initialPressure = this.values[23];

@@ -27,7 +27,7 @@ public class ValueCollector {
 	int sumValueB = 0;
 	
 	public ValueCollector() {};
-	
+
 	/**
 	 * initialize class while initializing count and the two pressure values
 	 * @param valueA a value times 1000 according GDE data model, as example static pressure
@@ -38,7 +38,7 @@ public class ValueCollector {
 		sumValueA = valueA;
 		sumValueB = valueB;			
 	}
-	
+
 	/**
 	 * add up count and the two given pressure values
 	 * @param valueA as example static pressure value times 1000 according GDE data model
@@ -49,33 +49,41 @@ public class ValueCollector {
 		sumValueA += valueA;
 		sumValueB += valueB;			
 	}
-	
+
 	/**
 	 * @return actual count of entries
 	 */
 	public int getCount() {
 		return count;
 	}
-	
+
 	/**
 	 * @return offset average of collected values A - values B divided by count
 	 */
 	public int getAvgOffset() {
 		return count > 0 ? (sumValueA - sumValueB) / count : 0;
 	}
-	
+
 	/**
 	 * @return average of counted values A
 	 */
 	public int getAvgValuesA() {
 		return count > 0 ? sumValueA / count : 0;
 	}
-	
+
 	/**
 	 * @return average of counted values B
 	 */
 	public int getAvgValuesB() {
 		return count > 0 ? sumValueB / count : 0;
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuffer(getClass().getSimpleName()).append(": ")
+		  .append( count ).append(" value pairs, ")
+		  .append("avg.valueA=").append(getAvgValuesA()).append(" ,avg.valueB=").append(getAvgValuesB())
+		  .append(", avg.offset=").append(getAvgOffset()).toString();
 	}
 }
 
