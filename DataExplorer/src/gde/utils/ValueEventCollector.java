@@ -19,9 +19,6 @@
 package gde.utils;
 
 import java.util.HashMap;
-import java.util.logging.Logger;
-
-import gde.log.Level;
 
 /**
  * this class collects ValueCollector events sorted by one of the values used as key 
@@ -30,7 +27,7 @@ import gde.log.Level;
  *
  */
 public class ValueEventCollector extends HashMap<Integer, ValueCollector> {
-	private static final Logger	log												= Logger.getLogger(ValueEventCollector.class.getName());
+	//private static final Logger	log												= Logger.getLogger(ValueEventCollector.class.getName());
 	private static final long serialVersionUID = 1L;
 	
 	int maxCount = 0;
@@ -55,7 +52,7 @@ public class ValueEventCollector extends HashMap<Integer, ValueCollector> {
 			}
 			if (get(maxCountKey) != null) {
 				avgOffsetMaxCount = get(maxCountKey).getAvgOffset();
-				log.log(Level.OFF, String.format("pressureOffsetCount = %3d avgOffset = %.3f hPa", get(maxCountKey).getCount(), avgOffsetMaxCount/1000.));
+				//log.log(Level.OFF, String.format("pressureOffsetCount = %3d avgOffset = %.3f hPa", get(maxCountKey).getCount(), avgOffsetMaxCount/1000.));
 			}
 		}
 		return avgOffsetMaxCount;
@@ -76,7 +73,7 @@ public class ValueEventCollector extends HashMap<Integer, ValueCollector> {
 			}
 			if (get(minCountKey) != null) {
 				avgOffsetMinCount = get(minCountKey).getAvgOffset();
-				log.log(Level.OFF, String.format("pressureOffsetCount = %3d avgOffset = %.3f hPa", get(minCountKey).getCount(), avgOffsetMaxCount/1000.));
+				//log.log(Level.OFF, String.format("pressureOffsetCount = %3d avgOffset = %.3f hPa", get(minCountKey).getCount(), avgOffsetMaxCount/1000.));
 			}
 		}
 		return avgOffsetMaxCount;

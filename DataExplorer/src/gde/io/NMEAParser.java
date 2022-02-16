@@ -70,21 +70,11 @@ public class NMEAParser implements IDataParser {
 	protected String											firmwareVersion           = GDE.STRING_EMPTY;
 	protected ValueEventCollector 				airPressures 							= new ValueEventCollector();
 	protected boolean											isOffsetSet								= false;
-	protected int													sumPressureOffset					= 0;
-	protected int													avgPressureOffset					= 0;
-	protected int													pressureOffsetCount				= 0;
 	protected int													initialPressure						= 0;
 	protected double											rho												= 0;
-	protected int 												avgAirSpeed40							= 0;
-	protected int 												avgPressureDeltaTec40			= 0;
-	protected int													countAvg40 								= 0;
-	protected int 												avgAirSpeed70							= 0;
-	protected int 												avgPressureDeltaTec70			= 0;
-	protected int													countAvg70 								= 0;
-	protected int 												avgAirSpeedDp1						= 0;
-	protected int 												avgPressureDeltaTecDp1		= 0;
-	protected int													countAvgDp1 							= 0;
-
+	protected ValueCollector							vcAirSpeed40;
+	protected ValueCollector							vcAirSpeedDp1;
+	protected ValueCollector							vcAirSpeed70;
 	
 	protected int													recordSetNumberOffset			= 0;
 	protected int													timeResetCounter					= 0;
@@ -130,7 +120,12 @@ public class NMEAParser implements IDataParser {
 		this.deviceName = this.device.getName();
 		this.channelConfigNumber = useChannelConfigNumber;
 		this.timeOffsetUTC = useTimeOffsetUTC;
-		this.sumPressureOffset	= 0;
+		if (this.device.getName().endsWith("Logger3")) {
+			vcAirSpeed40 = new ValueCollector();
+			vcAirSpeedDp1 = new ValueCollector();
+			vcAirSpeed70 = new ValueCollector();
+			
+		}
 	}
 	
 	/**
@@ -1322,7 +1317,7 @@ public class NMEAParser implements IDataParser {
 		//this.values[20] = noise level;
 		//this.values[21] = Impulse;
 		
-		if (strValues.length > 6) {
+		if (strValues.length > 6) { //GPS-Logger3
 			//this.values[22] = Airspeed [km/h];
 			//this.values[23] = static Airpressure [hPa];
 			//this.values[24] = Airpressure TEK [hPa];
@@ -1353,23 +1348,15 @@ public class NMEAParser implements IDataParser {
 			}
 			//build sum of AirSpeed values between 39,5 and 40,5 km/h as well as sum of matching ∆TEC pressure
 			if (this.values[22] >= 39500 && this.values[22] <= 40500) {
-				avgAirSpeed40 += this.values[22];
-				avgPressureDeltaTec40 += this.values[24];
-				countAvg40 += 1;
-				//log.log(Level.OFF, String.format("presOffset=%.3f AirSpeed=%.2f PresDeltaTec=%.2f countAvg40=%d sumAirSpeed40=%.2f sumPresDeltaTec40=%.2f", 
-				//		this.sumPressureOffset/this.pressureOffsetCount/1000., this.values[22]/1000., this.values[24]/1000., countAvg40, avgAirSpeed40/1000., avgPressureDeltaTec40/1000.));
+				vcAirSpeed40.add(this.values[22], this.values[24]);
 			}
 			//build sum of ∆TEC pressure values between 0,95 and 1,05 km/h as well as sum of matching ∆TEC pressure
 			if (this.values[24] >= 950 && this.values[24] <= 1050) {
-				avgAirSpeedDp1 += this.values[22];
-				avgPressureDeltaTecDp1 += this.values[24];
-				countAvgDp1 += 1;
+				vcAirSpeedDp1.add(this.values[22], this.values[24]);
 			}
 			//build sum of AirSpeed values between 69,5 and 70,5 km/h as well as sum of matching ∆TEC pressure
 			if (this.values[22] >= 69500 && this.values[22] <= 70500) {
-				avgAirSpeed70 += this.values[22];
-				avgPressureDeltaTec70 += this.values[24];
-				countAvg70 += 1;
+				vcAirSpeed70.add(this.values[22], this.values[24]);
 			}
 			//this.values[25] = Vario TEK [m/s];
 		}

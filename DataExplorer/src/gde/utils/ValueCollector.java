@@ -19,35 +19,35 @@
 package gde.utils;
 
 /**
- * this class collect values to enable average calculation of the value difference (offset)
+ * this class collect values to enable average calculation of the value difference (offset) or average of both collected values
  */
 public class ValueCollector {
 	int count = 0;
-	int sumStaticPressure = 0;
-	int sumTecPressure = 0;
+	int sumValueA = 0;
+	int sumValueB = 0;
 	
 	public ValueCollector() {};
 	
 	/**
 	 * initialize class while initializing count and the two pressure values
-	 * @param staticPressure the static pressure value times 1000 according GDE data model
-	 * @param tecPressure the TEC tube pressure value times 1000 according GDE data model
+	 * @param valueA a value times 1000 according GDE data model, as example static pressure
+	 * @param valueB a value times 1000 according GDE data model, as example TEC pressure
 	 */
-	public ValueCollector(int staticPressure, int tecPressure) {
+	public ValueCollector(int valueA, int valueB) {
 		count = 1;
-		sumStaticPressure = staticPressure;
-		sumTecPressure = tecPressure;			
+		sumValueA = valueA;
+		sumValueB = valueB;			
 	}
 	
 	/**
 	 * add up count and the two given pressure values
-	 * @param staticPressure the static pressure value times 1000 according GDE data model
-	 * @param tecPressure the TEC tube pressure value times 1000 according GDE data model
+	 * @param valueA as example static pressure value times 1000 according GDE data model
+	 * @param valueB as example TEC tube pressure value times 1000 according GDE data model
 	 */
-	public void add(int staticPressure, int tecPressure) {
+	public void add(int valueA, int valueB) {
 		count += 1;
-		sumStaticPressure += staticPressure;
-		sumTecPressure += tecPressure;			
+		sumValueA += valueA;
+		sumValueB += valueB;			
 	}
 	
 	/**
@@ -58,10 +58,24 @@ public class ValueCollector {
 	}
 	
 	/**
-	 * @return offset average of collected pressure values
+	 * @return offset average of collected values A - values B divided by count
 	 */
 	public int getAvgOffset() {
-		return (sumStaticPressure - sumTecPressure) / count;
+		return count > 0 ? (sumValueA - sumValueB) / count : 0;
+	}
+	
+	/**
+	 * @return average of counted values A
+	 */
+	public int getAvgValuesA() {
+		return count > 0 ? sumValueA / count : 0;
+	}
+	
+	/**
+	 * @return average of counted values B
+	 */
+	public int getAvgValuesB() {
+		return count > 0 ? sumValueB / count : 0;
 	}
 }
 
