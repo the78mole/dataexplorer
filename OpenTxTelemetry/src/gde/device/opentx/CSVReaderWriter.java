@@ -460,7 +460,7 @@ public class CSVReaderWriter {
 					activeChannel.remove(recordSetName);
 					if (createdRecordSets.contains(recordSetName))
 						createdRecordSets.remove(recordSetName);
-					//application.openMessageDialogAsync("recordSet removed, number of measurements " + recordSet.get(0).size() + " < 100");
+					log.log(Level.WARNING, "recordSet removed, number of measurements " + recordSet.get(0).size() + " < 100");
 				}
 
 				if (GDE.isWithUi() && createdRecordSets.size() > 0) 
