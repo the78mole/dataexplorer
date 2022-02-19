@@ -19,7 +19,7 @@
 package gde.utils;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import gde.log.Level;
@@ -30,7 +30,7 @@ import gde.log.Level;
  * the maximal count can be queried whenever required
  *
  */
-public class ValueEventCollector extends HashMap<Integer, ValueCollector> {
+public class ValueEventCollector extends TreeMap<Integer, ValueCollector> {
 	private static final Logger	log								= Logger.getLogger(ValueEventCollector.class.getName());
 	private static final long		serialVersionUID	= 1L;
 	public final static String	LF								= System.getProperty("line.separator");
@@ -61,6 +61,7 @@ public class ValueEventCollector extends HashMap<Integer, ValueCollector> {
 	 */
 	public int getAvgDiffMaxCount() {
 		if (avgOffsetMaxCount == Integer.MIN_VALUE) {
+			maxCount = Integer.MIN_VALUE;
 			int maxCountKey = 0;
 			for (int key : this.keySet()) {
 				if (get(key).getCount() > maxCount) {
@@ -82,6 +83,7 @@ public class ValueEventCollector extends HashMap<Integer, ValueCollector> {
 	 */
 	public int getAvgDiffMinCount() {
 		if (avgOffsetMinCount == Integer.MAX_VALUE) {
+			minCount = Integer.MAX_VALUE;
 			int minCountKey = 0;
 			for (int key : this.keySet()) {
 				if (get(key).getCount() < minCount) {
@@ -140,11 +142,12 @@ public class ValueEventCollector extends HashMap<Integer, ValueCollector> {
 
 	@Override
 	public String toString() {
-		return new StringBuffer(getClass().getSimpleName()).append(": ").append(size()).append(" entries, ").append("max.count=").append(getMaxEntryCount()).append(", min.count=")
-				.append(getMinEntryCount()).append(", avg.offset@max.count=").append(getAvgDiffMaxCount()).append(", avg.offset@min.count=").append(getAvgDiffMinCount()).toString();
+		return new StringBuffer(getClass().getSimpleName()).append(": ").append(size()).append(" entries, ")
+				.append("max.count=").append(getMaxEntryCount()).append(", min.count=").append(getMinEntryCount())
+				.append(", avg.offset@max.count=").append(getAvgDiffMaxCount()).append(", avg.offset@min.count=").append(getAvgDiffMinCount()).toString();
 	}
 
-	String listPressures() {
+	public String listValues() {
 		StringBuffer sb = new StringBuffer("number of value entries=").append(size()).append(LF);
 		// sort by static pressure first
 		int[] arKeys = new int[size()];
@@ -179,6 +182,6 @@ public class ValueEventCollector extends HashMap<Integer, ValueCollector> {
 		}
 		// dump result
 		log.log(Level.OFF, vec.toString());
-		log.log(Level.OFF, vec.listPressures());
+		log.log(Level.OFF, vec.listValues());
 	}
 }
