@@ -62,7 +62,7 @@ public class SetupReaderWriter {
 
 	//$SETUP,192 Byte*
 	int									serialNumber								= 357;																									// 1
-	short								datarate										= 0;																										// 2 0 = 10Hz, 1 = 5Hz, 2 = 2Hz, 1 = 1Hz
+	short								datarate										= 0;																										// 2 0 = 10Hz, 1 = 5Hz, 2 = 2Hz, 3 = 1Hz
 	short								startModus									= 1;																										// 3 0 = „manuell“, 1 = „3D-Fix“, 2 = „ >20 m“, 3 = „>20 km/h“
 	short								timeZone										= 2;																										// 4 -12 --> +12 step 1
 	short								units												= 0;																										// 5
